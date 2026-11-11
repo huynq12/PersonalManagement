@@ -6,8 +6,8 @@ use axum::{
     body::Body,
     http::{Request, StatusCode},
 };
-use backend::{AppState, app};
 use http_body_util::BodyExt;
+use personal_management_api::{AppState, app};
 use serde_json::Value;
 use sqlx::PgPool;
 use tower::ServiceExt;

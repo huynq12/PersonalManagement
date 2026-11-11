@@ -78,7 +78,7 @@ describe('HomePage', () => {
   it('switches the whole page to Vietnamese from the language switcher', async () => {
     vi.stubGlobal('fetch', async () => jsonResponse(200, { status: 'ok', database: 'ok' }))
     renderHomePage()
-    await screen.findByRole('heading', { name: 'Personal Manager' })
+    await screen.findByRole('heading', { name: 'Personal Management' })
 
     await userEvent.selectOptions(screen.getByLabelText('Language'), 'vi')
 

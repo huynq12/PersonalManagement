@@ -3,12 +3,12 @@
 use std::net::{Ipv4Addr, SocketAddr};
 
 use anyhow::Context;
-use backend::{AppState, app, config::Config};
+use personal_management_api::{AppState, app, config::Config};
 use sqlx::postgres::PgPoolOptions;
 use tracing_subscriber::EnvFilter;
 
 const MAX_DB_CONNECTIONS: u32 = 5;
-const DEFAULT_LOG_FILTER: &str = "backend=debug,tower_http=debug,info";
+const DEFAULT_LOG_FILTER: &str = "personal_management_api=debug,tower_http=debug,info";
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

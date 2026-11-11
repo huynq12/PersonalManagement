@@ -1,6 +1,6 @@
 # Project guide for AI coding agents
 
-Personal management web app (daily checklist, weekly meal plan, Pomodoro study timer, weekly stats).
+PersonalManagement: a personal management web app (daily checklist, weekly meal plan, Pomodoro study timer, weekly stats).
 The owner builds it primarily to learn, so prefer clear, idiomatic code over clever shortcuts.
 
 `SPEC.md` is the source of truth for features, data model, and API.

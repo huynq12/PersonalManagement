@@ -1,4 +1,6 @@
 # PostgreSQL for local development only. Not for production.
+name: personal-management
+
 services:
   db:
     image: postgres:17
