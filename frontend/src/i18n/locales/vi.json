@@ -1,0 +1,25 @@
+{
+  "app": {
+    "title": "Quản lý cá nhân"
+  },
+  "language": {
+    "label": "Ngôn ngữ",
+    "en": "English",
+    "vi": "Tiếng Việt"
+  },
+  "home": {
+    "intro": "Khung dự án đã sẵn sàng. Các tính năng sẽ được thêm theo SPEC.md.",
+    "backendStatus": "Trạng thái backend",
+    "checking": "Đang kiểm tra…",
+    "healthy": "API và cơ sở dữ liệu đang hoạt động.",
+    "degraded": "API đang chạy nhưng có thành phần gặp sự cố.",
+    "connectionFailed": "Không kết nối được: {{reason}}"
+  },
+  "errors": {
+    "unknown": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+    "network": "Không kết nối được tới máy chủ. Hãy kiểm tra mạng và thử lại.",
+    "not_found": "Không tìm thấy nội dung yêu cầu.",
+    "service_unavailable": "Dịch vụ tạm thời không khả dụng. Vui lòng thử lại sau ít phút.",
+    "internal_error": "Máy chủ gặp sự cố. Vui lòng thử lại sau."
+  }
+}

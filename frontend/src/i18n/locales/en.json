@@ -1,0 +1,25 @@
+{
+  "app": {
+    "title": "Personal Manager"
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "vi": "Tiếng Việt"
+  },
+  "home": {
+    "intro": "The project skeleton is ready. Features will be added following SPEC.md.",
+    "backendStatus": "Backend status",
+    "checking": "Checking…",
+    "healthy": "API and database are running.",
+    "degraded": "The API is running, but something is not healthy.",
+    "connectionFailed": "Could not connect: {{reason}}"
+  },
+  "errors": {
+    "unknown": "Something went wrong. Please try again.",
+    "network": "Could not reach the server. Check your connection and try again.",
+    "not_found": "The requested item was not found.",
+    "service_unavailable": "The service is temporarily unavailable. Please try again shortly.",
+    "internal_error": "The server ran into a problem. Please try again later."
+  }
+}
