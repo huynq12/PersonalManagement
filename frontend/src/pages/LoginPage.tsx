@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useSearchParams } from 'react-router'
 import AuthLayout from '../components/AuthLayout'
+import GoogleIcon from '../components/GoogleIcon'
 import Alert from '../components/ui/Alert'
 import Button from '../components/ui/Button'
 import { BUTTON_CLASSES } from '../components/ui/buttonClasses'
@@ -59,7 +60,18 @@ export default function LoginPage() {
     message ? t(message as ValidationMessageKey) : undefined
 
   return (
-    <AuthLayout title={t('auth.login.title')}>
+    <AuthLayout
+      title={t('auth.login.title')}
+      description={t('auth.login.description')}
+      footer={
+        <>
+          {t('auth.login.noAccount')}{' '}
+          <Link className="font-medium text-foreground underline underline-offset-4" to="/register">
+            {t('auth.login.registerLink')}
+          </Link>
+        </>
+      }
+    >
       {errorKey ? (
         <Alert variant="error">{t(errorKey)}</Alert>
       ) : registeredEmail ? (
@@ -86,19 +98,17 @@ export default function LoginPage() {
         </Button>
       </form>
 
-      <p className="text-center text-sm text-slate-500 dark:text-slate-400">{t('auth.or')}</p>
+      <div className="flex items-center gap-3">
+        <span className="h-px flex-1 bg-border" />
+        <span className="text-xs tracking-wide text-muted-foreground uppercase">{t('auth.or')}</span>
+        <span className="h-px flex-1 bg-border" />
+      </div>
 
       {/* A plain link: Google sign-in is a full page navigation through the backend. */}
       <a className={BUTTON_CLASSES.secondary} href={googleSignInUrl(i18n.resolvedLanguage ?? 'en')}>
+        <GoogleIcon />
         {t('auth.google')}
       </a>
-
-      <p className="text-center text-sm">
-        {t('auth.login.noAccount')}{' '}
-        <Link className="font-medium text-indigo-600 underline dark:text-indigo-400" to="/register">
-          {t('auth.login.registerLink')}
-        </Link>
-      </p>
     </AuthLayout>
   )
 }

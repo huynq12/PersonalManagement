@@ -1,6 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { cleanup, render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import i18n from '../i18n/i18n'
 import viLocale from '../i18n/locales/vi.json'
@@ -75,15 +74,14 @@ describe('HomePage', () => {
     expect(await screen.findByText(/Could not reach the server/)).toBeTruthy()
   })
 
-  it('switches the whole page to Vietnamese from the language switcher', async () => {
+  it('shows the date in the active language', async () => {
     vi.stubGlobal('fetch', async () => jsonResponse(200, { status: 'ok', database: 'ok' }))
+    await i18n.changeLanguage('vi')
+    const expected = new Intl.DateTimeFormat('vi', { dateStyle: 'full' }).format(new Date())
+
     renderHomePage()
-    await screen.findByRole('heading', { name: 'Personal Management' })
 
-    await userEvent.selectOptions(screen.getByLabelText('Language'), 'vi')
-
-    expect(await screen.findByRole('heading', { name: viLocale.app.title })).toBeTruthy()
-    expect(document.documentElement.lang).toBe('vi')
-    expect(document.title).toBe(viLocale.app.title)
+    expect(await screen.findByRole('heading', { name: viLocale.home.title })).toBeTruthy()
+    expect(screen.getByText(expected)).toBeTruthy()
   })
 })

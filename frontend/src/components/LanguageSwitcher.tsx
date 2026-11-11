@@ -1,17 +1,17 @@
 import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SUPPORTED_LANGUAGES } from '../i18n/i18n'
+import Select from './ui/Select'
 
 export default function LanguageSwitcher() {
   const { t, i18n } = useTranslation()
   const selectId = useId()
 
   return (
-    <div className="flex items-center gap-2 text-sm">
+    <div className="flex items-center justify-between gap-2 text-sm">
       <label htmlFor={selectId}>{t('language.label')}</label>
-      <select
+      <Select
         id={selectId}
-        className="rounded-md border border-slate-300 bg-white px-2 py-1 dark:border-slate-700 dark:bg-slate-900"
         value={i18n.resolvedLanguage}
         onChange={(event) => void i18n.changeLanguage(event.target.value)}
       >
@@ -20,7 +20,7 @@ export default function LanguageSwitcher() {
             {t(`language.${language}`)}
           </option>
         ))}
-      </select>
+      </Select>
     </div>
   )
 }

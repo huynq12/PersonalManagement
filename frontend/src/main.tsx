@@ -5,7 +5,11 @@ import { BrowserRouter } from 'react-router'
 import App from './App.tsx'
 import './i18n/i18n'
 import { installSessionRefresh } from './lib/auth'
+import { initTheme } from './lib/theme'
 import './index.css'
+
+// Before the first render, so the page does not flash in the wrong theme.
+initTheme()
 
 const queryClient = new QueryClient()
 // Lets API calls recover from an expired access token by refreshing the session.

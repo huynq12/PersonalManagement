@@ -1,36 +1,41 @@
 import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import LanguageSwitcher from '../components/LanguageSwitcher'
 import { errorMessageKey } from '../i18n/errorMessage'
 import { getHealth } from '../lib/api'
 
-const STATUS_OK_CLASSES = 'text-green-700 dark:text-green-400'
-const STATUS_ERROR_CLASSES = 'text-red-700 dark:text-red-400'
+const STATUS_OK_CLASSES = 'text-success'
+const STATUS_ERROR_CLASSES = 'text-destructive'
 
+/** The Today screen. Its cards arrive with the checklist, meal plan, and Pomodoro features. */
 export default function HomePage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const health = useQuery({ queryKey: ['health'], queryFn: getHealth })
+  // Read the clock once per visit; the date picker (SPEC.md, Today) will replace this.
+  const [now] = useState(() => new Date())
+
+  const today = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: 'full' }).format(now)
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-4 px-4 py-8">
-      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-        <h1 className="text-2xl font-semibold">{t('app.title')}</h1>
-        <LanguageSwitcher />
+    <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 md:px-8 md:py-8">
+      <header className="flex flex-col gap-1">
+        <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">{t('home.title')}</h1>
+        <p className="text-sm text-muted-foreground">{today}</p>
       </header>
-      <p>{t('home.intro')}</p>
+      <p className="text-sm">{t('home.intro')}</p>
 
-      <section className="rounded-xl border border-slate-200 bg-white px-5 py-4 dark:border-slate-800 dark:bg-slate-900">
-        <h2 className="mb-2 text-lg font-medium">{t('home.backendStatus')}</h2>
+      <section className="flex flex-col gap-2 rounded-xl border border-border p-5">
+        <h2 className="text-base font-semibold">{t('home.backendStatus')}</h2>
         {health.isPending ? (
-          <p>{t('home.checking')}</p>
+          <p className="text-sm text-muted-foreground">{t('home.checking')}</p>
         ) : health.isError ? (
-          <p className={STATUS_ERROR_CLASSES} role="alert">
+          <p className={`text-sm ${STATUS_ERROR_CLASSES}`} role="alert">
             {t('home.connectionFailed', { reason: t(errorMessageKey(health.error)) })}
           </p>
         ) : health.data.status === 'ok' && health.data.database === 'ok' ? (
-          <p className={STATUS_OK_CLASSES}>{t('home.healthy')}</p>
+          <p className={`text-sm ${STATUS_OK_CLASSES}`}>{t('home.healthy')}</p>
         ) : (
-          <p className={STATUS_ERROR_CLASSES}>{t('home.degraded')}</p>
+          <p className={`text-sm ${STATUS_ERROR_CLASSES}`}>{t('home.degraded')}</p>
         )}
       </section>
     </main>

@@ -1,25 +1,28 @@
-import { useTranslation } from 'react-i18next'
 import { Outlet } from 'react-router'
-import { useLogout, useSession } from '../hooks/useSession'
-import Button from './ui/Button'
+import BrandMark from './BrandMark'
+import BottomNav from './layout/BottomNav'
+import Sidebar from './layout/Sidebar'
 
-/** Frame around the signed-in screens: shows who is signed in and the sign-out button. */
+/**
+ * Frame around the signed-in screens: a sidebar on wide screens, and a top bar plus a bottom
+ * tab bar on phones (SPEC.md, Screens).
+ */
 export default function AppLayout() {
-  const { t } = useTranslation()
-  const session = useSession()
-  const logout = useLogout()
-
   return (
-    <>
-      <div className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-        <div className="mx-auto flex max-w-2xl flex-wrap items-center justify-end gap-3 px-4 py-2 text-sm">
-          <span>{session.data?.display_name}</span>
-          <Button variant="secondary" disabled={logout.isPending} onClick={() => logout.mutate()}>
-            {t('auth.logout')}
-          </Button>
+    <div className="flex min-h-dvh">
+      <Sidebar />
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="flex h-14 items-center border-b border-border px-4 md:hidden">
+          <BrandMark withName />
+        </header>
+        {/* Bottom padding keeps the last content clear of the phone bottom bar. */}
+        <div className="flex-1 pb-24 md:pb-0">
+          <Outlet />
         </div>
       </div>
-      <Outlet />
-    </>
+
+      <BottomNav />
+    </div>
   )
 }

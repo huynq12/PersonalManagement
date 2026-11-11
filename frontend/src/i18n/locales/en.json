@@ -7,7 +7,39 @@
     "en": "English",
     "vi": "Tiếng Việt"
   },
+  "theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "today": "Today",
+    "stats": "Weekly stats",
+    "habits": "Habits",
+    "pomodoro": "Pomodoro",
+    "subjects": "Subjects",
+    "mealPlan": "Weekly meal plan",
+    "mealPlanShort": "Meals",
+    "dishes": "Dishes",
+    "shoppingList": "Shopping list",
+    "settings": "Settings",
+    "more": "More",
+    "moreTitle": "All features",
+    "close": "Close",
+    "groups": {
+      "overview": "Overview",
+      "checklist": "Checklist",
+      "study": "Study",
+      "meals": "Meals"
+    }
+  },
+  "comingSoon": {
+    "description": "This feature is not built yet."
+  },
   "home": {
+    "title": "Today",
     "intro": "The project skeleton is ready. Features will be added following SPEC.md.",
     "backendStatus": "Backend status",
     "checking": "Checking…",
@@ -18,12 +50,14 @@
   "auth": {
     "login": {
       "title": "Sign in",
+      "description": "Enter your email and password to continue.",
       "submit": "Sign in",
       "noAccount": "No account yet?",
       "registerLink": "Create one"
     },
     "register": {
       "title": "Create account",
+      "description": "Create an account to get started.",
       "submit": "Create account",
       "haveAccount": "Already have an account?",
       "loginLink": "Sign in",

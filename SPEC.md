@@ -72,6 +72,7 @@ The backend is organized by feature: each feature is a directory under `backend/
 - **Linking Google:** if a Google email matches an existing password account, the accounts are **not merged automatically** (emails registered with a password are unverified). The user signs in with the password and links Google from Settings.
 - **Authorization:** every query filters by the `user_id` taken from the token; accessing another user's resource returns 404.
 - **Errors:** a single JSON shape, `{ "error": { "code", "message", "details?" } }`. `code` is a stable snake_case identifier; `message` is an English, developer-facing description that is never shown to users.
+- **Theme:** light, dark, or system (the default, which follows the operating system and its changes). The choice is stored in `localStorage` only and applied before the first render as a `dark` class on `<html>`. Colors come from semantic design tokens (shadcn/ui style, zinc palette) defined once for each theme.
 - **Language in the codebase:** comments, logs, error messages, test names, commit messages, and documentation are all English.
 - **Internationalization (i18n):** every string shown to users exists in English and Vietnamese. The backend never returns translated text; the frontend translates by error `code` (i18next) and uses a generic message for unknown codes. The language is chosen in this order: the user's saved choice, the browser language, then English. Dates, numbers, and durations are formatted with `Intl` in the active language.
 
@@ -83,6 +84,7 @@ The backend is organized by feature: each feature is a directory under `backend/
 - U3. As a user, I stay signed in after closing the browser and can sign out when I want.
 - U4. As a user, I change my display name and time zone, and link my Google account.
 - U5. As a visitor or user, I switch the interface between English and Vietnamese; the choice is remembered in the browser and, once signed in, on my account.
+- U6. As a visitor or user, I choose a light, dark, or system theme; the choice is remembered in the browser.
 
 ### Checklist
 - C1. I create a habit and choose the weekdays it applies to (every day by default).
@@ -126,7 +128,11 @@ The backend is organized by feature: each feature is a directory under `backend/
 | 9 | Weekly statistics | `/stats` | Week picker; study time charts per day and subject; checklist rate; streaks; comparison with the previous week |
 | 10 | Settings | `/settings` | Profile, time zone, language, Pomodoro settings, Google linking, sign out |
 
-Layout: a left navigation bar on desktop and a bottom bar on phones. The language switcher is available on every screen, including sign in and register.
+Layout: a left navigation bar on desktop and a bottom bar on phones. The language and theme switchers are available on every screen, including sign in and register.
+
+- Desktop sidebar: the screens grouped as Overview (Today, Weekly statistics), Checklist (Habits), Study (Pomodoro, Subjects), and Meals (Weekly meal plan, Dishes, Shopping list); at the bottom the theme and language switchers, Settings, and the signed-in user with sign out.
+- Phone bottom bar: Today, Habits, Pomodoro, Meal plan, and More. More opens a bottom sheet with the remaining screens, Settings, the switchers, and sign out.
+- A screen with a menu entry that is not built yet shows a placeholder page.
 
 ## 5. Data model
 

@@ -7,7 +7,39 @@
     "en": "English",
     "vi": "Tiếng Việt"
   },
+  "theme": {
+    "label": "Giao diện",
+    "light": "Sáng",
+    "dark": "Tối",
+    "system": "Theo hệ thống"
+  },
+  "nav": {
+    "label": "Điều hướng chính",
+    "today": "Hôm nay",
+    "stats": "Thống kê tuần",
+    "habits": "Thói quen",
+    "pomodoro": "Pomodoro",
+    "subjects": "Môn học",
+    "mealPlan": "Thực đơn tuần",
+    "mealPlanShort": "Thực đơn",
+    "dishes": "Món ăn",
+    "shoppingList": "Danh sách đi chợ",
+    "settings": "Cài đặt",
+    "more": "Thêm",
+    "moreTitle": "Tất cả chức năng",
+    "close": "Đóng",
+    "groups": {
+      "overview": "Tổng quan",
+      "checklist": "Checklist",
+      "study": "Học tập",
+      "meals": "Ăn uống"
+    }
+  },
+  "comingSoon": {
+    "description": "Tính năng này đang được xây dựng."
+  },
   "home": {
+    "title": "Hôm nay",
     "intro": "Khung dự án đã sẵn sàng. Các tính năng sẽ được thêm theo SPEC.md.",
     "backendStatus": "Trạng thái backend",
     "checking": "Đang kiểm tra…",
@@ -18,12 +50,14 @@
   "auth": {
     "login": {
       "title": "Đăng nhập",
+      "description": "Nhập email và mật khẩu để tiếp tục.",
       "submit": "Đăng nhập",
       "noAccount": "Chưa có tài khoản?",
       "registerLink": "Tạo tài khoản"
     },
     "register": {
       "title": "Tạo tài khoản",
+      "description": "Tạo tài khoản để bắt đầu.",
       "submit": "Tạo tài khoản",
       "haveAccount": "Đã có tài khoản?",
       "loginLink": "Đăng nhập",

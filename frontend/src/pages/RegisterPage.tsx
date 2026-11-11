@@ -52,7 +52,18 @@ export default function RegisterPage() {
     message ? t(message as ValidationMessageKey) : undefined
 
   return (
-    <AuthLayout title={t('auth.register.title')}>
+    <AuthLayout
+      title={t('auth.register.title')}
+      description={t('auth.register.description')}
+      footer={
+        <>
+          {t('auth.register.haveAccount')}{' '}
+          <Link className="font-medium text-foreground underline underline-offset-4" to="/login">
+            {t('auth.register.loginLink')}
+          </Link>
+        </>
+      }
+    >
       {registerAccount.isError ? (
         <Alert variant="error">{t(errorMessageKey(registerAccount.error))}</Alert>
       ) : null}
@@ -83,13 +94,6 @@ export default function RegisterPage() {
           {t('auth.register.submit')}
         </Button>
       </form>
-
-      <p className="text-center text-sm">
-        {t('auth.register.haveAccount')}{' '}
-        <Link className="font-medium text-indigo-600 underline dark:text-indigo-400" to="/login">
-          {t('auth.register.loginLink')}
-        </Link>
-      </p>
     </AuthLayout>
   )
 }

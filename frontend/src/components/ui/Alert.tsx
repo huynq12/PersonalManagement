@@ -3,10 +3,8 @@ import type { ReactNode } from 'react'
 type Variant = 'error' | 'success'
 
 const VARIANT_CLASSES: Record<Variant, string> = {
-  error:
-    'border-red-300 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200',
-  success:
-    'border-green-300 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-200',
+  error: 'border-destructive-border bg-destructive-muted text-destructive',
+  success: 'border-success-border bg-success-muted text-success',
 }
 
 interface AlertProps {
