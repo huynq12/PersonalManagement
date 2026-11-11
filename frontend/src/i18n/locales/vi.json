@@ -20,6 +20,16 @@
     "network": "Không kết nối được tới máy chủ. Hãy kiểm tra mạng và thử lại.",
     "not_found": "Không tìm thấy nội dung yêu cầu.",
     "service_unavailable": "Dịch vụ tạm thời không khả dụng. Vui lòng thử lại sau ít phút.",
-    "internal_error": "Máy chủ gặp sự cố. Vui lòng thử lại sau."
+    "internal_error": "Máy chủ gặp sự cố. Vui lòng thử lại sau.",
+    "invalid_request": "Yêu cầu không hợp lệ. Vui lòng thử lại.",
+    "validation_failed": "Một số trường chưa hợp lệ. Vui lòng kiểm tra và thử lại.",
+    "unauthorized": "Vui lòng đăng nhập để tiếp tục.",
+    "invalid_credentials": "Email hoặc mật khẩu không đúng.",
+    "invalid_refresh_token": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+    "email_taken": "Email này đã được đăng ký.",
+    "google_sign_in_failed": "Không thể hoàn tất đăng nhập bằng Google. Vui lòng thử lại.",
+    "google_email_unverified": "Email của tài khoản Google chưa được xác minh. Hãy xác minh với Google rồi thử lại.",
+    "email_already_registered": "Email này đã được đăng ký bằng mật khẩu. Hãy đăng nhập bằng mật khẩu, sau đó liên kết Google trong phần Cài đặt.",
+    "google_account_already_linked": "Tài khoản Google này đã được liên kết với tài khoản khác, hoặc tài khoản của bạn đã liên kết một tài khoản Google."
   }
 }

@@ -26,7 +26,11 @@ jobs:
           --health-timeout 3s
           --health-retries 10
     env:
+      # Used by the tests at run time; `sqlx::test` creates a database per test from it.
       DATABASE_URL: postgres://app:app@localhost:5432/app
+      # Compile the query macros against the committed `.sqlx` metadata instead of a live
+      # database, which has no schema until the tests apply the migrations.
+      SQLX_OFFLINE: "true"
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable

@@ -20,6 +20,16 @@
     "network": "Could not reach the server. Check your connection and try again.",
     "not_found": "The requested item was not found.",
     "service_unavailable": "The service is temporarily unavailable. Please try again shortly.",
-    "internal_error": "The server ran into a problem. Please try again later."
+    "internal_error": "The server ran into a problem. Please try again later.",
+    "invalid_request": "The request could not be understood. Please try again.",
+    "validation_failed": "Some fields are not valid. Please check them and try again.",
+    "unauthorized": "Please sign in to continue.",
+    "invalid_credentials": "Incorrect email or password.",
+    "invalid_refresh_token": "Your session has expired. Please sign in again.",
+    "email_taken": "This email is already registered.",
+    "google_sign_in_failed": "Google sign-in could not be completed. Please try again.",
+    "google_email_unverified": "Your Google account email is not verified. Verify it with Google and try again.",
+    "email_already_registered": "This email is already registered with a password. Sign in with your password, then link Google in Settings.",
+    "google_account_already_linked": "This Google account is linked to another account, or your account already has a Google account linked."
   }
 }

@@ -26,7 +26,7 @@ async fn main() -> anyhow::Result<()> {
 
     let db = PgPoolOptions::new()
         .max_connections(MAX_DB_CONNECTIONS)
-        .connect(&config.database_url)
+        .connect(config.database_url.expose())
         .await
         .context("failed to connect to the database")?;
 
@@ -35,9 +35,9 @@ async fn main() -> anyhow::Result<()> {
         .await
         .context("failed to run database migrations")?;
 
-    let app = app(AppState { db }, &config.cors_origin)?;
-
     let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, config.port));
+    let app = app(AppState::new(db, config)?)?;
+
     let listener = tokio::net::TcpListener::bind(addr)
         .await
         .with_context(|| format!("failed to bind {addr}"))?;

@@ -7,13 +7,14 @@ use axum::{
     http::{Request, StatusCode},
 };
 use http_body_util::BodyExt;
-use personal_management_api::{AppState, app};
 use serde_json::Value;
 use sqlx::PgPool;
 use tower::ServiceExt;
 
+mod common;
+
 async fn get(db: PgPool, uri: &str) -> (StatusCode, Value) {
-    let app = app(AppState { db }, "http://localhost:5173").unwrap();
+    let app = common::app(db);
     let response = app
         .oneshot(Request::get(uri).body(Body::empty()).unwrap())
         .await

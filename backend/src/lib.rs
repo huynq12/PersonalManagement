@@ -1,5 +1,7 @@
 //! Backend for the personal management app: an Axum HTTP API backed by PostgreSQL.
 
+use std::sync::Arc;
+
 use anyhow::Context;
 use axum::{
     Router,
@@ -8,24 +10,56 @@ use axum::{
 use sqlx::PgPool;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 
+use crate::{auth::GoogleClient, config::Config};
+
+pub mod auth;
 pub mod config;
 pub mod error;
-pub mod routes;
+pub mod health;
+pub mod validation;
 
-/// State shared by every handler.
+/// State shared by every handler. Cloning is cheap: the fields are reference counted.
 #[derive(Debug, Clone)]
 pub struct AppState {
     /// PostgreSQL connection pool.
     pub db: PgPool,
+    /// Application settings.
+    pub config: Arc<Config>,
+    /// Google OAuth client; `None` when Google sign-in is not configured.
+    pub google: Option<Arc<GoogleClient>>,
+}
+
+impl AppState {
+    /// Bundles the shared resources handlers need.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the Google OAuth client cannot be initialized.
+    pub fn new(db: PgPool, config: Config) -> anyhow::Result<Self> {
+        let google = config
+            .google
+            .clone()
+            .map(GoogleClient::new)
+            .transpose()?
+            .map(Arc::new);
+
+        Ok(Self {
+            db,
+            config: Arc::new(config),
+            google,
+        })
+    }
 }
 
 /// Builds the whole application. Kept out of `main` so integration tests can call it directly.
 ///
 /// # Errors
 ///
-/// Returns an error if `cors_origin` is not a valid header value.
-pub fn app(state: AppState, cors_origin: &str) -> anyhow::Result<Router> {
-    let origin: HeaderValue = cors_origin
+/// Returns an error if the configured CORS origin is not a valid header value.
+pub fn app(state: AppState) -> anyhow::Result<Router> {
+    let origin: HeaderValue = state
+        .config
+        .cors_origin
         .parse()
         .context("CORS_ORIGIN is not a valid origin")?;
 
@@ -43,8 +77,10 @@ pub fn app(state: AppState, cors_origin: &str) -> anyhow::Result<Router> {
         ])
         .allow_headers([header::AUTHORIZATION, header::CONTENT_TYPE]);
 
+    let api = Router::new().merge(health::router()).merge(auth::router());
+
     Ok(Router::new()
-        .nest("/api/v1", routes::router())
+        .nest("/api/v1", api)
         .fallback(|| async { error::AppError::NotFound })
         .layer(TraceLayer::new_for_http())
         .layer(cors)
