@@ -7,10 +7,11 @@ export default function LanguageSwitcher() {
   const selectId = useId()
 
   return (
-    <div className="language-switcher">
+    <div className="flex items-center gap-2 text-sm">
       <label htmlFor={selectId}>{t('language.label')}</label>
       <select
         id={selectId}
+        className="rounded-md border border-slate-300 bg-white px-2 py-1 dark:border-slate-700 dark:bg-slate-900"
         value={i18n.resolvedLanguage}
         onChange={(event) => void i18n.changeLanguage(event.target.value)}
       >

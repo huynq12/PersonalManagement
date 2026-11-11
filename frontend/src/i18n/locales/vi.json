@@ -15,6 +15,39 @@
     "degraded": "API đang chạy nhưng có thành phần gặp sự cố.",
     "connectionFailed": "Không kết nối được: {{reason}}"
   },
+  "auth": {
+    "login": {
+      "title": "Đăng nhập",
+      "submit": "Đăng nhập",
+      "noAccount": "Chưa có tài khoản?",
+      "registerLink": "Tạo tài khoản"
+    },
+    "register": {
+      "title": "Tạo tài khoản",
+      "submit": "Tạo tài khoản",
+      "haveAccount": "Đã có tài khoản?",
+      "loginLink": "Đăng nhập",
+      "created": "Đã tạo tài khoản. Bạn có thể đăng nhập ngay."
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Mật khẩu",
+      "passwordHint": "Từ 8 đến 128 ký tự.",
+      "displayName": "Tên hiển thị (không bắt buộc)"
+    },
+    "google": "Tiếp tục với Google",
+    "or": "hoặc",
+    "checkingSession": "Đang kiểm tra phiên đăng nhập…",
+    "signingIn": "Đang đăng nhập…",
+    "retry": "Thử lại",
+    "logout": "Đăng xuất"
+  },
+  "validation": {
+    "required": "Trường này là bắt buộc.",
+    "emailInvalid": "Hãy nhập địa chỉ email hợp lệ.",
+    "passwordLength": "Hãy dùng từ 8 đến 128 ký tự.",
+    "displayNameLength": "Hãy dùng tối đa 100 ký tự."
+  },
   "errors": {
     "unknown": "Đã có lỗi xảy ra. Vui lòng thử lại.",
     "network": "Không kết nối được tới máy chủ. Hãy kiểm tra mạng và thử lại.",

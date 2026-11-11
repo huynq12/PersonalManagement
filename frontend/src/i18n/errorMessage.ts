@@ -15,8 +15,14 @@ function isKnownErrorCode(code: string): code is ErrorCode {
  * error `code` selects the localized text, and unknown codes get a generic message.
  */
 export function errorMessageKey(error: unknown): ErrorMessageKey {
-  if (error instanceof ApiError && isKnownErrorCode(error.code)) {
-    return `errors.${error.code}`
-  }
-  return 'errors.unknown'
+  return error instanceof ApiError ? errorCodeMessageKey(error.code) : 'errors.unknown'
+}
+
+/**
+ * Returns the translation key for a bare error code, such as the `?error=` parameter the
+ * backend adds when it redirects back from Google. The code is untrusted input: anything that
+ * is not a known code gets the generic message.
+ */
+export function errorCodeMessageKey(code: string): ErrorMessageKey {
+  return isKnownErrorCode(code) ? `errors.${code}` : 'errors.unknown'
 }

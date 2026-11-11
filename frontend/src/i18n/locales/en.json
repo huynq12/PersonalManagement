@@ -15,6 +15,39 @@
     "degraded": "The API is running, but something is not healthy.",
     "connectionFailed": "Could not connect: {{reason}}"
   },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "submit": "Sign in",
+      "noAccount": "No account yet?",
+      "registerLink": "Create one"
+    },
+    "register": {
+      "title": "Create account",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Sign in",
+      "created": "Account created. You can sign in now."
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "passwordHint": "8 to 128 characters.",
+      "displayName": "Display name (optional)"
+    },
+    "google": "Continue with Google",
+    "or": "or",
+    "checkingSession": "Checking your session…",
+    "signingIn": "Signing you in…",
+    "retry": "Try again",
+    "logout": "Sign out"
+  },
+  "validation": {
+    "required": "This field is required.",
+    "emailInvalid": "Enter a valid email address.",
+    "passwordLength": "Use 8 to 128 characters.",
+    "displayNameLength": "Use at most 100 characters."
+  },
   "errors": {
     "unknown": "Something went wrong. Please try again.",
     "network": "Could not reach the server. Check your connection and try again.",

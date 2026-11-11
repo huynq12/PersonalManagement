@@ -48,7 +48,7 @@ GitHub ── push ──► GitHub Actions: test, build image, deploy
 |---|---|
 | Backend | Rust, Axum, Tokio, SQLx (compile-time checked `query!` macros with committed `.sqlx` offline metadata, migrations), `argon2`, `jsonwebtoken`, `reqwest` (the Google OAuth flow is written by hand on top of it), `utoipa` (OpenAPI), `tracing`, `validator` |
 | Database | PostgreSQL. The running app (development and production) uses a Supabase-hosted database; tests and CI use a disposable PostgreSQL in Docker. Supabase is used only as a PostgreSQL host, not for Supabase Auth or its client libraries. |
-| Frontend | Vite, React, TypeScript, React Router, TanStack Query, Zod, i18next, a chart library (Recharts) |
+| Frontend | Vite, React, TypeScript, React Router, TanStack Query, Zod, React Hook Form, Tailwind CSS, i18next, a chart library (Recharts) |
 | Operations | Docker multi-stage builds, GitHub Actions |
 | Hosting (free) | Frontend: Cloudflare Pages or Vercel. Backend: Render or Koyeb. Database: Supabase. Free-tier terms must be re-checked at deployment time. |
 
@@ -63,6 +63,7 @@ The backend is organized by feature: each feature is a directory under `backend/
 - **Dates and time zones:** each user has a `timezone` field (default `Asia/Ho_Chi_Minh`). Every notion of a "day" (checklist, statistics) is the calendar date in that time zone. Instants are stored as `timestamptz` (UTC).
 - **Weeks:** start on Monday. `weekday` is numbered 1 (Monday) to 7 (Sunday).
 - **Auth:** a short-lived JWT access token (15 minutes) sent in the `Authorization` header; a long-lived random refresh token (30 days) stored in an `httpOnly`, `Secure` cookie, rotated on every refresh, with only its hash stored in the database.
+- **Tokens in the browser:** the access token is kept in memory only, never in `localStorage`. On page load the frontend calls `/auth/refresh` to restore the session from the refresh cookie, and it repeats that call once when the API answers 401 `unauthorized`. Refresh calls never overlap, within a tab or across tabs, because a reused refresh token revokes the session.
 - **Access token signing:** HS256 with a symmetric secret read from the `JWT_SECRET` environment variable.
 - **Refresh token reuse:** every sign-in starts a token family. Presenting a refresh token that was already rotated is treated as theft: the request gets 401 and every token in that family is revoked. Other sign-ins (other devices) are not affected.
 - **Passwords:** 8 to 128 characters with no composition rules (NIST SP 800-63B), hashed with Argon2id.
