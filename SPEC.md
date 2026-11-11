@@ -36,7 +36,7 @@ Status: draft v1. Date: 2026-11-11.
                                ▼
                         ┌──────────────┐
                         │ PostgreSQL   │
-                        │ Neon/Supabase│
+                        │ Supabase     │
                         └──────────────┘
 
 GitHub ── push ──► GitHub Actions: test, build image, deploy
@@ -46,21 +46,28 @@ GitHub ── push ──► GitHub Actions: test, build image, deploy
 
 | Part | Choice |
 |---|---|
-| Backend | Rust, Axum, Tokio, SQLx (compile-time checked queries, migrations), `argon2`, `jsonwebtoken`, `oauth2`, `utoipa` (OpenAPI), `tracing`, `validator` |
-| Database | PostgreSQL |
+| Backend | Rust, Axum, Tokio, SQLx (compile-time checked `query!` macros with committed `.sqlx` offline metadata, migrations), `argon2`, `jsonwebtoken`, `reqwest` (the Google OAuth flow is written by hand on top of it), `utoipa` (OpenAPI), `tracing`, `validator` |
+| Database | PostgreSQL. The running app (development and production) uses a Supabase-hosted database; tests and CI use a disposable PostgreSQL in Docker. Supabase is used only as a PostgreSQL host, not for Supabase Auth or its client libraries. |
 | Frontend | Vite, React, TypeScript, React Router, TanStack Query, Zod, i18next, a chart library (Recharts) |
 | Operations | Docker multi-stage builds, GitHub Actions |
-| Hosting (free) | Frontend: Cloudflare Pages or Vercel. Backend: Render or Koyeb. Database: Neon or Supabase. Free-tier terms must be re-checked at deployment time. |
+| Hosting (free) | Frontend: Cloudflare Pages or Vercel. Backend: Render or Koyeb. Database: Supabase. Free-tier terms must be re-checked at deployment time. |
 
 ### Repository layout
 
 Monorepo: `backend/`, `frontend/`, `.github/workflows/`.
+
+The backend is organized by feature: each feature is a directory under `backend/src/` (`auth/`, `health/`, later `habits/`, ...) holding its own router, handlers, service, repository, and models.
 
 ### Cross-cutting decisions
 
 - **Dates and time zones:** each user has a `timezone` field (default `Asia/Ho_Chi_Minh`). Every notion of a "day" (checklist, statistics) is the calendar date in that time zone. Instants are stored as `timestamptz` (UTC).
 - **Weeks:** start on Monday. `weekday` is numbered 1 (Monday) to 7 (Sunday).
 - **Auth:** a short-lived JWT access token (15 minutes) sent in the `Authorization` header; a long-lived random refresh token (30 days) stored in an `httpOnly`, `Secure` cookie, rotated on every refresh, with only its hash stored in the database.
+- **Access token signing:** HS256 with a symmetric secret read from the `JWT_SECRET` environment variable.
+- **Refresh token reuse:** every sign-in starts a token family. Presenting a refresh token that was already rotated is treated as theft: the request gets 401 and every token in that family is revoked. Other sign-ins (other devices) are not affected.
+- **Passwords:** 8 to 128 characters with no composition rules (NIST SP 800-63B), hashed with Argon2id.
+- **Registration:** creates the account without signing in; the user then signs in with the new credentials.
+- **Google sign-in flow:** authorization code flow with PKCE, `state`, and `nonce`. These values travel in a signed, `httpOnly` cookie that lives 10 minutes; nothing is stored in the database. The backend exchanges the code, then verifies the Google ID token (signature against Google's JWKS, issuer, audience, expiry, nonce) and requires a verified email. On success it sets the refresh cookie and redirects to the frontend route `/auth/callback`, which calls `/auth/refresh` to obtain an access token; no token ever appears in a URL. Failures redirect to `/login?error=<code>` (or `/settings?error=<code>` when linking).
 - **Linking Google:** if a Google email matches an existing password account, the accounts are **not merged automatically** (emails registered with a password are unverified). The user signs in with the password and links Google from Settings.
 - **Authorization:** every query filters by the `user_id` taken from the token; accessing another user's resource returns 404.
 - **Errors:** a single JSON shape, `{ "error": { "code", "message", "details?" } }`. `code` is a stable snake_case identifier; `message` is an English, developer-facing description that is never shown to users.
@@ -147,6 +154,7 @@ Every table has `id uuid` (primary key) and `created_at timestamptz` unless note
 |---|---|---|
 | user_id | uuid | |
 | token_hash | text | unique |
+| family_id | uuid | shared by all tokens rotated from one sign-in; index |
 | expires_at | timestamptz | |
 | revoked_at | timestamptz null | |
 
@@ -258,13 +266,13 @@ Prefix `/api/v1`. Every endpoint requires an access token except the public Auth
 ### Auth and account
 | Method | Path | Description |
 |---|---|---|
-| POST | `/auth/register` | Register with email and password |
+| POST | `/auth/register` | Register with email and password; returns the new user without signing in |
 | POST | `/auth/login` | Sign in; returns an access token and sets the refresh cookie |
-| POST | `/auth/refresh` | Rotate the refresh token and issue a new access token |
+| POST | `/auth/refresh` | Rotate the refresh token and issue a new access token; reusing a rotated token revokes its family |
 | POST | `/auth/logout` | Revoke the current refresh token |
 | GET | `/auth/google` | Redirect to Google (with `state` and PKCE) |
 | GET | `/auth/google/callback` | Handle the callback; sign in or create an account |
-| POST | `/auth/google/link` | Start linking Google to the signed-in account |
+| POST | `/auth/google/link` | Start linking Google to the signed-in account; returns the Google authorization URL for the browser to open |
 | GET | `/me` | Current user |
 | PATCH | `/me` | Update display name, time zone, language |
 | GET | `/settings` | Pomodoro settings |
@@ -339,9 +347,9 @@ Prefix `/api/v1`. Every endpoint requires an access token except the public Auth
 ## 8. Suggested roadmap
 
 1. Project skeleton: monorepo, Axum + SQLx + migrations, Docker Compose for local Postgres, CI running tests.
-2. Email + password auth, sign-in and registration screens.
+2. Auth: email + password first, then Google OAuth (sign-in and linking) on the backend; then the sign-in and registration screens. The app connects to Supabase from this step on.
 3. Checklist (habits, to-dos, Today screen).
 4. Pomodoro (subjects, sessions, settings).
 5. Meal plan (ingredients, dishes, weekly template, shopping list).
 6. Weekly statistics.
-7. Google OAuth, OpenAPI, deployment.
+7. OpenAPI, deployment.
