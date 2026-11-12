@@ -190,6 +190,8 @@
     "google_email_unverified": "Your Google account email is not verified. Verify it with Google and try again.",
     "email_already_registered": "This email is already registered with a password. Sign in with your password, then link Google in Settings.",
     "google_account_already_linked": "This Google account is linked to another account, or your account already has a Google account linked.",
-    "subject_name_taken": "You already have a subject with this name."
+    "subject_name_taken": "You already have a subject with this name.",
+    "study_session_already_running": "A study session is already running. Finish or cancel it first.",
+    "study_session_not_running": "This study session has already ended."
   }
 }

@@ -1,0 +1,67 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE study_sessions\n        SET status = CASE WHEN $3 THEN 'completed' ELSE 'cancelled' END,\n            ended_at = $4,\n            duration_seconds = CASE WHEN $3 THEN\n                LEAST(\n                    GREATEST(floor(EXTRACT(EPOCH FROM ($4 - started_at)))::integer, 0),\n                    planned_minutes * 60\n                )\n            END\n        WHERE id = $2 AND user_id = $1 AND status = 'running'\n        RETURNING id, subject_id, status, planned_minutes, started_at, ended_at,\n                  duration_seconds, local_date\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "subject_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "planned_minutes",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 4,
+        "name": "started_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "ended_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "duration_seconds",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "local_date",
+        "type_info": "Date"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Bool",
+        "Timestamptz"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "bd4a825658e1c007ac38b27ba22bdc13f4e001b3f9c6495894e06addabb366b6"
+}

@@ -307,11 +307,11 @@ Prefix `/api/v1`. Every endpoint requires an access token except the public Auth
 | POST | `/subjects` | Create |
 | PATCH | `/subjects/{id}` | Update, archive |
 | DELETE | `/subjects/{id}` | Delete (past sessions are kept without a subject) |
-| POST | `/study-sessions` | Start a session; 409 if one is already running |
+| POST | `/study-sessions` | Start a session. Body: optional `subject_id` (an active subject of the user) and optional `planned_minutes` (1 to 180; defaults to the user's `focus_minutes` setting). 409 `study_session_already_running` if one is already running. |
 | GET | `/study-sessions/current` | The running session (to restore the timer); 204 if none |
-| POST | `/study-sessions/{id}/complete` | Finish; the server computes the duration |
-| POST | `/study-sessions/{id}/cancel` | Cancel |
-| GET | `/study-sessions?from=&to=` | Session history |
+| POST | `/study-sessions/{id}/complete` | Finish; the server computes the duration as the time elapsed, capped at `planned_minutes × 60` (finishing early is allowed). 409 `study_session_not_running` if it already ended. |
+| POST | `/study-sessions/{id}/cancel` | Cancel (no duration is stored); 409 `study_session_not_running` if it already ended |
+| GET | `/study-sessions?from=&to=` | Sessions of every status whose `local_date` is in the inclusive range, newest first; both dates are required |
 | DELETE | `/study-sessions/{id}` | Delete a session |
 
 ### Meal plan

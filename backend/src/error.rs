@@ -55,6 +55,12 @@ pub enum AppError {
     /// Another subject of the same user already has this name, ignoring case.
     #[error("subject name is already in use")]
     SubjectNameTaken,
+    /// The user already has a running study session.
+    #[error("a study session is already running")]
+    StudySessionAlreadyRunning,
+    /// The study session was already completed or cancelled.
+    #[error("study session is not running")]
+    StudySessionNotRunning,
     /// A dependency such as the database is unreachable.
     #[error("service temporarily unavailable")]
     ServiceUnavailable,
@@ -89,6 +95,10 @@ impl AppError {
                 (StatusCode::CONFLICT, "google_account_already_linked")
             }
             Self::SubjectNameTaken => (StatusCode::CONFLICT, "subject_name_taken"),
+            Self::StudySessionAlreadyRunning => {
+                (StatusCode::CONFLICT, "study_session_already_running")
+            }
+            Self::StudySessionNotRunning => (StatusCode::CONFLICT, "study_session_not_running"),
             Self::ServiceUnavailable => (StatusCode::SERVICE_UNAVAILABLE, "service_unavailable"),
             Self::Database(_) | Self::Internal(_) => {
                 (StatusCode::INTERNAL_SERVER_ERROR, "internal_error")

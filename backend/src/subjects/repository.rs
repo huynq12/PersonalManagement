@@ -31,6 +31,26 @@ pub(super) async fn list_subjects(
     .await
 }
 
+/// Finds one of the user's subjects, archived or not.
+pub(crate) async fn find_subject(
+    executor: impl PgExecutor<'_>,
+    user_id: Uuid,
+    subject_id: Uuid,
+) -> sqlx::Result<Option<Subject>> {
+    sqlx::query_as!(
+        Subject,
+        r#"
+        SELECT id, name, color, archived_at, created_at
+        FROM subjects
+        WHERE id = $2 AND user_id = $1
+        "#,
+        user_id,
+        subject_id,
+    )
+    .fetch_optional(executor)
+    .await
+}
+
 /// Inserts a subject. Fails with a unique violation if the user already has the name.
 pub(super) async fn insert_subject(
     executor: impl PgExecutor<'_>,

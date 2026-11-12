@@ -190,6 +190,8 @@
     "google_email_unverified": "Email của tài khoản Google chưa được xác minh. Hãy xác minh với Google rồi thử lại.",
     "email_already_registered": "Email này đã được đăng ký bằng mật khẩu. Hãy đăng nhập bằng mật khẩu, sau đó liên kết Google trong phần Cài đặt.",
     "google_account_already_linked": "Tài khoản Google này đã được liên kết với tài khoản khác, hoặc tài khoản của bạn đã liên kết một tài khoản Google.",
-    "subject_name_taken": "Bạn đã có một môn học trùng tên này."
+    "subject_name_taken": "Bạn đã có một môn học trùng tên này.",
+    "study_session_already_running": "Đang có một phiên học chạy. Hãy hoàn thành hoặc hủy phiên đó trước.",
+    "study_session_not_running": "Phiên học này đã kết thúc."
   }
 }

@@ -9,7 +9,7 @@ use crate::AppState;
 
 mod handler;
 mod model;
-mod repository;
+pub(crate) mod repository;
 mod service;
 
 /// Routes of the subjects feature, mounted under `/api/v1`.
