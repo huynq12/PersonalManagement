@@ -283,7 +283,7 @@ Prefix `/api/v1`. Every endpoint requires an access token except the public Auth
 | GET | `/me` | Current user |
 | PATCH | `/me` | Update display name, time zone, language |
 | GET | `/settings` | Pomodoro settings |
-| PUT | `/settings` | Update Pomodoro settings |
+| PUT | `/settings` | Replace the Pomodoro settings; every field is required. Limits: `focus_minutes` 1 to 180, `short_break_minutes` 1 to 60, `long_break_minutes` 1 to 120, `long_break_every` 1 to 12. |
 
 ### Checklist
 | Method | Path | Description |
