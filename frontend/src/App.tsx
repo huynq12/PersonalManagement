@@ -9,6 +9,7 @@ import HabitsPage from './pages/HabitsPage'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+import SettingsPage from './pages/SettingsPage'
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/habits" element={<HabitsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           {UNBUILT_ITEMS.map((item) => (
             <Route key={item.path} path={item.path} element={<ComingSoonPage item={item} />} />
           ))}

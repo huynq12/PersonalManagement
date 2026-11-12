@@ -137,7 +137,11 @@
     "displayNameLength": "Hãy dùng tối đa 100 ký tự.",
     "habitNameLength": "Hãy dùng tối đa 100 ký tự.",
     "taskTitleLength": "Hãy dùng tối đa 200 ký tự.",
-    "weekdaysRequired": "Hãy chọn ít nhất một ngày."
+    "weekdaysRequired": "Hãy chọn ít nhất một ngày.",
+    "focusMinutesRange": "Nhập số nguyên từ 1 đến 180.",
+    "shortBreakMinutesRange": "Nhập số nguyên từ 1 đến 60.",
+    "longBreakMinutesRange": "Nhập số nguyên từ 1 đến 120.",
+    "longBreakEveryRange": "Nhập số nguyên từ 1 đến 12."
   },
   "errors": {
     "unknown": "Đã có lỗi xảy ra. Vui lòng thử lại.",
@@ -156,5 +160,36 @@
     "email_already_registered": "Email này đã được đăng ký bằng mật khẩu. Hãy đăng nhập bằng mật khẩu, sau đó liên kết Google trong phần Cài đặt.",
     "google_account_already_linked": "Tài khoản Google này đã được liên kết với tài khoản khác, hoặc tài khoản của bạn đã liên kết một tài khoản Google.",
     "subject_name_taken": "Bạn đã có một môn học trùng tên này."
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "description": "Hồ sơ, ngôn ngữ và tuỳ chỉnh bộ đếm giờ của bạn.",
+    "profile": {
+      "title": "Hồ sơ",
+      "email": "Email",
+      "displayName": "Tên hiển thị",
+      "language": "Ngôn ngữ",
+      "timezone": "Múi giờ",
+      "timezoneHint": "Quyết định ngày bắt đầu và kết thúc lúc nào đối với thói quen và việc cần làm của bạn.",
+      "saved": "Đã lưu hồ sơ."
+    },
+    "pomodoro": {
+      "title": "Pomodoro",
+      "focusMinutes": "Thời gian tập trung (phút)",
+      "shortBreakMinutes": "Nghỉ ngắn (phút)",
+      "longBreakMinutes": "Nghỉ dài (phút)",
+      "longBreakEvery": "Số phiên tập trung trước khi nghỉ dài",
+      "saved": "Đã lưu cài đặt bộ đếm giờ."
+    },
+    "google": {
+      "title": "Google",
+      "description": "Liên kết tài khoản Google để lần sau đăng nhập bằng Google.",
+      "link": "Liên kết tài khoản Google",
+      "linked": "Tài khoản Google đã được liên kết."
+    },
+    "account": {
+      "title": "Tài khoản",
+      "logout": "Đăng xuất"
+    }
   }
 }

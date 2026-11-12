@@ -137,7 +137,11 @@
     "displayNameLength": "Use at most 100 characters.",
     "habitNameLength": "Use at most 100 characters.",
     "taskTitleLength": "Use at most 200 characters.",
-    "weekdaysRequired": "Choose at least one day."
+    "weekdaysRequired": "Choose at least one day.",
+    "focusMinutesRange": "Enter a whole number from 1 to 180.",
+    "shortBreakMinutesRange": "Enter a whole number from 1 to 60.",
+    "longBreakMinutesRange": "Enter a whole number from 1 to 120.",
+    "longBreakEveryRange": "Enter a whole number from 1 to 12."
   },
   "errors": {
     "unknown": "Something went wrong. Please try again.",
@@ -156,5 +160,36 @@
     "email_already_registered": "This email is already registered with a password. Sign in with your password, then link Google in Settings.",
     "google_account_already_linked": "This Google account is linked to another account, or your account already has a Google account linked.",
     "subject_name_taken": "You already have a subject with this name."
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Your profile, language, and timer preferences.",
+    "profile": {
+      "title": "Profile",
+      "email": "Email",
+      "displayName": "Display name",
+      "language": "Language",
+      "timezone": "Time zone",
+      "timezoneHint": "Decides when a day starts and ends for your habits and to-dos.",
+      "saved": "Profile saved."
+    },
+    "pomodoro": {
+      "title": "Pomodoro",
+      "focusMinutes": "Focus length (minutes)",
+      "shortBreakMinutes": "Short break (minutes)",
+      "longBreakMinutes": "Long break (minutes)",
+      "longBreakEvery": "Focus sessions before a long break",
+      "saved": "Timer settings saved."
+    },
+    "google": {
+      "title": "Google",
+      "description": "Link your Google account to sign in with it next time.",
+      "link": "Link Google account",
+      "linked": "Your Google account is linked."
+    },
+    "account": {
+      "title": "Account",
+      "logout": "Sign out"
+    }
   }
 }

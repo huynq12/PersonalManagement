@@ -126,7 +126,7 @@ The backend is organized by feature: each feature is a directory under `backend/
 | 7 | Dishes | `/dishes`, `/dishes/:id` | Dish library, dish form with ingredients |
 | 8 | Shopping list | `/shopping-list` | Merged ingredients for the week, with temporary check marks kept in the browser |
 | 9 | Weekly statistics | `/stats` | Week picker; study time charts per day and subject; checklist rate; streaks; comparison with the previous week |
-| 10 | Settings | `/settings` | Profile, time zone, language, Pomodoro settings, Google linking, sign out |
+| 10 | Settings | `/settings` | Cards for the profile (display name, language, time zone; the email is read-only), Pomodoro settings, Google linking, and sign out. Saving the profile also switches the interface language. |
 
 Layout: a left navigation bar on desktop and a bottom bar on phones. The language and theme switchers are available on every screen, including sign in and register.
 
@@ -281,9 +281,9 @@ Prefix `/api/v1`. Every endpoint requires an access token except the public Auth
 | GET | `/auth/google/callback` | Handle the callback; sign in or create an account |
 | POST | `/auth/google/link` | Start linking Google to the signed-in account; returns the Google authorization URL for the browser to open |
 | GET | `/me` | Current user |
-| PATCH | `/me` | Update display name, time zone, language |
+| PATCH | `/me` | Update display name (1 to 100 characters, trimmed), time zone (an IANA name such as `Asia/Ho_Chi_Minh`), language (`vi` or `en`). Fields left out keep their value; the email cannot be changed. |
 | GET | `/settings` | Pomodoro settings |
-| PUT | `/settings` | Update Pomodoro settings |
+| PUT | `/settings` | Replace the Pomodoro settings; all four fields are required. Allowed ranges: focus 1 to 180 minutes, short break 1 to 60, long break 1 to 120, sessions before a long break 1 to 12 (otherwise 422 with the rule code `range`). |
 
 ### Checklist
 | Method | Path | Description |
