@@ -17,6 +17,7 @@ pub mod config;
 pub mod error;
 pub mod habits;
 pub mod health;
+pub mod tasks;
 pub mod validation;
 
 /// State shared by every handler. Cloning is cheap: the fields are reference counted.
@@ -81,7 +82,8 @@ pub fn app(state: AppState) -> anyhow::Result<Router> {
     let api = Router::new()
         .merge(health::router())
         .merge(auth::router())
-        .merge(habits::router());
+        .merge(habits::router())
+        .merge(tasks::router());
 
     Ok(Router::new()
         .nest("/api/v1", api)

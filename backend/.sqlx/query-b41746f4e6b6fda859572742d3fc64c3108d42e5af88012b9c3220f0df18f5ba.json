@@ -1,0 +1,64 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE tasks\n        SET title = COALESCE($3, title),\n            is_done = COALESCE($4, is_done),\n            done_at = CASE\n                WHEN $4::boolean IS NULL THEN done_at\n                -- Marking a done to-do as done again keeps the first completion time.\n                WHEN $4 THEN COALESCE(done_at, $7)\n                ELSE NULL\n            END,\n            date = COALESCE($5, date),\n            sort_order = COALESCE($6, sort_order)\n        WHERE id = $2 AND user_id = $1\n        RETURNING id, date, title, is_done, done_at, sort_order, created_at\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "date",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 2,
+        "name": "title",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "is_done",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 4,
+        "name": "done_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "sort_order",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Bool",
+        "Date",
+        "Int4",
+        "Timestamptz"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "b41746f4e6b6fda859572742d3fc64c3108d42e5af88012b9c3220f0df18f5ba"
+}
