@@ -94,6 +94,40 @@
       "confirm": "Xóa vĩnh viễn"
     }
   },
+  "subjects": {
+    "title": "Môn học",
+    "description": "Những gì bạn học. Chọn một môn khi bắt đầu phiên tập trung.",
+    "add": "Thêm môn học",
+    "empty": "Bạn chưa có môn học nào. Hãy thêm một môn để bắt đầu theo dõi thời gian học.",
+    "edit": "Sửa {{name}}",
+    "archive": "Lưu trữ {{name}}",
+    "restore": "Khôi phục {{name}}",
+    "delete": "Xóa {{name}}",
+    "archived": "Đã lưu trữ ({{count}})",
+    "form": {
+      "addTitle": "Thêm môn học",
+      "editTitle": "Sửa môn học",
+      "name": "Tên",
+      "color": "Màu"
+    },
+    "colors": {
+      "red": "Đỏ",
+      "orange": "Cam",
+      "yellow": "Vàng",
+      "green": "Xanh lá",
+      "teal": "Xanh ngọc",
+      "blue": "Xanh dương",
+      "purple": "Tím",
+      "pink": "Hồng",
+      "gray": "Xám",
+      "custom": "Tùy chỉnh"
+    },
+    "deleteDialog": {
+      "title": "Xóa môn học này?",
+      "description": "\"{{name}}\" sẽ bị xóa. Các phiên học trước đây vẫn được giữ lại nhưng không còn môn học. Hãy lưu trữ nếu chỉ muốn ẩn môn này khỏi bộ đếm giờ.",
+      "confirm": "Xóa"
+    }
+  },
   "common": {
     "save": "Lưu",
     "cancel": "Hủy",
@@ -137,6 +171,7 @@
     "displayNameLength": "Hãy dùng tối đa 100 ký tự.",
     "habitNameLength": "Hãy dùng tối đa 100 ký tự.",
     "taskTitleLength": "Hãy dùng tối đa 200 ký tự.",
+    "subjectNameLength": "Hãy dùng tối đa 100 ký tự.",
     "weekdaysRequired": "Hãy chọn ít nhất một ngày."
   },
   "errors": {
