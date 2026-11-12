@@ -15,6 +15,7 @@ use crate::{auth::GoogleClient, config::Config};
 pub mod auth;
 pub mod config;
 pub mod error;
+pub mod habits;
 pub mod health;
 pub mod validation;
 
@@ -77,7 +78,10 @@ pub fn app(state: AppState) -> anyhow::Result<Router> {
         ])
         .allow_headers([header::AUTHORIZATION, header::CONTENT_TYPE]);
 
-    let api = Router::new().merge(health::router()).merge(auth::router());
+    let api = Router::new()
+        .merge(health::router())
+        .merge(auth::router())
+        .merge(habits::router());
 
     Ok(Router::new()
         .nest("/api/v1", api)

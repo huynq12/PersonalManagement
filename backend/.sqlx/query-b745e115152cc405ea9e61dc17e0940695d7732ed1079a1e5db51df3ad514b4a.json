@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        DELETE FROM habit_completions c\n        USING habits h\n        WHERE c.habit_id = h.id AND h.id = $2 AND h.user_id = $1 AND c.date = $3\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Date"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b745e115152cc405ea9e61dc17e0940695d7732ed1079a1e5db51df3ad514b4a"
+}

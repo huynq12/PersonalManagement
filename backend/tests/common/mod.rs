@@ -157,3 +157,30 @@ impl TestRequest {
         send(app, self.builder.body(self.body).unwrap()).await
     }
 }
+
+/// Password used for every account created by [`sign_up`].
+pub const PASSWORD: &str = "correct horse battery";
+
+/// Registers an account, signs in, and returns the access token.
+pub async fn sign_up(app: &Router, email: &str) -> String {
+    let registered = TestRequest::post("/api/v1/auth/register")
+        .json(&serde_json::json!({ "email": email, "password": PASSWORD }))
+        .send(app)
+        .await;
+    assert_eq!(registered.status, StatusCode::CREATED);
+
+    let session = TestRequest::post("/api/v1/auth/login")
+        .json(&serde_json::json!({ "email": email, "password": PASSWORD }))
+        .send(app)
+        .await;
+    assert_eq!(session.status, StatusCode::OK);
+    session.body["access_token"].as_str().unwrap().to_owned()
+}
+
+/// The current calendar date in the default user time zone, as the database sees it.
+pub async fn today(db: &PgPool) -> chrono::NaiveDate {
+    sqlx::query_scalar("SELECT (now() AT TIME ZONE 'Asia/Ho_Chi_Minh')::date")
+        .fetch_one(db)
+        .await
+        .unwrap()
+}
