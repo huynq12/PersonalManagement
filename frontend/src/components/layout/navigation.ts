@@ -88,4 +88,4 @@ export const MORE_SHEET_GROUPS: NavGroup[] = NAV_GROUPS.map((group) => ({
 export const UNBUILT_ITEMS: NavItem[] = [
   ...NAV_GROUPS.flatMap((group) => group.items),
   SETTINGS_ITEM,
-].filter((item) => item !== TODAY)
+].filter((item) => item !== TODAY && item !== HABITS)

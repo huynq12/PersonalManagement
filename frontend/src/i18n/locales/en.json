@@ -75,6 +75,13 @@
     "restore": "Restore {{name}}",
     "delete": "Delete {{name}}",
     "archived": "Archived ({{count}})",
+    "drag": {
+      "instructions": "Press Space or Enter to pick up a habit. Use the arrow keys to move it, Space or Enter to drop it, and Escape to cancel.",
+      "pickedUp": "Picked up {{name}}.",
+      "movedOver": "{{name}} is now at position {{position}} of {{total}}.",
+      "dropped": "{{name}} was dropped at position {{position}} of {{total}}.",
+      "cancelled": "Reordering was cancelled. {{name}} is back in its place."
+    },
     "form": {
       "addTitle": "Add habit",
       "editTitle": "Edit habit",

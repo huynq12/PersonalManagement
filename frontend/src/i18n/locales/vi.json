@@ -75,6 +75,13 @@
     "restore": "Khôi phục {{name}}",
     "delete": "Xóa {{name}}",
     "archived": "Đã lưu trữ ({{count}})",
+    "drag": {
+      "instructions": "Nhấn Space hoặc Enter để nhấc một thói quen. Dùng phím mũi tên để di chuyển, Space hoặc Enter để thả, và Escape để hủy.",
+      "pickedUp": "Đã nhấc {{name}}.",
+      "movedOver": "{{name}} đang ở vị trí {{position}} trên {{total}}.",
+      "dropped": "Đã thả {{name}} vào vị trí {{position}} trên {{total}}.",
+      "cancelled": "Đã hủy sắp xếp. {{name}} trở về vị trí cũ."
+    },
     "form": {
       "addTitle": "Thêm thói quen",
       "editTitle": "Sửa thói quen",
