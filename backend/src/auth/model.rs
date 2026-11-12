@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use validator::Validate;
 
+use crate::validation::{not_blank, valid_timezone};
+
 /// Interface languages a user can choose.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -65,6 +67,16 @@ pub(super) struct RegisterRequest {
 pub(super) struct LoginRequest {
     pub email: String,
     pub password: String,
+}
+
+/// Body of `PATCH /me`. Fields left out keep their value; the email cannot be changed.
+#[derive(Debug, Deserialize, Validate)]
+pub(super) struct UpdateProfileRequest {
+    #[validate(length(max = 100), custom(function = "not_blank"))]
+    pub display_name: Option<String>,
+    #[validate(custom(function = "valid_timezone"))]
+    pub timezone: Option<String>,
+    pub locale: Option<Locale>,
 }
 
 /// The public view of a user. Never includes the password hash.

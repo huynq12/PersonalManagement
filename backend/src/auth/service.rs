@@ -6,9 +6,9 @@ use uuid::Uuid;
 
 use super::{
     google::{self, CallbackQuery, Flow, GoogleClient, GoogleProfile},
-    model::{Locale, LoginRequest, RegisterRequest, User},
+    model::{Locale, LoginRequest, RegisterRequest, UpdateProfileRequest, User},
     password,
-    repository::{self, NewUser},
+    repository::{self, NewUser, ProfileChanges},
     token,
 };
 use crate::{
@@ -186,6 +186,26 @@ pub(super) async fn logout(db: &PgPool, refresh_token: &str) -> AppResult<()> {
 /// Returns [`AppError::Unauthorized`] if the account no longer exists.
 pub(super) async fn current_user(db: &PgPool, user_id: Uuid) -> AppResult<User> {
     repository::find_user_by_id(db, user_id)
+        .await?
+        .ok_or(AppError::Unauthorized)
+}
+
+/// Updates the given profile fields of the signed-in user.
+///
+/// # Errors
+///
+/// Returns [`AppError::Unauthorized`] if the user no longer exists.
+pub(super) async fn update_profile(
+    db: &PgPool,
+    user_id: Uuid,
+    request: UpdateProfileRequest,
+) -> AppResult<User> {
+    let changes = ProfileChanges {
+        display_name: request.display_name.as_deref().map(str::trim),
+        timezone: request.timezone.as_deref(),
+        locale: request.locale.map(Locale::as_str),
+    };
+    repository::update_profile(db, user_id, changes)
         .await?
         .ok_or(AppError::Unauthorized)
 }

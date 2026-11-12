@@ -39,6 +39,38 @@ pub(super) async fn insert_user(
     .await
 }
 
+/// Profile fields to change; `None` keeps the stored value.
+pub(super) struct ProfileChanges<'a> {
+    pub display_name: Option<&'a str>,
+    pub timezone: Option<&'a str>,
+    pub locale: Option<&'a str>,
+}
+
+/// Updates the given profile fields. Returns `None` if the user does not exist.
+pub(super) async fn update_profile(
+    executor: impl PgExecutor<'_>,
+    user_id: Uuid,
+    changes: ProfileChanges<'_>,
+) -> sqlx::Result<Option<User>> {
+    sqlx::query_as!(
+        User,
+        r#"
+        UPDATE users
+        SET display_name = COALESCE($2, display_name),
+            timezone = COALESCE($3, timezone),
+            locale = COALESCE($4, locale)
+        WHERE id = $1
+        RETURNING id, email::text AS "email!", password_hash, display_name, timezone, locale
+        "#,
+        user_id,
+        changes.display_name,
+        changes.timezone,
+        changes.locale,
+    )
+    .fetch_optional(executor)
+    .await
+}
+
 /// Creates the default Pomodoro settings row for a new user.
 pub(super) async fn insert_user_settings(
     executor: impl PgExecutor<'_>,

@@ -124,9 +124,31 @@ pub fn not_blank(text: &str) -> Result<(), ValidationError> {
     Ok(())
 }
 
+/// `validator` rule: the text must be an IANA time zone name such as `Asia/Ho_Chi_Minh`.
+/// Code: `timezone`.
+///
+/// # Errors
+///
+/// Returns a [`ValidationError`] if the name is not in the IANA database.
+pub fn valid_timezone(name: &str) -> Result<(), ValidationError> {
+    if name.parse::<chrono_tz::Tz>().is_err() {
+        return Err(ValidationError::new("timezone"));
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn valid_timezone_accepts_iana_names_only() {
+        assert!(valid_timezone("Asia/Ho_Chi_Minh").is_ok());
+        assert!(valid_timezone("UTC").is_ok());
+        for name in ["", "Mars/Olympus", "UTC+7", " Asia/Ho_Chi_Minh"] {
+            assert!(valid_timezone(name).is_err(), "{name:?} should be rejected");
+        }
+    }
 
     #[test]
     fn not_blank_rejects_empty_and_whitespace_only_text() {

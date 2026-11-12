@@ -1,0 +1,44 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE user_settings\n        SET focus_minutes = $2,\n            short_break_minutes = $3,\n            long_break_minutes = $4,\n            long_break_every = $5\n        WHERE user_id = $1\n        RETURNING focus_minutes, short_break_minutes, long_break_minutes, long_break_every\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "focus_minutes",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 1,
+        "name": "short_break_minutes",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 2,
+        "name": "long_break_minutes",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 3,
+        "name": "long_break_every",
+        "type_info": "Int2"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int2",
+        "Int2",
+        "Int2",
+        "Int2"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "91e34c01064e1a13b72a58af1f42a2774488b049bb0477450a4560f988bb87bf"
+}
