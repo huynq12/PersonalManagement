@@ -121,7 +121,7 @@ The backend is organized by feature: each feature is a directory under `backend/
 | 2 | Today | `/` | Date picker (previous/next); habits for the day; to-dos with quick add; menu for that weekday; study time for the day and a shortcut to Pomodoro |
 | 3 | Habits | `/habits` | List, add/edit (name, weekdays), reorder, archive, streak |
 | 4 | Pomodoro | `/pomodoro` | Subject picker, countdown, start/cancel, focus/break state, today's sessions |
-| 5 | Subjects | `/subjects` | Subject CRUD (name, color) |
+| 5 | Subjects | `/subjects` | Subject CRUD (name, color); the color is picked from a fixed palette in the UI, and the API only checks the `#RRGGBB` format |
 | 6 | Weekly meal plan | `/meal-plan` | A 7 weekdays × 4 meals grid; choose dishes for each cell |
 | 7 | Dishes | `/dishes`, `/dishes/:id` | Dish library, dish form with ingredients |
 | 8 | Shopping list | `/shopping-list` | Merged ingredients for the week, with temporary check marks kept in the browser |
@@ -207,8 +207,8 @@ Every table has `id uuid` (primary key) and `created_at timestamptz` unless note
 | Column | Type | Notes |
 |---|---|---|
 | user_id | uuid | |
-| name | text | unique (user_id, name) |
-| color | text | hex code |
+| name | text | unique (user_id, lower(name)); archived subjects count too |
+| color | text | hex code `#RRGGBB` |
 | archived_at | timestamptz null | |
 
 **study_sessions** (focus sessions only; breaks are not stored)
@@ -303,7 +303,7 @@ Prefix `/api/v1`. Every endpoint requires an access token except the public Auth
 ### Pomodoro
 | Method | Path | Description |
 |---|---|---|
-| GET | `/subjects` | List subjects |
+| GET | `/subjects` | List subjects by name, ignoring case; archived ones are hidden unless `?include_archived=true` |
 | POST | `/subjects` | Create |
 | PATCH | `/subjects/{id}` | Update, archive |
 | DELETE | `/subjects/{id}` | Delete (past sessions are kept without a subject) |

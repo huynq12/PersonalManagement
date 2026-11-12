@@ -13,7 +13,7 @@ use super::{
 };
 use crate::{
     config::Config,
-    error::{AppError, AppResult},
+    error::{AppError, AppResult, is_unique_violation},
 };
 
 /// A signed-in session: what the handler turns into a response body and a cookie.
@@ -346,12 +346,6 @@ async fn google_link(
 /// The part of the email before `@`, used when the user gives no display name.
 fn default_display_name(email: &str) -> &str {
     email.split('@').next().unwrap_or(email)
-}
-
-fn is_unique_violation(error: &sqlx::Error) -> bool {
-    error
-        .as_database_error()
-        .is_some_and(sqlx::error::DatabaseError::is_unique_violation)
 }
 
 #[cfg(test)]

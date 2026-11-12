@@ -52,6 +52,9 @@ pub enum AppError {
     /// The Google account is linked to a different user, or the user already linked another one.
     #[error("google account is already linked")]
     GoogleAccountAlreadyLinked,
+    /// Another subject of the same user already has this name, ignoring case.
+    #[error("subject name is already in use")]
+    SubjectNameTaken,
     /// A dependency such as the database is unreachable.
     #[error("service temporarily unavailable")]
     ServiceUnavailable,
@@ -85,6 +88,7 @@ impl AppError {
             Self::GoogleAccountAlreadyLinked => {
                 (StatusCode::CONFLICT, "google_account_already_linked")
             }
+            Self::SubjectNameTaken => (StatusCode::CONFLICT, "subject_name_taken"),
             Self::ServiceUnavailable => (StatusCode::SERVICE_UNAVAILABLE, "service_unavailable"),
             Self::Database(_) | Self::Internal(_) => {
                 (StatusCode::INTERNAL_SERVER_ERROR, "internal_error")
@@ -126,6 +130,14 @@ impl IntoResponse for AppError {
 
         (status, Json(json!({ "error": error }))).into_response()
     }
+}
+
+/// Whether a database error is a unique constraint violation, so a service can turn it into
+/// the matching "already taken" [`AppError`].
+pub(crate) fn is_unique_violation(error: &sqlx::Error) -> bool {
+    error
+        .as_database_error()
+        .is_some_and(sqlx::error::DatabaseError::is_unique_violation)
 }
 
 /// Result alias used by handlers.
