@@ -1,0 +1,3 @@
+# SQLx checksums migrations byte for byte, so they must keep LF endings on every OS.
+# With core.autocrlf=true on Windows, CRLF would change the checksum and break deploys.
+*.sql text eol=lf
