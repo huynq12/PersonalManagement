@@ -10,7 +10,6 @@ commit and update this table.
 | `verification-before-completion` | https://github.com/obra/superpowers | `skills/verification-before-completion` | `22f0b463e7a5e579904dd6211a520321035526f7` | MIT |
 | `rust-skills` | https://github.com/leonardomso/rust-skills | `SKILL.md`, `rules/` | `fd2a861ab0406a4ac536a55274d14ea6fd1ca9c9` | MIT |
 | `vercel-react-best-practices` | https://github.com/vercel-labs/agent-skills | `skills/react-best-practices` | `1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62` | MIT (declared in `SKILL.md`; the repository has no LICENSE file) |
-| `vercel-composition-patterns` | https://github.com/vercel-labs/agent-skills | `skills/composition-patterns` | `1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62` | MIT (declared in `SKILL.md`; the repository has no LICENSE file) |
 
 Notes:
 

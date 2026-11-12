@@ -79,12 +79,15 @@ Read the relevant section before implementing anything, and update it when a dec
 
 ## Workflow
 
-Use the vendored skills; they apply to all new work in this repository.
+Always apply these vendored skills to new work:
 
 - `test-driven-development` — write the failing test first for features and bug fixes.
 - `systematic-debugging` — find the root cause before proposing a fix.
 - `verification-before-completion` — run the checks and read the output before claiming something works.
-- `rust-skills` — consult when writing or reviewing Rust.
-- `vercel-react-best-practices`, `vercel-composition-patterns` — consult when writing or reviewing React. Rules about Next.js, server components, and SWR do not apply (this is a Vite SPA using TanStack Query).
+
+Load these large reference skills only when reviewing code or when the owner asks, not for routine writing; the conventions above already cover day-to-day work:
+
+- `rust-skills` — Rust review.
+- `vercel-react-best-practices` — React review. Rules about Next.js, server components, and SWR do not apply (this is a Vite SPA using TanStack Query).
 
 Do not commit or push unless the owner asks.
