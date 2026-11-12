@@ -14,6 +14,7 @@ use crate::{auth::GoogleClient, config::Config};
 
 pub mod auth;
 pub mod config;
+pub mod days;
 pub mod error;
 pub mod habits;
 pub mod health;
@@ -83,7 +84,8 @@ pub fn app(state: AppState) -> anyhow::Result<Router> {
         .merge(health::router())
         .merge(auth::router())
         .merge(habits::router())
-        .merge(tasks::router());
+        .merge(tasks::router())
+        .merge(days::router());
 
     Ok(Router::new()
         .nest("/api/v1", api)

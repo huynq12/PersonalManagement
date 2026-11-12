@@ -261,7 +261,7 @@ Constraint: at most one `running` session per user (partial unique index).
 
 ### Calculation rules
 
-- **Streak:** the number of consecutive *scheduled* days completed, counting back from today (today not yet checked does not break the streak). Unscheduled days are skipped. The habit's current `weekdays` schedule is used, including for the past.
+- **Streak:** the number of consecutive *scheduled* days completed, counting back from today (today not yet checked does not break the streak). Unscheduled days are skipped. The habit's current `weekdays` schedule is used, including for the past. Computed in SQL by the `habit_current_streak` function, with "today" taken in the user's time zone.
 - **Checklist rate for a day:** (habits checked + to-dos done) / (habits scheduled + total to-dos) for that day.
 - **Study time:** the sum of `duration_seconds` over `completed` sessions, grouped by `local_date`.
 - **Shopping list:** `quantity` summed per (ingredient, unit) across the whole weekly template; units are not converted.
@@ -288,12 +288,12 @@ Prefix `/api/v1`. Every endpoint requires an access token except the public Auth
 ### Checklist
 | Method | Path | Description |
 |---|---|---|
-| GET | `/days/{date}` | Aggregated data for the Today screen: scheduled habits with their state, to-dos, the menu for that weekday, total study time |
+| GET | `/days/{date}` | Aggregated data for the Today screen: scheduled habits with their state, to-dos, the menu for that weekday, total study time. The menu and the study time are added to the response together with the meal plan and Pomodoro features. |
 | GET | `/habits` | List (`?include_archived=`), with streaks |
 | POST | `/habits` | Create |
 | PATCH | `/habits/{id}` | Update name, weekdays, order, archive state |
 | DELETE | `/habits/{id}` | Delete permanently with its history |
-| PUT | `/habits/{id}/completions/{date}` | Mark completed (idempotent) |
+| PUT | `/habits/{id}/completions/{date}` | Mark completed (idempotent). Only today or a past day the habit is scheduled for; otherwise 422 with `details.fields.date` set to `future` or `not_scheduled`. |
 | DELETE | `/habits/{id}/completions/{date}` | Unmark |
 | GET | `/tasks?date=` | To-dos for a day |
 | POST | `/tasks` | Create |

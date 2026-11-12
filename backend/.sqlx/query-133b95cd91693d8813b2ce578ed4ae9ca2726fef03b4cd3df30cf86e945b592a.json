@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT h.id, h.name,\n               EXISTS (\n                   SELECT 1 FROM habit_completions c\n                   WHERE c.habit_id = h.id AND c.date = $2\n               ) AS \"completed!\"\n        FROM habits h\n        WHERE h.user_id = $1\n          AND h.archived_at IS NULL\n          AND EXTRACT(ISODOW FROM $2::date)::smallint = ANY (h.weekdays)\n        ORDER BY h.sort_order, h.created_at\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "completed!",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Date"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "133b95cd91693d8813b2ce578ed4ae9ca2726fef03b4cd3df30cf86e945b592a"
+}
