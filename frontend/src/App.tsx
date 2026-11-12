@@ -8,6 +8,7 @@ import ComingSoonPage from './pages/ComingSoonPage'
 import HabitsPage from './pages/HabitsPage'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
+import PomodoroPage from './pages/PomodoroPage'
 import RegisterPage from './pages/RegisterPage'
 import SubjectsPage from './pages/SubjectsPage'
 
@@ -25,6 +26,7 @@ export default function App() {
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/habits" element={<HabitsPage />} />
+          <Route path="/pomodoro" element={<PomodoroPage />} />
           <Route path="/subjects" element={<SubjectsPage />} />
           {UNBUILT_ITEMS.map((item) => (
             <Route key={item.path} path={item.path} element={<ComingSoonPage item={item} />} />

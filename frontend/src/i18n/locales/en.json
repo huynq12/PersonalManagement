@@ -128,6 +128,30 @@
       "confirm": "Delete"
     }
   },
+  "pomodoro": {
+    "title": "Pomodoro",
+    "description": "Focus on one subject at a time, then take a break.",
+    "subject": "Subject",
+    "noSubject": "No subject",
+    "manageSubjects": "Manage subjects",
+    "start": "Start focus",
+    "cancel": "Cancel session",
+    "skipBreak": "Skip break",
+    "saving": "Saving your session…",
+    "phase": {
+      "ready": "Ready",
+      "focus": "Focus",
+      "shortBreak": "Short break",
+      "longBreak": "Long break"
+    },
+    "history": {
+      "title": "Today's sessions",
+      "empty": "No completed sessions yet today.",
+      "summary_one": "{{count}} session · {{total}}",
+      "summary_other": "{{count}} sessions · {{total}}",
+      "delete": "Delete session at {{time}}"
+    }
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",

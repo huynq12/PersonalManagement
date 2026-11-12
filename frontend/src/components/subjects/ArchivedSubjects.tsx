@@ -1,14 +1,19 @@
-import { ArchiveRestore, ChevronDown, ChevronRight, Trash2 } from 'lucide-react'
-import { useId, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import type { Subject } from '../../lib/subjects'
-import IconButton from '../ui/IconButton'
-import ColorDot from './ColorDot'
+import {
+  ArchiveRestore,
+  ChevronDown,
+  ChevronRight,
+  Trash2,
+} from "lucide-react";
+import { useId, useState } from "react";
+import { useTranslation } from "react-i18next";
+import type { Subject } from "../../lib/subjects";
+import IconButton from "../ui/IconButton";
+import ColorDot from "./ColorDot";
 
 interface ArchivedSubjectsProps {
-  subjects: Subject[]
-  onRestore: (subject: Subject) => void
-  onDelete: (subject: Subject) => void
+  subjects: Subject[];
+  onRestore: (subject: Subject) => void;
+  onDelete: (subject: Subject) => void;
 }
 
 /** The archived subjects, collapsed until the user asks to see them. */
@@ -17,10 +22,10 @@ export default function ArchivedSubjects({
   onRestore,
   onDelete,
 }: ArchivedSubjectsProps) {
-  const { t } = useTranslation()
-  const [isOpen, setIsOpen] = useState(false)
-  const listId = useId()
-  const Chevron = isOpen ? ChevronDown : ChevronRight
+  const { t } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
+  const listId = useId();
+  const Chevron = isOpen ? ChevronDown : ChevronRight;
 
   return (
     <section className="flex flex-col gap-2">
@@ -32,7 +37,7 @@ export default function ArchivedSubjects({
         className="flex h-9 items-center gap-1.5 self-start rounded-md px-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
       >
         <Chevron className="size-4" aria-hidden="true" />
-        {t('subjects.archived', { count: subjects.length })}
+        {t("subjects.archived", { count: subjects.length })}
       </button>
 
       {isOpen ? (
@@ -48,12 +53,12 @@ export default function ArchivedSubjects({
               </span>
               <IconButton
                 icon={ArchiveRestore}
-                label={t('subjects.restore', { name: subject.name })}
+                label={t("subjects.restore", { name: subject.name })}
                 onClick={() => onRestore(subject)}
               />
               <IconButton
                 icon={Trash2}
-                label={t('subjects.delete', { name: subject.name })}
+                label={t("subjects.delete", { name: subject.name })}
                 onClick={() => onDelete(subject)}
               />
             </li>
@@ -61,5 +66,5 @@ export default function ArchivedSubjects({
         </ul>
       ) : null}
     </section>
-  )
+  );
 }

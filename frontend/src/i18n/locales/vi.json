@@ -128,6 +128,30 @@
       "confirm": "Xóa"
     }
   },
+  "pomodoro": {
+    "title": "Pomodoro",
+    "description": "Tập trung vào một môn mỗi lần, rồi nghỉ ngơi.",
+    "subject": "Môn học",
+    "noSubject": "Không có môn",
+    "manageSubjects": "Quản lý môn học",
+    "start": "Bắt đầu tập trung",
+    "cancel": "Hủy phiên",
+    "skipBreak": "Bỏ qua giờ nghỉ",
+    "saving": "Đang lưu phiên học…",
+    "phase": {
+      "ready": "Sẵn sàng",
+      "focus": "Tập trung",
+      "shortBreak": "Nghỉ ngắn",
+      "longBreak": "Nghỉ dài"
+    },
+    "history": {
+      "title": "Phiên học hôm nay",
+      "empty": "Hôm nay chưa có phiên nào hoàn thành.",
+      "summary_one": "{{count}} phiên · {{total}}",
+      "summary_other": "{{count}} phiên · {{total}}",
+      "delete": "Xóa phiên lúc {{time}}"
+    }
+  },
   "common": {
     "save": "Lưu",
     "cancel": "Hủy",
