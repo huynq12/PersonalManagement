@@ -40,12 +40,59 @@
   },
   "home": {
     "title": "Hôm nay",
-    "intro": "Khung dự án đã sẵn sàng. Các tính năng sẽ được thêm theo SPEC.md.",
-    "backendStatus": "Trạng thái backend",
-    "checking": "Đang kiểm tra…",
-    "healthy": "API và cơ sở dữ liệu đang hoạt động.",
-    "degraded": "API đang chạy nhưng có thành phần gặp sự cố.",
-    "connectionFailed": "Không kết nối được: {{reason}}"
+    "previousDay": "Ngày trước",
+    "nextDay": "Ngày sau",
+    "backToToday": "Về hôm nay",
+    "progress": "Xong {{done}}/{{total}}",
+    "habits": {
+      "title": "Thói quen",
+      "empty": "Không có thói quen nào theo lịch cho ngày này.",
+      "manage": "Quản lý thói quen",
+      "futureNote": "Không thể đánh dấu thói quen trước ngày thực hiện."
+    },
+    "tasks": {
+      "title": "Việc cần làm",
+      "empty": "Chưa có việc nào. Hãy thêm việc đầu tiên bên dưới.",
+      "newLabel": "Việc mới",
+      "newPlaceholder": "Thêm việc cần làm…",
+      "add": "Thêm",
+      "titleLabel": "Tên việc",
+      "edit": "Sửa {{title}}",
+      "delete": "Xóa {{title}}"
+    }
+  },
+  "habits": {
+    "title": "Thói quen",
+    "description": "Những việc bạn muốn làm đều đặn. Kéo một thói quen để đổi thứ tự.",
+    "add": "Thêm thói quen",
+    "empty": "Bạn chưa có thói quen nào. Hãy thêm thói quen đầu tiên để bắt đầu chuỗi ngày.",
+    "everyDay": "Mỗi ngày",
+    "streak_one": "Chuỗi {{count}} ngày",
+    "streak_other": "Chuỗi {{count}} ngày",
+    "reorder": "Sắp xếp lại {{name}}",
+    "edit": "Sửa {{name}}",
+    "archive": "Lưu trữ {{name}}",
+    "restore": "Khôi phục {{name}}",
+    "delete": "Xóa {{name}}",
+    "archived": "Đã lưu trữ ({{count}})",
+    "form": {
+      "addTitle": "Thêm thói quen",
+      "editTitle": "Sửa thói quen",
+      "name": "Tên",
+      "weekdays": "Lặp lại vào"
+    },
+    "deleteDialog": {
+      "title": "Xóa thói quen này?",
+      "description": "\"{{name}}\" và toàn bộ lịch sử của nó sẽ bị xóa vĩnh viễn. Không thể hoàn tác. Hãy lưu trữ nếu bạn muốn giữ lịch sử.",
+      "confirm": "Xóa vĩnh viễn"
+    }
+  },
+  "common": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "close": "Đóng",
+    "loading": "Đang tải…",
+    "retry": "Thử lại"
   },
   "auth": {
     "login": {
@@ -80,7 +127,10 @@
     "required": "Trường này là bắt buộc.",
     "emailInvalid": "Hãy nhập địa chỉ email hợp lệ.",
     "passwordLength": "Hãy dùng từ 8 đến 128 ký tự.",
-    "displayNameLength": "Hãy dùng tối đa 100 ký tự."
+    "displayNameLength": "Hãy dùng tối đa 100 ký tự.",
+    "habitNameLength": "Hãy dùng tối đa 100 ký tự.",
+    "taskTitleLength": "Hãy dùng tối đa 200 ký tự.",
+    "weekdaysRequired": "Hãy chọn ít nhất một ngày."
   },
   "errors": {
     "unknown": "Đã có lỗi xảy ra. Vui lòng thử lại.",

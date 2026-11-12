@@ -6,6 +6,9 @@ export type ValidationMessageKey =
   | 'validation.emailInvalid'
   | 'validation.passwordLength'
   | 'validation.displayNameLength'
+  | 'validation.habitNameLength'
+  | 'validation.taskTitleLength'
+  | 'validation.weekdaysRequired'
 
 const required: ValidationMessageKey = 'validation.required'
 const emailInvalid: ValidationMessageKey = 'validation.emailInvalid'

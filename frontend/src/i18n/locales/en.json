@@ -40,12 +40,59 @@
   },
   "home": {
     "title": "Today",
-    "intro": "The project skeleton is ready. Features will be added following SPEC.md.",
-    "backendStatus": "Backend status",
-    "checking": "Checking…",
-    "healthy": "API and database are running.",
-    "degraded": "The API is running, but something is not healthy.",
-    "connectionFailed": "Could not connect: {{reason}}"
+    "previousDay": "Previous day",
+    "nextDay": "Next day",
+    "backToToday": "Back to today",
+    "progress": "{{done}} of {{total}} done",
+    "habits": {
+      "title": "Habits",
+      "empty": "No habits are scheduled for this day.",
+      "manage": "Manage habits",
+      "futureNote": "Habits cannot be checked off ahead of time."
+    },
+    "tasks": {
+      "title": "To-dos",
+      "empty": "Nothing to do yet. Add your first to-do below.",
+      "newLabel": "New to-do",
+      "newPlaceholder": "Add a to-do…",
+      "add": "Add",
+      "titleLabel": "To-do title",
+      "edit": "Edit {{title}}",
+      "delete": "Delete {{title}}"
+    }
+  },
+  "habits": {
+    "title": "Habits",
+    "description": "Things you want to do regularly. Drag a habit to change the order.",
+    "add": "Add habit",
+    "empty": "You have no habits yet. Add the first one to start a streak.",
+    "everyDay": "Every day",
+    "streak_one": "{{count}}-day streak",
+    "streak_other": "{{count}}-day streak",
+    "reorder": "Reorder {{name}}",
+    "edit": "Edit {{name}}",
+    "archive": "Archive {{name}}",
+    "restore": "Restore {{name}}",
+    "delete": "Delete {{name}}",
+    "archived": "Archived ({{count}})",
+    "form": {
+      "addTitle": "Add habit",
+      "editTitle": "Edit habit",
+      "name": "Name",
+      "weekdays": "Repeat on"
+    },
+    "deleteDialog": {
+      "title": "Delete this habit?",
+      "description": "\"{{name}}\" and its whole history will be deleted permanently. This cannot be undone. Archive it instead to keep the history.",
+      "confirm": "Delete permanently"
+    }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "loading": "Loading…",
+    "retry": "Try again"
   },
   "auth": {
     "login": {
@@ -80,7 +127,10 @@
     "required": "This field is required.",
     "emailInvalid": "Enter a valid email address.",
     "passwordLength": "Use 8 to 128 characters.",
-    "displayNameLength": "Use at most 100 characters."
+    "displayNameLength": "Use at most 100 characters.",
+    "habitNameLength": "Use at most 100 characters.",
+    "taskTitleLength": "Use at most 200 characters.",
+    "weekdaysRequired": "Choose at least one day."
   },
   "errors": {
     "unknown": "Something went wrong. Please try again.",

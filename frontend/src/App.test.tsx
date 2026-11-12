@@ -41,7 +41,7 @@ describe('route protection', () => {
     renderApp('/')
 
     expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeTruthy()
-    expect(screen.queryByText('API and database are running.')).toBeNull()
+    expect(screen.queryByRole('heading', { name: 'Today' })).toBeNull()
   })
 
   it('restores the session from the refresh cookie and shows the home page', async () => {
@@ -49,7 +49,7 @@ describe('route protection', () => {
 
     renderApp('/')
 
-    expect(await screen.findByText('API and database are running.')).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Today' })).toBeTruthy()
     expect(screen.getByText(USER.display_name)).toBeTruthy()
   })
 

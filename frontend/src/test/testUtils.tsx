@@ -26,11 +26,18 @@ export interface RecordedRequest {
 
 type Handler = (request: RecordedRequest) => Response
 
+/** Answers requests that no fixed route matched; `undefined` means "not mine". */
+type DynamicHandler = (request: RecordedRequest) => Response | undefined
+
 /**
  * Replaces `fetch` with a router keyed by `"METHOD /path"` (the path is relative to `/api/v1`).
- * Routes that are not listed answer 404. Returns the list of requests received so far.
+ * Requests without a fixed route go to `dynamic`, for stateful fakes; anything still unanswered
+ * gets a 404. Returns the list of requests received so far.
  */
-export function stubApi(routes: Record<string, Handler>): RecordedRequest[] {
+export function stubApi(
+  routes: Record<string, Handler>,
+  dynamic?: DynamicHandler,
+): RecordedRequest[] {
   const requests: RecordedRequest[] = []
 
   vi.stubGlobal('fetch', async (input: string, init?: RequestInit) => {
@@ -45,7 +52,9 @@ export function stubApi(routes: Record<string, Handler>): RecordedRequest[] {
     requests.push(request)
 
     const handler = routes[`${request.method} ${request.path}`]
-    return handler ? handler(request) : errorResponse(404, 'not_found')
+    return handler
+      ? handler(request)
+      : (dynamic?.(request) ?? errorResponse(404, 'not_found'))
   })
 
   return requests
