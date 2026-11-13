@@ -2,6 +2,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
 import { SUPPORTED_LANGUAGES } from '../i18n/i18n'
 import { API_BASE_URL, ApiError, apiRequest, setAccessToken, setUnauthorizedHandler } from './api'
+import { SUPPORTED_CURRENCIES } from './money'
 
 export const userSchema = z.object({
   id: z.string(),
@@ -9,6 +10,7 @@ export const userSchema = z.object({
   display_name: z.string(),
   timezone: z.string(),
   locale: z.enum(SUPPORTED_LANGUAGES),
+  currency: z.enum(SUPPORTED_CURRENCIES),
 })
 
 export type User = z.infer<typeof userSchema>
@@ -57,6 +59,17 @@ export async function login(input: LoginInput): Promise<User> {
   setAccessToken(session.access_token)
   return session.user
 }
+
+export interface AccountChanges {
+  display_name?: string
+  timezone?: string
+  locale?: string
+  currency?: string
+}
+
+/** Changes the signed-in user's account fields and returns the updated user. */
+export const updateMe = (changes: AccountChanges) =>
+  apiRequest('/me', userSchema, { method: 'PATCH', body: changes })
 
 /** Revokes the refresh token on the server, then forgets the access token either way. */
 export async function logout(): Promise<void> {

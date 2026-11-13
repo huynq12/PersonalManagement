@@ -1,0 +1,68 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE user_settings\n        SET focus_minutes = COALESCE($2, focus_minutes),\n            short_break_minutes = COALESCE($3, short_break_minutes),\n            long_break_minutes = COALESCE($4, long_break_minutes),\n            long_break_every = COALESCE($5, long_break_every),\n            hourly_wage = CASE WHEN $6 THEN $7 ELSE hourly_wage END,\n            base_work_hours = CASE WHEN $8 THEN $9::int4::numeric / 100 ELSE base_work_hours END,\n            monthly_budget = CASE WHEN $10 THEN $11 ELSE monthly_budget END\n        WHERE user_id = $1\n        RETURNING focus_minutes, short_break_minutes, long_break_minutes, long_break_every,\n                  hourly_wage, (base_work_hours * 100)::int4 AS base_work_hundredths,\n                  monthly_budget\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "focus_minutes",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 1,
+        "name": "short_break_minutes",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 2,
+        "name": "long_break_minutes",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 3,
+        "name": "long_break_every",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 4,
+        "name": "hourly_wage",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "base_work_hundredths",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "monthly_budget",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int2",
+        "Int2",
+        "Int2",
+        "Int2",
+        "Bool",
+        "Int8",
+        "Bool",
+        "Int4",
+        "Bool",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      null,
+      true
+    ]
+  },
+  "hash": "b23d38078f2032f58a422bfdc570e444976de0317af4c628f994c6881f8e94d4"
+}

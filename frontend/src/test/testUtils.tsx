@@ -66,6 +66,7 @@ export const USER = {
   display_name: 'Ada Lovelace',
   timezone: 'Asia/Ho_Chi_Minh',
   locale: 'en',
+  currency: 'VND',
 }
 
 export function sessionResponse(accessToken = 'access-token-1'): Response {

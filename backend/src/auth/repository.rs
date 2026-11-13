@@ -28,7 +28,8 @@ pub(super) async fn insert_user(
         r#"
         INSERT INTO users (email, password_hash, display_name, locale)
         VALUES ($1::text::citext, $2, $3, $4)
-        RETURNING id, email::text AS "email!", password_hash, display_name, timezone, locale
+        RETURNING id, email::text AS "email!", password_hash, display_name, timezone, locale,
+               currency
         "#,
         new_user.email,
         new_user.password_hash,
@@ -58,7 +59,8 @@ pub(super) async fn find_user_by_email(
     sqlx::query_as!(
         User,
         r#"
-        SELECT id, email::text AS "email!", password_hash, display_name, timezone, locale
+        SELECT id, email::text AS "email!", password_hash, display_name, timezone, locale,
+               currency
         FROM users
         WHERE email = $1::text::citext
         "#,
@@ -76,7 +78,8 @@ pub(super) async fn find_user_by_id(
     sqlx::query_as!(
         User,
         r#"
-        SELECT id, email::text AS "email!", password_hash, display_name, timezone, locale
+        SELECT id, email::text AS "email!", password_hash, display_name, timezone, locale,
+               currency
         FROM users
         WHERE id = $1
         "#,
@@ -187,7 +190,7 @@ pub(super) async fn find_user_by_oauth_account(
         User,
         r#"
         SELECT u.id, u.email::text AS "email!", u.password_hash, u.display_name, u.timezone,
-               u.locale
+               u.locale, u.currency
         FROM users u
         JOIN oauth_accounts o ON o.user_id = u.id
         WHERE o.provider = $1 AND o.provider_user_id = $2
@@ -219,4 +222,54 @@ pub(super) async fn insert_oauth_account(
     .execute(executor)
     .await?;
     Ok(())
+}
+
+/// Changes of `PATCH /me`; `None` keeps the current value.
+pub(super) struct UserChanges<'a> {
+    pub display_name: Option<&'a str>,
+    pub timezone: Option<&'a str>,
+    pub locale: Option<&'a str>,
+    pub currency: Option<&'a str>,
+}
+
+/// Applies the changes to a user and returns the updated row, or `None` if the user is gone.
+pub(super) async fn update_user(
+    executor: impl PgExecutor<'_>,
+    user_id: Uuid,
+    changes: UserChanges<'_>,
+) -> sqlx::Result<Option<User>> {
+    sqlx::query_as!(
+        User,
+        r#"
+        UPDATE users
+        SET display_name = COALESCE($2, display_name),
+            timezone = COALESCE($3, timezone),
+            locale = COALESCE($4, locale),
+            currency = COALESCE($5, currency)
+        WHERE id = $1
+        RETURNING id, email::text AS "email!", password_hash, display_name, timezone, locale,
+                  currency
+        "#,
+        user_id,
+        changes.display_name,
+        changes.timezone,
+        changes.locale,
+        changes.currency,
+    )
+    .fetch_optional(executor)
+    .await
+}
+
+/// The canonical spelling of an IANA time zone name, ignoring case, or `None` if PostgreSQL
+/// does not know the zone.
+pub(super) async fn find_timezone_name(
+    executor: impl PgExecutor<'_>,
+    name: &str,
+) -> sqlx::Result<Option<String>> {
+    sqlx::query_scalar!(
+        r#"SELECT name AS "name!" FROM pg_timezone_names WHERE lower(name) = lower($1) LIMIT 1"#,
+        name,
+    )
+    .fetch_optional(executor)
+    .await
 }

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT u.id, u.email::text AS \"email!\", u.password_hash, u.display_name, u.timezone,\n               u.locale\n        FROM users u\n        JOIN oauth_accounts o ON o.user_id = u.id\n        WHERE o.provider = $1 AND o.provider_user_id = $2\n        ",
+  "query": "\n        UPDATE users\n        SET display_name = COALESCE($2, display_name),\n            timezone = COALESCE($3, timezone),\n            locale = COALESCE($4, locale),\n            currency = COALESCE($5, currency)\n        WHERE id = $1\n        RETURNING id, email::text AS \"email!\", password_hash, display_name, timezone, locale,\n                  currency\n        ",
   "describe": {
     "columns": [
       {
@@ -32,10 +32,18 @@
         "ordinal": 5,
         "name": "locale",
         "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "currency",
+        "type_info": "Text"
       }
     ],
     "parameters": {
       "Left": [
+        "Uuid",
+        "Text",
+        "Text",
         "Text",
         "Text"
       ]
@@ -46,8 +54,9 @@
       true,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "058a74b9c239ee36f1fb63b7e15cf58f4581e419898f673d3211e913c1c1b22a"
+  "hash": "5832dc19f765248b0f9f9c76b065ab859b9be0e864b900179e7549888f1d2fe1"
 }

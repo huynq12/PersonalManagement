@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT focus_minutes, short_break_minutes, long_break_minutes, long_break_every,\n               hourly_wage, (base_work_hours * 100)::int4 AS base_work_hundredths,\n               monthly_budget\n        FROM user_settings\n        WHERE user_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "focus_minutes",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 1,
+        "name": "short_break_minutes",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 2,
+        "name": "long_break_minutes",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 3,
+        "name": "long_break_every",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 4,
+        "name": "hourly_wage",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "base_work_hundredths",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "monthly_budget",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      null,
+      true
+    ]
+  },
+  "hash": "6357e2414c5bbae5e087a1a57c9d3835c65f0f866616e98b33fff6e38abad275"
+}

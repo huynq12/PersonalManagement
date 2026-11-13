@@ -30,5 +30,5 @@ pub fn router() -> Router<AppState> {
         .route("/auth/google", get(handler::google_start))
         .route("/auth/google/callback", get(handler::google_callback))
         .route("/auth/google/link", post(handler::google_link))
-        .route("/me", get(handler::me))
+        .route("/me", get(handler::me).patch(handler::update_me))
 }

@@ -1,0 +1,59 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT u.id, u.email::text AS \"email!\", u.password_hash, u.display_name, u.timezone,\n               u.locale, u.currency\n        FROM users u\n        JOIN oauth_accounts o ON o.user_id = u.id\n        WHERE o.provider = $1 AND o.provider_user_id = $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "email!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "password_hash",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "display_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "timezone",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "locale",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "currency",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      null,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "21453695cb7a54b518c2d682fa6c38bc002131529baecea04996c3e005995fd6"
+}

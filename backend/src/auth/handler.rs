@@ -13,7 +13,7 @@ use super::{
     google::{self, CallbackQuery},
     model::{
         GoogleLinkResponse, GoogleStartQuery, LoginRequest, RegisterRequest, SessionResponse,
-        UserResponse,
+        UpdateMeRequest, UserResponse,
     },
     service::{self, GoogleCallback, Session},
     token,
@@ -85,6 +85,16 @@ pub(super) async fn me(
     auth: AuthUser,
 ) -> AppResult<Json<UserResponse>> {
     let user = service::current_user(&state.db, auth.id).await?;
+    Ok(Json(user.into()))
+}
+
+/// `PATCH /api/v1/me` — updates display name, time zone, language, or currency.
+pub(super) async fn update_me(
+    State(state): State<AppState>,
+    auth: AuthUser,
+    ValidatedJson(request): ValidatedJson<UpdateMeRequest>,
+) -> AppResult<Json<UserResponse>> {
+    let user = service::update_current_user(&state.db, auth.id, request).await?;
     Ok(Json(user.into()))
 }
 
