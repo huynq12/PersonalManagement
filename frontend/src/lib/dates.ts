@@ -4,6 +4,9 @@
 /** A calendar date as `YYYY-MM-DD`. */
 export type IsoDate = string
 
+/** A calendar month as `YYYY-MM`, the form the work log and finance endpoints take. */
+export type IsoMonth = string
+
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000
 // 2024-01-01 was a Monday; used to produce weekday names in week order.
@@ -61,4 +64,44 @@ export function weekdayNames(language: string | undefined): string[] {
   return Array.from({ length: 7 }, (_, index) =>
     format.format(new Date(A_MONDAY + index * MILLISECONDS_PER_DAY)),
   )
+}
+
+const ISO_MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/
+
+/** Whether `value` is a real month written as `YYYY-MM`. */
+export function isIsoMonth(value: string): value is IsoMonth {
+  return ISO_MONTH_PATTERN.test(value)
+}
+
+/** The month a date belongs to. */
+export function monthOf(date: IsoDate): IsoMonth {
+  return date.slice(0, 7)
+}
+
+/** The month `delta` months after `month` (negative for before). */
+export function addMonths(month: IsoMonth, delta: number): IsoMonth {
+  const [year, monthNumber] = month.split('-').map(Number)
+  const index = year * 12 + (monthNumber - 1) + delta
+  const newYear = Math.floor(index / 12)
+  const newMonth = (index % 12) + 1
+  return `${String(newYear).padStart(4, '0')}-${String(newMonth).padStart(2, '0')}`
+}
+
+/** A localized month and year such as "November 2026". */
+export function formatMonth(month: IsoMonth, language: string | undefined): string {
+  return new Intl.DateTimeFormat(language, {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(toUtc(`${month}-01`))
+}
+
+/** A short localized date with the weekday, such as "Sun, Nov 1". */
+export function formatShortDate(date: IsoDate, language: string | undefined): string {
+  return new Intl.DateTimeFormat(language, {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    timeZone: 'UTC',
+  }).format(toUtc(date))
 }

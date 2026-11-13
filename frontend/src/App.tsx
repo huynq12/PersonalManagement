@@ -10,6 +10,7 @@ import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import SettingsPage from './pages/SettingsPage'
+import WorkLogPage from './pages/WorkLogPage'
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/habits" element={<HabitsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/work-log" element={<WorkLogPage />} />
           {UNBUILT_ITEMS.map((item) => (
             <Route key={item.path} path={item.path} element={<ComingSoonPage item={item} />} />
           ))}

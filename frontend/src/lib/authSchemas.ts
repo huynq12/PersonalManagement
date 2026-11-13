@@ -13,6 +13,9 @@ export type ValidationMessageKey =
   | 'validation.longBreakEveryRange'
   | 'validation.moneyInvalid'
   | 'validation.hoursInvalid'
+  | 'validation.dateInvalid'
+  | 'validation.dateInFuture'
+  | 'validation.noteLength'
 
 const required: ValidationMessageKey = 'validation.required'
 const emailInvalid: ValidationMessageKey = 'validation.emailInvalid'
