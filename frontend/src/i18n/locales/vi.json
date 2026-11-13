@@ -162,7 +162,8 @@
     "hoursInvalid": "Nhập số giờ lớn hơn 0 và tối đa 24, tối đa hai chữ số thập phân.",
     "dateInvalid": "Hãy nhập một ngày hợp lệ.",
     "dateInFuture": "Hãy chọn hôm nay hoặc một ngày trước đó.",
-    "noteLength": "Tối đa 500 ký tự."
+    "noteLength": "Tối đa 500 ký tự.",
+    "categoryNameLength": "Hãy dùng tối đa 100 ký tự."
   },
   "errors": {
     "unknown": "Đã có lỗi xảy ra. Vui lòng thử lại.",
@@ -184,7 +185,9 @@
     "study_session_already_running": "Một phiên học đang chạy.",
     "study_session_not_running": "Phiên học này đã kết thúc.",
     "day_mode_locked": "Không thể đổi chế độ khi đã có thói quen được đánh dấu. Hãy bỏ đánh dấu các thói quen trước.",
-    "work_settings_missing": "Hãy đặt lương theo giờ và số giờ làm chuẩn trong Cài đặt trước."
+    "work_settings_missing": "Hãy đặt lương theo giờ và số giờ làm chuẩn trong Cài đặt trước.",
+    "finance_category_name_taken": "Bạn đã có một danh mục với tên này.",
+    "finance_category_in_use": "Danh mục này đã có giao dịch nên không thể xóa. Hãy lưu trữ nó."
   },
   "settings": {
     "title": "Cài đặt",
@@ -259,6 +262,94 @@
       "title": "Xóa mục này?",
       "description": "Mục của ngày {{date}} sẽ bị xóa. Không thể hoàn tác.",
       "confirm": "Xóa"
+    }
+  },
+  "finances": {
+    "title": "Tài chính",
+    "description": "Thu nhập và chi tiêu của bạn theo từng tháng.",
+    "summary": {
+      "income": "Thu nhập",
+      "expenses": "Chi tiêu",
+      "balance": "Số dư"
+    },
+    "budget": {
+      "title": "Ngân sách tháng",
+      "none": "Chưa đặt ngân sách.",
+      "setLink": "Đặt ngân sách trong Cài đặt",
+      "used": "{{spent}} trên {{budget}}",
+      "left": "Còn lại {{amount}} trong tháng này.",
+      "over": "Vượt ngân sách {{amount}}."
+    },
+    "byCategory": {
+      "title": "Chi tiêu theo danh mục",
+      "empty": "Tháng này chưa có khoản chi nào."
+    },
+    "form": {
+      "title": "Thêm giao dịch",
+      "editTitle": "Sửa giao dịch",
+      "kind": "Loại",
+      "expense": "Chi tiêu",
+      "income": "Thu nhập",
+      "amount": "Số tiền ({{currency}})",
+      "date": "Ngày",
+      "category": "Danh mục",
+      "categoryPlaceholder": "Chọn danh mục",
+      "noCategories": "Chưa có danh mục nào cho loại này.",
+      "manageCategories": "Quản lý danh mục",
+      "note": "Ghi chú",
+      "save": "Lưu giao dịch",
+      "cancelEdit": "Hủy sửa"
+    },
+    "list": {
+      "title": "Giao dịch",
+      "empty": "Tháng này chưa có giao dịch nào.",
+      "edit": "Sửa {{category}}, {{date}}",
+      "delete": "Xóa {{category}}, {{date}}"
+    },
+    "deleteDialog": {
+      "title": "Xóa giao dịch này?",
+      "description": "Giao dịch {{category}} ngày {{date}} sẽ bị xóa. Không thể hoàn tác.",
+      "confirm": "Xóa"
+    },
+    "suggestedCategories": {
+      "expense": {
+        "food": "Ăn uống",
+        "transport": "Đi lại",
+        "housing": "Nhà ở",
+        "bills": "Hóa đơn",
+        "shopping": "Mua sắm",
+        "health": "Sức khỏe",
+        "entertainment": "Giải trí",
+        "education": "Giáo dục",
+        "other": "Khác"
+      },
+      "income": {
+        "salary": "Lương",
+        "bonus": "Thưởng",
+        "other": "Khác"
+      }
+    }
+  },
+  "financeCategories": {
+    "title": "Danh mục tài chính",
+    "description": "Các danh mục để phân loại thu nhập và chi tiêu.",
+    "expenseTitle": "Danh mục chi tiêu",
+    "incomeTitle": "Danh mục thu nhập",
+    "empty": "Chưa có danh mục nào.",
+    "showArchived": "Hiện các danh mục đã lưu trữ",
+    "archivedBadge": "đã lưu trữ",
+    "name": "Tên",
+    "color": "Màu",
+    "add": "Thêm danh mục",
+    "addForm": "Thêm vào {{kind}}",
+    "edit": "Sửa {{name}}",
+    "editTitle": "Sửa danh mục",
+    "archive": "Lưu trữ {{name}}",
+    "restore": "Khôi phục {{name}}",
+    "suggested": {
+      "title": "Bắt đầu với bộ gợi ý",
+      "description": "Thêm các danh mục chi tiêu và thu nhập phổ biến chỉ với một bước. Bạn có thể đổi tên hoặc lưu trữ chúng sau.",
+      "button": "Thêm danh mục gợi ý"
     }
   }
 }

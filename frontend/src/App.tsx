@@ -5,6 +5,8 @@ import { UNBUILT_ITEMS } from './components/layout/navigation'
 import RequireAuth from './components/RequireAuth'
 import AuthCallbackPage from './pages/AuthCallbackPage'
 import ComingSoonPage from './pages/ComingSoonPage'
+import FinanceCategoriesPage from './pages/FinanceCategoriesPage'
+import FinancesPage from './pages/FinancesPage'
 import HabitsPage from './pages/HabitsPage'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
@@ -28,6 +30,8 @@ export default function App() {
           <Route path="/habits" element={<HabitsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/work-log" element={<WorkLogPage />} />
+          <Route path="/finances" element={<FinancesPage />} />
+          <Route path="/finance-categories" element={<FinanceCategoriesPage />} />
           {UNBUILT_ITEMS.map((item) => (
             <Route key={item.path} path={item.path} element={<ComingSoonPage item={item} />} />
           ))}

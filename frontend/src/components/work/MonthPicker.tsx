@@ -5,8 +5,8 @@ import IconButton from '../ui/IconButton'
 
 interface MonthPickerProps {
   month: IsoMonth
-  /** The newest month that can be shown; "next" is disabled there. */
-  latest: IsoMonth
+  /** The newest month that can be shown; "next" is disabled there. No limit when omitted. */
+  latest?: IsoMonth
   onChange: (month: IsoMonth) => void
 }
 
@@ -27,7 +27,7 @@ export default function MonthPicker({ month, latest, onChange }: MonthPickerProp
       <IconButton
         icon={ChevronRight}
         label={t('workLog.month.next')}
-        disabled={month >= latest}
+        disabled={latest !== undefined && month >= latest}
         onClick={() => onChange(addMonths(month, 1))}
       />
     </div>
