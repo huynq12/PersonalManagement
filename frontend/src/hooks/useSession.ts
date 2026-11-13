@@ -1,5 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { login, logout, register, restoreSession, SESSION_QUERY_KEY } from '../lib/auth'
+import {
+  login,
+  logout,
+  register,
+  restoreSession,
+  SESSION_QUERY_KEY,
+  startGoogleLink,
+} from '../lib/auth'
 
 /**
  * The signed-in user: `data` is a `User`, or `null` when nobody is signed in.
@@ -43,7 +50,19 @@ export function useLogout() {
     onSettled: () => {
       queryClient.setQueryData(SESSION_QUERY_KEY, null)
       // Drop everything cached for the previous user.
-      queryClient.removeQueries({ predicate: (query) => query.queryKey[0] !== SESSION_QUERY_KEY[0] })
+      queryClient.removeQueries({
+        predicate: (query) => query.queryKey[0] !== SESSION_QUERY_KEY[0],
+      })
+    },
+  })
+}
+
+/** Starts linking Google, then sends the browser to Google; the page unloads on success. */
+export function useLinkGoogle() {
+  return useMutation({
+    mutationFn: startGoogleLink,
+    onSuccess: (authorizationUrl) => {
+      window.location.assign(authorizationUrl)
     },
   })
 }

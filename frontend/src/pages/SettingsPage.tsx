@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import BudgetSection from '../components/settings/BudgetSection'
 import CurrencySection from '../components/settings/CurrencySection'
+import GoogleSection from '../components/settings/GoogleSection'
 import PomodoroSection from '../components/settings/PomodoroSection'
 import WorkSection from '../components/settings/WorkSection'
 import Alert from '../components/ui/Alert'
@@ -9,7 +10,7 @@ import { useSession } from '../hooks/useSession'
 import { useSettings } from '../hooks/useSettings'
 import { errorMessageKey } from '../i18n/errorMessage'
 
-/** The Settings screen: currency, Pomodoro lengths, work settings, and the monthly budget. */
+/** The Settings screen: currency, Pomodoro lengths, work settings, the monthly budget, and Google linking. */
 export default function SettingsPage() {
   const { t } = useTranslation()
   const settings = useSettings()
@@ -45,6 +46,7 @@ export default function SettingsPage() {
           />
           <BudgetSection key={`budget-${currency}`} settings={settings.data} currency={currency} />
           <PomodoroSection settings={settings.data} />
+          <GoogleSection />
         </>
       )}
     </main>

@@ -193,6 +193,12 @@
     "title": "Settings",
     "description": "Currency, work, budget, and Pomodoro preferences.",
     "saved": "Saved.",
+    "google": {
+      "title": "Google account",
+      "description": "Link your Google account to sign in with Google as well as your password.",
+      "link": "Link Google",
+      "linked": "Your Google account is linked."
+    },
     "currency": {
       "title": "Currency",
       "label": "Currency",

@@ -13,6 +13,7 @@ import {
   signedIn,
   stubApi,
   USER,
+  type Handler,
   type RecordedRequest,
 } from '../test/testUtils'
 
@@ -30,7 +31,7 @@ let settings: Settings
 let user: typeof USER & { currency: string }
 let requests: RecordedRequest[]
 
-function renderSettings() {
+function renderSettings(path = '/settings', extraHandlers: Record<string, Handler> = {}) {
   requests = stubApi({
     ...signedIn,
     'POST /auth/refresh': () =>
@@ -49,8 +50,9 @@ function renderSettings() {
       user = { ...user, ...(request.body as { currency: string }) }
       return jsonResponse(200, user)
     },
+    ...extraHandlers,
   })
-  renderApp('/settings')
+  renderApp(path)
 }
 
 function patchesTo(path: string) {
@@ -89,9 +91,9 @@ describe('Settings screen', () => {
     expect((work.getByLabelText('Hourly wage (VND)') as HTMLInputElement).value).toBe('30000')
     expect((work.getByLabelText('Base hours per day') as HTMLInputElement).value).toBe('7.5')
     const budget = await section('Monthly budget')
-    expect(
-      (budget.getByLabelText('Monthly expense budget (VND)') as HTMLInputElement).value,
-    ).toBe('5000000')
+    expect((budget.getByLabelText('Monthly expense budget (VND)') as HTMLInputElement).value).toBe(
+      '5000000',
+    )
     const pomodoro = await section('Pomodoro')
     expect((pomodoro.getByLabelText('Focus (minutes)') as HTMLInputElement).value).toBe('50')
   })
@@ -139,7 +141,10 @@ describe('Settings screen', () => {
     await userEvent.click(work.getByRole('button', { name: 'Save' }))
 
     expect(await work.findByText('Saved.')).toBeTruthy()
-    expect(patchesTo('/settings')[0].body).toEqual({ hourly_wage: 1250, base_work_hours: null })
+    expect(patchesTo('/settings')[0].body).toEqual({
+      hourly_wage: 1250,
+      base_work_hours: null,
+    })
     expect((work.getByLabelText('Hourly wage (USD)') as HTMLInputElement).value).toBe('12.5')
   })
 
@@ -240,8 +245,71 @@ describe('Settings screen', () => {
     renderSettings()
 
     expect(
-      await screen.findByRole('heading', { name: vi_.settings.title, level: 1 }),
+      await screen.findByRole('heading', {
+        name: vi_.settings.title,
+        level: 1,
+      }),
     ).toBeTruthy()
     expect(await screen.findByRole('region', { name: vi_.settings.work.title })).toBeTruthy()
+  })
+
+  describe('Google linking', () => {
+    it('starts linking and sends the browser to the Google URL', async () => {
+      const assign = vi.fn()
+      vi.stubGlobal('location', { ...window.location, assign })
+      renderSettings('/settings', {
+        'POST /auth/google/link': () =>
+          jsonResponse(200, {
+            authorization_url: 'https://accounts.example/auth?x=1',
+          }),
+      })
+      const google = await section('Google account')
+
+      await userEvent.click(google.getByRole('button', { name: 'Link Google' }))
+
+      await vi.waitFor(() =>
+        expect(assign).toHaveBeenCalledWith('https://accounts.example/auth?x=1'),
+      )
+    })
+
+    it('shows an error and stays on the page when linking cannot start', async () => {
+      const assign = vi.fn()
+      vi.stubGlobal('location', { ...window.location, assign })
+      renderSettings('/settings', {
+        'POST /auth/google/link': () => errorResponse(404, 'not_found'),
+      })
+      const google = await section('Google account')
+
+      await userEvent.click(google.getByRole('button', { name: 'Link Google' }))
+
+      expect((await google.findByRole('alert')).textContent).toBe(
+        'The requested item was not found.',
+      )
+      expect(assign).not.toHaveBeenCalled()
+    })
+
+    it('confirms a successful link after Google sends the user back', async () => {
+      renderSettings('/settings?google=linked')
+      const google = await section('Google account')
+
+      expect((await google.findByRole('status')).textContent).toBe('Your Google account is linked.')
+    })
+
+    it('translates the error code Google linking redirects back with', async () => {
+      renderSettings('/settings?error=google_account_already_linked')
+      const google = await section('Google account')
+
+      expect((await google.findByRole('alert')).textContent).toBe(
+        'This Google account is linked to another account, or your account already has a Google account linked.',
+      )
+    })
+
+    it('shows the Vietnamese text from the locale file', async () => {
+      await i18n.changeLanguage('vi')
+      renderSettings('/settings?google=linked')
+
+      const google = await section(vi_.settings.google.title)
+      expect((await google.findByRole('status')).textContent).toBe(vi_.settings.google.linked)
+    })
   })
 })

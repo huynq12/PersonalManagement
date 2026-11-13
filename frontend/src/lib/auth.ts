@@ -74,7 +74,10 @@ export const updateMe = (changes: AccountChanges) =>
 /** Revokes the refresh token on the server, then forgets the access token either way. */
 export async function logout(): Promise<void> {
   try {
-    await apiRequest('/auth/logout', z.null(), { method: 'POST', refreshOnUnauthorized: false })
+    await apiRequest('/auth/logout', z.null(), {
+      method: 'POST',
+      refreshOnUnauthorized: false,
+    })
   } finally {
     setAccessToken(null)
   }
@@ -130,6 +133,19 @@ export function installSessionRefresh(queryClient: QueryClient) {
     queryClient.setQueryData(SESSION_QUERY_KEY, user)
     return user !== null
   })
+}
+
+const googleLinkSchema = z.object({ authorization_url: z.string() })
+
+/**
+ * Asks the backend to start linking Google to the signed-in account and resolves to the Google
+ * URL the browser must open. It is an API call because it carries the access token.
+ */
+export async function startGoogleLink(): Promise<string> {
+  const { authorization_url } = await apiRequest('/auth/google/link', googleLinkSchema, {
+    method: 'POST',
+  })
+  return authorization_url
 }
 
 /** URL that starts Google sign-in. It is a page navigation, not an API call. */
