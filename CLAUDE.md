@@ -90,4 +90,41 @@ Load these large reference skills only when reviewing code or when the owner ask
 - `rust-skills` — Rust review.
 - `vercel-react-best-practices` — React review. Rules about Next.js, server components, and SWR do not apply (this is a Vite SPA using TanStack Query).
 
-Do not commit or push unless the owner asks.
+## Git workflow
+
+`main` always passes CI and only changes through a merged pull request.
+
+### Before starting a task
+
+- Run `git status` and `git branch --show-current`. If the working tree has changes that do not belong to the task, stop and ask the owner what to do with them; never stash, discard, or commit them on your own.
+- One task, one branch. Create it from an up-to-date `main` (`git switch main && git pull --ff-only && git switch -c <branch>`), or continue the task's existing branch.
+- Branch names: `<type>/<short-kebab-description>`, for example `feat/work-log-api` or `fix/streak-low-energy`. The types are the commit types below.
+- Never mix two tasks on one branch. If you notice unrelated work worth doing, tell the owner instead of doing it.
+
+### Commits
+
+- Commit on the task branch without asking, whenever one logical change is complete and the checks in the Commands table pass for the parts it touches. Never commit directly to `main`.
+- One logical change per commit: a commit builds and passes its checks on its own. Code, its tests, its migration, its `.sqlx/` metadata, its locale keys, and the `SPEC.md` update it requires go in the same commit.
+- Stage files by name (`git add <paths>`), then read `git diff --staged` before committing. Never use `git add -A` or `git add .`, and never commit `.env`, secrets, build output, or editor files.
+- Run the stray-Vietnamese check before every commit.
+- Messages follow [Conventional Commits](https://www.conventionalcommits.org/):
+  - Subject: `<type>(<optional scope>): <imperative summary>`, lowercase after the colon, no trailing period, at most 72 characters. Example: `feat(work-log): add monthly summary endpoint`.
+  - Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `ci`, `build`, `perf`, `style`.
+  - Scopes are feature names (`auth`, `habits`, `days`, `subjects`, `study-sessions`, `settings`, `work-log`, ...) or `backend` / `frontend` for cross-cutting changes.
+  - Body, separated by a blank line and wrapped at 72 columns: what changed and why, not a list of files.
+  - A breaking API or schema change adds `!` after the type and a `BREAKING CHANGE:` footer.
+- Commits made before this rule use plain imperative subjects; leave them as they are.
+
+### Pull requests
+
+- Push the branch and open a pull request only when the owner asks. Target `main`.
+- PR title: the Conventional Commits subject for the whole task. Description: summary, how it was verified (commands run and their result), and anything left undone or deferred.
+- Merge only after CI passes and the owner approves; the owner merges. Use **squash and merge**, with the PR title as the commit subject, so `main` keeps one commit per task.
+- After the merge, delete the branch locally and on GitHub, and switch back to an updated `main`.
+
+### Never, unless the owner explicitly asks for that specific action
+
+- Push to `main`, force-push (`--force`, `--force-with-lease`), or rewrite history that has been pushed (rebase, amend, reset).
+- Skip hooks (`--no-verify`) or signing.
+- Discard work: `git reset --hard`, `git checkout -- <path>`, `git restore`, `git clean`, `git stash drop`, or deleting an unmerged branch.
+- Create tags or releases.

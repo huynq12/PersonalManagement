@@ -18,6 +18,7 @@ pub mod days;
 pub mod error;
 pub mod habits;
 pub mod health;
+pub mod study_sessions;
 pub mod subjects;
 pub mod tasks;
 pub mod validation;
@@ -86,6 +87,7 @@ pub fn app(state: AppState) -> anyhow::Result<Router> {
         .merge(auth::router())
         .merge(habits::router())
         .merge(subjects::router())
+        .merge(study_sessions::router())
         .merge(tasks::router())
         .merge(days::router());
 

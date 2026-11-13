@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM study_sessions WHERE id = $2 AND user_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c7c4f3b5a427f8e2d91a8412833d3312b4d673966563774b51cbacf6cddde76c"
+}
