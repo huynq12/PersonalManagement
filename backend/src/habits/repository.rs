@@ -20,8 +20,8 @@ pub(super) async fn list_habits(
     sqlx::query_as!(
         Habit,
         r#"
-        SELECT id, name, weekdays, sort_order, archived_at, created_at,
-               habit_current_streak(id, weekdays, user_today($1, $3)) AS "current_streak!"
+        SELECT id, name, weekdays, low_energy, low_energy_name, sort_order, archived_at, created_at,
+               habit_current_streak(id, user_id, weekdays, low_energy, user_today($1, $3)) AS "current_streak!"
         FROM habits
         WHERE user_id = $1 AND ($2 OR archived_at IS NULL)
         ORDER BY sort_order, created_at
@@ -40,22 +40,27 @@ pub(super) async fn insert_habit(
     user_id: Uuid,
     name: &str,
     weekdays: &[i16],
+    low_energy: bool,
+    low_energy_name: Option<&str>,
     now: DateTime<Utc>,
 ) -> sqlx::Result<Habit> {
     sqlx::query_as!(
         Habit,
         r#"
-        INSERT INTO habits (user_id, name, weekdays, sort_order)
+        INSERT INTO habits (user_id, name, weekdays, low_energy, low_energy_name, sort_order)
         VALUES (
-            $1, $2, $3,
+            $1, $2, $3, $4, $5,
             (SELECT COALESCE(max(sort_order) + 1, 0) FROM habits WHERE user_id = $1)
         )
-        RETURNING id, name, weekdays, sort_order, archived_at, created_at,
-                  habit_current_streak(id, weekdays, user_today($1, $4)) AS "current_streak!"
+        RETURNING id, name, weekdays, low_energy, low_energy_name, sort_order, archived_at,
+                  created_at,
+                  habit_current_streak(id, user_id, weekdays, low_energy, user_today($1, $6)) AS "current_streak!"
         "#,
         user_id,
         name,
         weekdays,
+        low_energy,
+        low_energy_name,
         now,
     )
     .fetch_one(executor)
@@ -66,6 +71,9 @@ pub(super) async fn insert_habit(
 pub(super) struct HabitChanges<'a> {
     pub name: Option<&'a str>,
     pub weekdays: Option<&'a [i16]>,
+    pub low_energy: Option<bool>,
+    /// Trimmed; empty clears the easier name.
+    pub low_energy_name: Option<&'a str>,
     pub sort_order: Option<i32>,
     pub archived: Option<bool>,
 }
@@ -84,21 +92,31 @@ pub(super) async fn update_habit(
         UPDATE habits
         SET name = COALESCE($3, name),
             weekdays = COALESCE($4, weekdays),
-            sort_order = COALESCE($5, sort_order),
+            low_energy = COALESCE($5, low_energy),
+            low_energy_name = CASE
+                -- A habit that is not kept has no easier version.
+                WHEN NOT COALESCE($5, low_energy) THEN NULL
+                WHEN $6::text IS NULL THEN low_energy_name
+                ELSE NULLIF($6, '')
+            END,
+            sort_order = COALESCE($7, sort_order),
             archived_at = CASE
-                WHEN $6::boolean IS NULL THEN archived_at
+                WHEN $8::boolean IS NULL THEN archived_at
                 -- Archiving twice keeps the first archive time.
-                WHEN $6 THEN COALESCE(archived_at, $7)
+                WHEN $8 THEN COALESCE(archived_at, $9)
                 ELSE NULL
             END
         WHERE id = $2 AND user_id = $1
-        RETURNING id, name, weekdays, sort_order, archived_at, created_at,
-                  habit_current_streak(id, weekdays, user_today($1, $7)) AS "current_streak!"
+        RETURNING id, name, weekdays, low_energy, low_energy_name, sort_order, archived_at,
+                  created_at,
+                  habit_current_streak(id, user_id, weekdays, low_energy, user_today($1, $9)) AS "current_streak!"
         "#,
         user_id,
         habit_id,
         changes.name,
         changes.weekdays,
+        changes.low_energy,
+        changes.low_energy_name,
         changes.sort_order,
         changes.archived,
         now,
@@ -125,7 +143,8 @@ pub(super) async fn delete_habit(
 
 /// How a date relates to a habit's schedule and to the user's current day.
 pub(super) struct CompletionDateCheck {
-    /// The date's weekday is one the habit applies to.
+    /// The date's weekday is one the habit applies to, and the habit is not hidden by a
+    /// low-energy day.
     pub is_scheduled: bool,
     /// The date is after today in the user's time zone.
     pub is_future: bool,
@@ -142,7 +161,15 @@ pub(super) async fn check_completion_date(
     sqlx::query_as!(
         CompletionDateCheck,
         r#"
-        SELECT EXTRACT(ISODOW FROM $3::date)::smallint = ANY (weekdays) AS "is_scheduled!",
+        SELECT (
+                   EXTRACT(ISODOW FROM $3::date)::smallint = ANY (weekdays)
+                   AND (
+                       low_energy
+                       OR NOT EXISTS (
+                           SELECT 1 FROM low_energy_days l WHERE l.user_id = $1 AND l.date = $3
+                       )
+                   )
+               ) AS "is_scheduled!",
                $3::date > user_today($1, $4) AS "is_future!"
         FROM habits
         WHERE id = $2 AND user_id = $1

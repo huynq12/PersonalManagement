@@ -111,7 +111,12 @@ describe('adding a habit', () => {
 
     expect(await activeList().findByText('Meditate')).toBeTruthy()
     expect(screen.queryByRole('dialog')).toBeNull()
-    expect(habitRequests('POST')[0].body).toEqual({ name: 'Meditate', weekdays: [1, 2, 3, 4, 5] })
+    expect(habitRequests('POST')[0].body).toEqual({
+      name: 'Meditate',
+      weekdays: [1, 2, 3, 4, 5],
+      low_energy: false,
+      low_energy_name: null,
+    })
   })
 
   it('starts with every weekday selected', async () => {
@@ -204,7 +209,134 @@ describe('editing a habit', () => {
     expect(await activeList().findByText('Mon, Tue, Wed, Fri')).toBeTruthy()
     const [update] = habitRequests('PATCH')
     expect(update.path).toBe('/habits/habit-gym')
-    expect(update.body).toEqual({ name: 'Climbing', weekdays: [1, 2, 3, 5] })
+    expect(update.body).toEqual({
+      name: 'Climbing',
+      weekdays: [1, 2, 3, 5],
+      low_energy: false,
+      low_energy_name: null,
+    })
+  })
+})
+
+describe('low-energy days', () => {
+  const KEEP = 'Keep on low-energy days'
+  const EASIER = 'Easier version (optional)'
+
+  it('marks the habits that are kept on low-energy days', async () => {
+    backend.habits[0] = habit('habit-read', 'Read', { low_energy: true })
+
+    renderHabits()
+
+    const list = await screen.findByRole('list', { name: 'Habits' })
+    const [read, gym] = within(list).getAllByRole('listitem')
+    expect(within(read).getByText('Kept on low-energy days')).toBeTruthy()
+    expect(within(gym).queryByText('Kept on low-energy days')).toBeNull()
+  })
+
+  it('shows the easier version of a kept habit in the list', async () => {
+    backend.habits[0] = habit('habit-read', 'Read', {
+      low_energy: true,
+      low_energy_name: 'Read one page',
+    })
+
+    renderHabits()
+
+    expect(await screen.findByText('Easier version: Read one page')).toBeTruthy()
+  })
+
+  it('shows the easier-version field only while the switch is on', async () => {
+    renderHabits()
+    const dialog = await openDialog('Add habit', 'Add habit')
+
+    expect(dialog.getByRole('switch', { name: KEEP })).toHaveProperty('checked', false)
+    expect(dialog.queryByLabelText(EASIER)).toBeNull()
+
+    await userEvent.click(dialog.getByRole('switch', { name: KEEP }))
+    expect(dialog.getByLabelText(EASIER)).toBeTruthy()
+
+    await userEvent.click(dialog.getByRole('switch', { name: KEEP }))
+    expect(dialog.queryByLabelText(EASIER)).toBeNull()
+  })
+
+  it('sends the switch and the easier version when adding a habit', async () => {
+    renderHabits()
+    const dialog = await openDialog('Add habit', 'Add habit')
+
+    await userEvent.type(dialog.getByLabelText('Name'), 'Run 5 km')
+    await userEvent.click(dialog.getByRole('switch', { name: KEEP }))
+    await userEvent.type(dialog.getByLabelText(EASIER), '  Walk 5 minutes ')
+    await userEvent.click(dialog.getByRole('button', { name: 'Save' }))
+
+    expect(await activeList().findByText('Run 5 km')).toBeTruthy()
+    expect(habitRequests('POST')[0].body).toEqual({
+      name: 'Run 5 km',
+      weekdays: [1, 2, 3, 4, 5, 6, 7],
+      low_energy: true,
+      low_energy_name: 'Walk 5 minutes',
+    })
+  })
+
+  it('opens with the saved switch and easier version', async () => {
+    backend.habits[0] = habit('habit-read', 'Read', {
+      low_energy: true,
+      low_energy_name: 'Read one page',
+    })
+    renderHabits()
+
+    const dialog = await openDialog('Edit Read', 'Edit habit')
+
+    expect(dialog.getByRole('switch', { name: KEEP })).toHaveProperty('checked', true)
+    expect((dialog.getByLabelText(EASIER) as HTMLInputElement).value).toBe('Read one page')
+  })
+
+  it('sends a null easier version when the switch is turned off', async () => {
+    backend.habits[0] = habit('habit-read', 'Read', {
+      low_energy: true,
+      low_energy_name: 'Read one page',
+    })
+    renderHabits()
+    const dialog = await openDialog('Edit Read', 'Edit habit')
+
+    await userEvent.click(dialog.getByRole('switch', { name: KEEP }))
+    await userEvent.click(dialog.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => expect(habitRequests('PATCH')).toHaveLength(1))
+    expect(habitRequests('PATCH')[0].body).toMatchObject({
+      low_energy: false,
+      low_energy_name: null,
+    })
+  })
+
+  it('sends an empty easier version when it is cleared on a kept habit', async () => {
+    backend.habits[0] = habit('habit-read', 'Read', {
+      low_energy: true,
+      low_energy_name: 'Read one page',
+    })
+    renderHabits()
+    const dialog = await openDialog('Edit Read', 'Edit habit')
+
+    await userEvent.clear(dialog.getByLabelText(EASIER))
+    await userEvent.click(dialog.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => expect(habitRequests('PATCH')).toHaveLength(1))
+    expect(habitRequests('PATCH')[0].body).toMatchObject({
+      low_energy: true,
+      low_energy_name: '',
+    })
+  })
+
+  it('rejects an easier version longer than 100 characters', async () => {
+    renderHabits()
+    const dialog = await openDialog('Add habit', 'Add habit')
+
+    await userEvent.type(dialog.getByLabelText('Name'), 'Run')
+    await userEvent.click(dialog.getByRole('switch', { name: KEEP }))
+    await userEvent.click(dialog.getByLabelText(EASIER))
+    await userEvent.paste('a'.repeat(101))
+    await userEvent.click(dialog.getByRole('button', { name: 'Save' }))
+
+    expect(await dialog.findByText('Use at most 100 characters.')).toBeTruthy()
+    expect(habitRequests('POST')).toHaveLength(0)
   })
 })
 

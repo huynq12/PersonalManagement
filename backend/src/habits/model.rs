@@ -19,6 +19,10 @@ pub(crate) struct Habit {
     pub name: String,
     /// ISO weekdays the habit applies to, sorted.
     pub weekdays: Vec<i16>,
+    /// Whether the habit stays visible on low-energy days.
+    pub low_energy: bool,
+    /// Easier version shown on low-energy days. Always `null` when `low_energy` is `false`.
+    pub low_energy_name: Option<String>,
     pub sort_order: i32,
     /// When the habit was archived, or `null` while it is active.
     pub archived_at: Option<DateTime<Utc>>,
@@ -35,6 +39,11 @@ pub(super) struct CreateHabitRequest {
     /// Defaults to every day.
     #[validate(custom(function = "valid_weekdays"))]
     pub weekdays: Option<Vec<i16>>,
+    /// Defaults to `false`.
+    pub low_energy: Option<bool>,
+    /// Ignored unless `low_energy` is `true`; blank means "show the normal name".
+    #[validate(length(max = MAX_NAME_LENGTH))]
+    pub low_energy_name: Option<String>,
 }
 
 /// Body of `PATCH /habits/{id}`. Fields left out keep their value.
@@ -44,6 +53,10 @@ pub(super) struct UpdateHabitRequest {
     pub name: Option<String>,
     #[validate(custom(function = "valid_weekdays"))]
     pub weekdays: Option<Vec<i16>>,
+    pub low_energy: Option<bool>,
+    /// Blank clears the easier name. Turning `low_energy` off clears it as well.
+    #[validate(length(max = MAX_NAME_LENGTH))]
+    pub low_energy_name: Option<String>,
     pub sort_order: Option<i32>,
     /// `true` archives the habit, `false` restores it.
     pub archived: Option<bool>,

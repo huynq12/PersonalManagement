@@ -48,7 +48,8 @@
       "title": "Habits",
       "empty": "No habits are scheduled for this day.",
       "manage": "Manage habits",
-      "futureNote": "Habits cannot be checked off ahead of time."
+      "futureNote": "Habits cannot be checked off ahead of time.",
+      "emptyLowEnergy": "No habits are kept for low-energy days."
     },
     "tasks": {
       "title": "To-dos",
@@ -59,6 +60,13 @@
       "titleLabel": "To-do title",
       "edit": "Edit {{title}}",
       "delete": "Delete {{title}}"
+    },
+    "mode": {
+      "label": "Day mode",
+      "normal": "Normal",
+      "lowEnergy": "Low energy",
+      "lockedNotToday": "The mode can only be changed for today.",
+      "lockedChecked": "Uncheck all habits to change the mode."
     }
   },
   "habits": {
@@ -86,13 +94,19 @@
       "addTitle": "Add habit",
       "editTitle": "Edit habit",
       "name": "Name",
-      "weekdays": "Repeat on"
+      "weekdays": "Repeat on",
+      "lowEnergy": "Keep on low-energy days",
+      "lowEnergyHint": "On a low-energy day you only see the habits you keep.",
+      "lowEnergyName": "Easier version (optional)",
+      "lowEnergyNameHint": "Shown instead of the name on low-energy days."
     },
     "deleteDialog": {
       "title": "Delete this habit?",
       "description": "\"{{name}}\" and its whole history will be deleted permanently. This cannot be undone. Archive it instead to keep the history.",
       "confirm": "Delete permanently"
-    }
+    },
+    "keptOnLowEnergy": "Kept on low-energy days",
+    "easierVersion": "Easier version: {{name}}"
   },
   "common": {
     "save": "Save",
@@ -157,6 +171,7 @@
     "google_account_already_linked": "This Google account is linked to another account, or your account already has a Google account linked.",
     "subject_name_taken": "You already have a subject with this name.",
     "study_session_already_running": "A study session is already running.",
-    "study_session_not_running": "This study session has already ended."
+    "study_session_not_running": "This study session has already ended.",
+    "day_mode_locked": "The mode cannot be changed while a habit is checked. Uncheck your habits first."
   }
 }

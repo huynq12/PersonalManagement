@@ -6,8 +6,10 @@ import {
   deleteTask,
   getDay,
   HABITS_QUERY_KEY,
+  setDayMode,
   setHabitCompleted,
   updateTask,
+  type DayMode,
   type DayView,
 } from '../lib/checklist'
 import type { IsoDate } from '../lib/dates'
@@ -54,6 +56,9 @@ export function useToggleHabit(date: IsoDate) {
         habits: day.habits.map((habit) =>
           habit.id === habitId ? { ...habit, completed } : habit,
         ),
+        // Checking a habit locks the day mode right away; unchecking is settled by the refetch,
+        // because the server also counts habits that are not shown.
+        mode_locked: day.mode_locked || completed,
       })),
     onError: (_error, _input, previous) => {
       queryClient.setQueryData(dayQueryKey(date), previous)
@@ -120,5 +125,20 @@ export function useDeleteTask() {
   return useMutation({
     mutationFn: deleteTask,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: DAYS_QUERY_KEY }),
+  })
+}
+
+/**
+ * Switches `date` between a normal and a low-energy day.
+ *
+ * The result always comes from the server: the list of habits changes with the mode, and a
+ * refused change (another tab checked a habit) must show the real, locked state.
+ */
+export function useSetDayMode(date: IsoDate) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (mode: DayMode) => setDayMode(date, mode),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: dayQueryKey(date) }),
   })
 }

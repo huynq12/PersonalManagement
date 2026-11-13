@@ -1,0 +1,30 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT EXISTS (\n                   SELECT 1 FROM low_energy_days d WHERE d.user_id = $1 AND d.date = $2\n               ) AS \"is_low_energy!\",\n               (\n                   $2::date IS DISTINCT FROM user_today($1, $3)\n                   OR EXISTS (\n                       SELECT 1 FROM habit_completions c\n                       JOIN habits h ON h.id = c.habit_id\n                       WHERE h.user_id = $1 AND h.archived_at IS NULL AND c.date = $2\n                   )\n               ) AS \"locked!\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "is_low_energy!",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 1,
+        "name": "locked!",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Date",
+        "Timestamptz"
+      ]
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "debeb97506699fa110ae0e334cbedd31d69ea4e8622e25ee7f3add7346764960"
+}

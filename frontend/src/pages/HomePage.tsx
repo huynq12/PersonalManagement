@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router'
+import DayModeControl from '../components/today/DayModeControl'
 import DayNavigation from '../components/today/DayNavigation'
 import HabitChecklist from '../components/today/HabitChecklist'
 import TaskList from '../components/today/TaskList'
@@ -36,6 +37,14 @@ export default function HomePage() {
       <header className="flex flex-col gap-3">
         <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">{t('home.title')}</h1>
         <DayNavigation date={date} today={today} />
+        {day.isSuccess ? (
+          <DayModeControl
+            date={date}
+            mode={day.data.mode}
+            locked={day.data.mode_locked}
+            isToday={date === today}
+          />
+        ) : null}
       </header>
 
       {day.isPending ? (
@@ -50,7 +59,12 @@ export default function HomePage() {
       ) : (
         <div className="grid items-start gap-6 md:grid-cols-2">
           {/* ISO dates compare correctly as strings. */}
-          <HabitChecklist date={date} habits={day.data.habits} isFuture={date > today} />
+          <HabitChecklist
+            date={date}
+            habits={day.data.habits}
+            mode={day.data.mode}
+            isFuture={date > today}
+          />
           <TaskList date={date} tasks={day.data.tasks} />
         </div>
       )}

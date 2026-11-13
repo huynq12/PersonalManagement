@@ -7,6 +7,10 @@ export const habitSchema = z.object({
   name: z.string(),
   /** ISO weekdays the habit applies to: 1 (Monday) to 7 (Sunday). */
   weekdays: z.array(z.number()),
+  /** Whether the habit stays on low-energy days. */
+  low_energy: z.boolean(),
+  /** Easier version shown on low-energy days; always null when `low_energy` is false. */
+  low_energy_name: z.string().nullable(),
   sort_order: z.number(),
   archived_at: z.string().nullable(),
   created_at: z.string(),
@@ -35,8 +39,15 @@ const dayHabitSchema = z.object({
 
 export type DayHabit = z.infer<typeof dayHabitSchema>
 
+export const dayModeSchema = z.enum(['normal', 'low_energy'])
+
+export type DayMode = z.infer<typeof dayModeSchema>
+
 export const dayViewSchema = z.object({
   date: z.string(),
+  mode: dayModeSchema,
+  /** The mode cannot change: the date is not today, or a habit is already checked. */
+  mode_locked: z.boolean(),
   habits: z.array(dayHabitSchema),
   tasks: z.array(taskSchema),
 })
@@ -62,6 +73,10 @@ export const HABITS_QUERY_KEY = ['habits'] as const
 
 export const getDay = (date: IsoDate) => apiRequest(`/days/${date}`, dayViewSchema)
 
+/** Marks a day as a normal or a low-energy day. The server accepts only today. */
+export const setDayMode = (date: IsoDate, mode: DayMode) =>
+  apiRequest(`/days/${date}/mode`, noContent, { method: 'PUT', body: { mode } })
+
 // ---------------------------------------------------------------------------------------------
 // Habits
 // ---------------------------------------------------------------------------------------------
@@ -71,6 +86,9 @@ export const listHabits = () => apiRequest('/habits?include_archived=true', z.ar
 export interface HabitInput {
   name: string
   weekdays: number[]
+  low_energy: boolean
+  /** Ignored by the server unless `low_energy` is true; blank means "use the normal name". */
+  low_energy_name: string | null
 }
 
 export const createHabit = (input: HabitInput) =>
@@ -79,6 +97,9 @@ export const createHabit = (input: HabitInput) =>
 export interface HabitChanges {
   name?: string
   weekdays?: number[]
+  low_energy?: boolean
+  /** A blank string clears the easier name; `null` leaves it unchanged. */
+  low_energy_name?: string | null
   sort_order?: number
   archived?: boolean
 }

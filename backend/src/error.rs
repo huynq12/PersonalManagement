@@ -61,6 +61,9 @@ pub enum AppError {
     /// The study session already completed or was cancelled.
     #[error("study session is not running")]
     StudySessionNotRunning,
+    /// The day mode cannot change because a habit is already checked for today.
+    #[error("day mode cannot change while a habit is checked")]
+    DayModeLocked,
     /// A dependency such as the database is unreachable.
     #[error("service temporarily unavailable")]
     ServiceUnavailable,
@@ -99,6 +102,7 @@ impl AppError {
                 (StatusCode::CONFLICT, "study_session_already_running")
             }
             Self::StudySessionNotRunning => (StatusCode::CONFLICT, "study_session_not_running"),
+            Self::DayModeLocked => (StatusCode::CONFLICT, "day_mode_locked"),
             Self::ServiceUnavailable => (StatusCode::SERVICE_UNAVAILABLE, "service_unavailable"),
             Self::Database(_) | Self::Internal(_) => {
                 (StatusCode::INTERNAL_SERVER_ERROR, "internal_error")

@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { useToggleHabit } from '../../hooks/useDay'
 import { errorMessageKey } from '../../i18n/errorMessage'
-import type { DayHabit } from '../../lib/checklist'
+import type { DayHabit, DayMode } from '../../lib/checklist'
 import type { IsoDate } from '../../lib/dates'
 import Alert from '../ui/Alert'
 import Card from '../ui/Card'
@@ -11,12 +11,13 @@ import Checkbox from '../ui/Checkbox'
 interface HabitChecklistProps {
   date: IsoDate
   habits: DayHabit[]
+  mode: DayMode
   /** A future day: habits are listed but cannot be checked (the API rejects it too). */
   isFuture: boolean
 }
 
 /** The habits scheduled for one day, each with a checkbox. */
-export default function HabitChecklist({ date, habits, isFuture }: HabitChecklistProps) {
+export default function HabitChecklist({ date, habits, mode, isFuture }: HabitChecklistProps) {
   const { t } = useTranslation()
   const toggle = useToggleHabit(date)
   const done = habits.filter((habit) => habit.completed).length
@@ -30,7 +31,7 @@ export default function HabitChecklist({ date, habits, isFuture }: HabitChecklis
 
       {habits.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          {t('home.habits.empty')}{' '}
+          {t(mode === 'low_energy' ? 'home.habits.emptyLowEnergy' : 'home.habits.empty')}{' '}
           <Link className="font-medium text-foreground underline underline-offset-4" to="/habits">
             {t('home.habits.manage')}
           </Link>
