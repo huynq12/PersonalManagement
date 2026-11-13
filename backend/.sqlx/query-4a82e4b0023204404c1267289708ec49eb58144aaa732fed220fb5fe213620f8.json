@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE transactions\n        SET category_id = COALESCE($3, category_id),\n            amount = COALESCE($4, amount),\n            date = COALESCE($5, date),\n            note = CASE WHEN $6 THEN $7 ELSE note END\n        WHERE id = $2 AND user_id = $1\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Int8",
+        "Date",
+        "Bool",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4a82e4b0023204404c1267289708ec49eb58144aaa732fed220fb5fe213620f8"
+}

@@ -1,0 +1,57 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE finance_categories\n        SET name = COALESCE($3, name),\n            color = COALESCE($4, color),\n            archived_at = CASE\n                WHEN $5::boolean IS NULL THEN archived_at\n                -- Archiving twice keeps the first archive time.\n                WHEN $5 THEN COALESCE(archived_at, $6)\n                ELSE NULL\n            END\n        WHERE id = $2 AND user_id = $1\n        RETURNING id, kind, name, color, archived_at, created_at\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "kind",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "color",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "archived_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "Bool",
+        "Timestamptz"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "7d48e369813dcc736c45abdfc386a70b3bec6272e142e02a42d50339e9b64798"
+}

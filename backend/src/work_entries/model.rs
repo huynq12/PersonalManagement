@@ -118,22 +118,6 @@ fn valid_hours(hours: f64) -> Result<(), ValidationError> {
     Ok(())
 }
 
-/// Parses `YYYY-MM` into the first day of that month, or `None` if it is not exactly that
-/// shape or not a real month.
-pub(super) fn parse_month(text: &str) -> Option<NaiveDate> {
-    let bytes = text.as_bytes();
-    let shaped = bytes.len() == 7
-        && bytes[4] == b'-'
-        && bytes
-            .iter()
-            .enumerate()
-            .all(|(index, byte)| index == 4 || byte.is_ascii_digit());
-    if !shaped {
-        return None;
-    }
-    NaiveDate::parse_from_str(&format!("{text}-01"), "%Y-%m-%d").ok()
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -146,23 +130,6 @@ mod tests {
             base_hundredths: base,
             pay,
             note: None,
-        }
-    }
-
-    #[test]
-    fn parse_month_accepts_only_year_dash_month() {
-        assert_eq!(parse_month("2026-01"), NaiveDate::from_ymd_opt(2026, 1, 1));
-        for bad in [
-            "2026-13",
-            "2026-00",
-            "2026-1",
-            "26-01",
-            "2026-01-01",
-            "",
-            "abcd-ef",
-            "+026-01",
-        ] {
-            assert_eq!(parse_month(bad), None, "{bad}");
         }
     }
 

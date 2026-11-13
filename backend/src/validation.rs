@@ -9,7 +9,8 @@ use axum::{
     extract::{FromRequest, FromRequestParts, Path, Query, Request},
     http::request::Parts,
 };
-use serde::de::DeserializeOwned;
+use chrono::NaiveDate;
+use serde::{Deserialize, Deserializer, de::DeserializeOwned};
 use validator::{Validate, ValidationError};
 
 use crate::error::{AppError, FieldErrors};
@@ -124,6 +125,32 @@ pub fn not_blank(text: &str) -> Result<(), ValidationError> {
     Ok(())
 }
 
+/// Parses `YYYY-MM` into the first day of that month, or `None` if it is not exactly that
+/// shape or not a real month.
+pub(crate) fn parse_month(text: &str) -> Option<NaiveDate> {
+    let bytes = text.as_bytes();
+    let shaped = bytes.len() == 7
+        && bytes[4] == b'-'
+        && bytes
+            .iter()
+            .enumerate()
+            .all(|(index, byte)| index == 4 || byte.is_ascii_digit());
+    if !shaped {
+        return None;
+    }
+    NaiveDate::parse_from_str(&format!("{text}-01"), "%Y-%m-%d").ok()
+}
+
+/// Deserializes a field that may be absent, `null`, or a value into `None`, `Some(None)`, or
+/// `Some(Some(value))`. Use together with `#[serde(default)]`.
+pub(crate) fn present<'de, T, D>(deserializer: D) -> Result<Option<Option<T>>, D::Error>
+where
+    T: Deserialize<'de>,
+    D: Deserializer<'de>,
+{
+    Option::<T>::deserialize(deserializer).map(Some)
+}
+
 const MAX_HOURS_PER_DAY: f64 = 24.0;
 
 /// Converts hours to whole hundredths of an hour, or `None` if the value is out of range or
@@ -146,6 +173,23 @@ pub(crate) fn to_hundredths(hours: f64) -> Option<i32> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn parse_month_accepts_only_year_dash_month() {
+        assert_eq!(parse_month("2026-01"), NaiveDate::from_ymd_opt(2026, 1, 1));
+        for bad in [
+            "2026-13",
+            "2026-00",
+            "2026-1",
+            "26-01",
+            "2026-01-01",
+            "",
+            "abcd-ef",
+            "+026-01",
+        ] {
+            assert_eq!(parse_month(bad), None, "{bad}");
+        }
+    }
 
     #[test]
     fn not_blank_rejects_empty_and_whitespace_only_text() {
