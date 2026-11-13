@@ -1,0 +1,53 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT date, (hours * 100)::int4 AS \"hours_hundredths!\", hourly_wage,\n               (base_hours * 100)::int4 AS \"base_hundredths!\",\n               round(hours * hourly_wage)::int8 AS \"pay!\", note\n        FROM work_entries\n        WHERE user_id = $1 AND date >= $2 AND date < ($2::date + interval '1 month')::date\n        ORDER BY date\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "date",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 1,
+        "name": "hours_hundredths!",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "hourly_wage",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "base_hundredths!",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "pay!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "note",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Date"
+      ]
+    },
+    "nullable": [
+      false,
+      null,
+      false,
+      null,
+      null,
+      true
+    ]
+  },
+  "hash": "649183c039e08ae32af85ffe788098d10a20b4ec0236963a8ffa98bd22b362bf"
+}

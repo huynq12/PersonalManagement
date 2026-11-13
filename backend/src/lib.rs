@@ -23,6 +23,7 @@ pub mod study_sessions;
 pub mod subjects;
 pub mod tasks;
 pub mod validation;
+pub mod work_entries;
 
 /// State shared by every handler. Cloning is cheap: the fields are reference counted.
 #[derive(Debug, Clone)]
@@ -91,7 +92,8 @@ pub fn app(state: AppState) -> anyhow::Result<Router> {
         .merge(subjects::router())
         .merge(study_sessions::router())
         .merge(tasks::router())
-        .merge(days::router());
+        .merge(days::router())
+        .merge(work_entries::router());
 
     Ok(Router::new()
         .nest("/api/v1", api)

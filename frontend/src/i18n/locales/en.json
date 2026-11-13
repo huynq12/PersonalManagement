@@ -32,8 +32,12 @@
       "overview": "Overview",
       "checklist": "Checklist",
       "study": "Study",
-      "meals": "Meals"
-    }
+      "meals": "Meals",
+      "money": "Money"
+    },
+    "workLog": "Work log",
+    "finances": "Finances",
+    "financeCategories": "Finance categories"
   },
   "comingSoon": {
     "description": "This feature is not built yet."
@@ -155,7 +159,10 @@
     "minutesRange": "Enter a whole number from 1 to 240.",
     "longBreakEveryRange": "Enter a whole number from 1 to 12.",
     "moneyInvalid": "Enter an amount greater than 0, using digits and at most one decimal point, with no more decimals than the currency has.",
-    "hoursInvalid": "Enter hours greater than 0 and at most 24, with up to two decimals."
+    "hoursInvalid": "Enter hours greater than 0 and at most 24, with up to two decimals.",
+    "dateInvalid": "Enter a valid date.",
+    "dateInFuture": "Choose today or an earlier day.",
+    "noteLength": "Use at most 500 characters."
   },
   "errors": {
     "unknown": "Something went wrong. Please try again.",
@@ -176,7 +183,8 @@
     "subject_name_taken": "You already have a subject with this name.",
     "study_session_already_running": "A study session is already running.",
     "study_session_not_running": "This study session has already ended.",
-    "day_mode_locked": "The mode cannot be changed while a habit is checked. Uncheck your habits first."
+    "day_mode_locked": "The mode cannot be changed while a habit is checked. Uncheck your habits first.",
+    "work_settings_missing": "Set your hourly wage and base hours in Settings first."
   },
   "settings": {
     "title": "Settings",
@@ -205,6 +213,52 @@
       "shortBreak": "Short break (minutes)",
       "longBreak": "Long break (minutes)",
       "longBreakEvery": "Focus sessions before a long break"
+    }
+  },
+  "workLog": {
+    "title": "Work log",
+    "description": "The hours you worked each day and the pay they earn.",
+    "month": {
+      "previous": "Previous month",
+      "next": "Next month"
+    },
+    "form": {
+      "title": "Log hours",
+      "editTitle": "Edit entry",
+      "date": "Date",
+      "hours": "Hours",
+      "hoursHint": "Up to two decimals, such as 7.5.",
+      "note": "Note",
+      "save": "Save entry",
+      "cancelEdit": "Cancel editing"
+    },
+    "list": {
+      "title": "Entries",
+      "date": "Date",
+      "hours": "Hours",
+      "pay": "Pay",
+      "comparison": "Compared with base",
+      "total": "Total",
+      "daysWorked_one": "{{count}} day",
+      "daysWorked_other": "{{count}} days",
+      "empty": "No hours logged this month.",
+      "edit": "Edit {{date}}",
+      "delete": "Delete {{date}}"
+    },
+    "comparison": {
+      "above": "Above base",
+      "equal": "Equal to base",
+      "below": "Below base"
+    },
+    "setup": {
+      "title": "Set your wage first",
+      "description": "The work log needs your hourly wage and base hours to compute pay.",
+      "link": "Open Settings"
+    },
+    "deleteDialog": {
+      "title": "Delete this entry?",
+      "description": "The entry for {{date}} will be removed. This cannot be undone.",
+      "confirm": "Delete"
     }
   }
 }

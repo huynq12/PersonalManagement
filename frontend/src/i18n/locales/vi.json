@@ -32,8 +32,12 @@
       "overview": "Tổng quan",
       "checklist": "Checklist",
       "study": "Học tập",
-      "meals": "Ăn uống"
-    }
+      "meals": "Ăn uống",
+      "money": "Tiền bạc"
+    },
+    "workLog": "Nhật ký công việc",
+    "finances": "Tài chính",
+    "financeCategories": "Danh mục tài chính"
   },
   "comingSoon": {
     "description": "Tính năng này đang được xây dựng."
@@ -155,7 +159,10 @@
     "minutesRange": "Nhập một số nguyên từ 1 đến 240.",
     "longBreakEveryRange": "Nhập một số nguyên từ 1 đến 12.",
     "moneyInvalid": "Nhập số tiền lớn hơn 0, chỉ gồm chữ số và tối đa một dấu thập phân, không quá số chữ số thập phân của tiền tệ.",
-    "hoursInvalid": "Nhập số giờ lớn hơn 0 và tối đa 24, tối đa hai chữ số thập phân."
+    "hoursInvalid": "Nhập số giờ lớn hơn 0 và tối đa 24, tối đa hai chữ số thập phân.",
+    "dateInvalid": "Hãy nhập một ngày hợp lệ.",
+    "dateInFuture": "Hãy chọn hôm nay hoặc một ngày trước đó.",
+    "noteLength": "Tối đa 500 ký tự."
   },
   "errors": {
     "unknown": "Đã có lỗi xảy ra. Vui lòng thử lại.",
@@ -176,7 +183,8 @@
     "subject_name_taken": "Bạn đã có một môn học trùng tên này.",
     "study_session_already_running": "Một phiên học đang chạy.",
     "study_session_not_running": "Phiên học này đã kết thúc.",
-    "day_mode_locked": "Không thể đổi chế độ khi đã có thói quen được đánh dấu. Hãy bỏ đánh dấu các thói quen trước."
+    "day_mode_locked": "Không thể đổi chế độ khi đã có thói quen được đánh dấu. Hãy bỏ đánh dấu các thói quen trước.",
+    "work_settings_missing": "Hãy đặt lương theo giờ và số giờ làm chuẩn trong Cài đặt trước."
   },
   "settings": {
     "title": "Cài đặt",
@@ -205,6 +213,52 @@
       "shortBreak": "Nghỉ ngắn (phút)",
       "longBreak": "Nghỉ dài (phút)",
       "longBreakEvery": "Số phiên tập trung trước mỗi lần nghỉ dài"
+    }
+  },
+  "workLog": {
+    "title": "Nhật ký công việc",
+    "description": "Số giờ bạn làm mỗi ngày và tiền công tương ứng.",
+    "month": {
+      "previous": "Tháng trước",
+      "next": "Tháng sau"
+    },
+    "form": {
+      "title": "Ghi giờ làm",
+      "editTitle": "Sửa mục",
+      "date": "Ngày",
+      "hours": "Số giờ",
+      "hoursHint": "Tối đa hai chữ số thập phân, ví dụ 7,5.",
+      "note": "Ghi chú",
+      "save": "Lưu mục",
+      "cancelEdit": "Hủy sửa"
+    },
+    "list": {
+      "title": "Các mục",
+      "date": "Ngày",
+      "hours": "Số giờ",
+      "pay": "Tiền công",
+      "comparison": "So với giờ chuẩn",
+      "total": "Tổng",
+      "daysWorked_one": "{{count}} ngày",
+      "daysWorked_other": "{{count}} ngày",
+      "empty": "Tháng này chưa có giờ làm nào.",
+      "edit": "Sửa {{date}}",
+      "delete": "Xóa {{date}}"
+    },
+    "comparison": {
+      "above": "Hơn giờ chuẩn",
+      "equal": "Bằng giờ chuẩn",
+      "below": "Ít hơn giờ chuẩn"
+    },
+    "setup": {
+      "title": "Hãy đặt mức lương trước",
+      "description": "Nhật ký công việc cần lương theo giờ và số giờ làm chuẩn để tính tiền công.",
+      "link": "Mở Cài đặt"
+    },
+    "deleteDialog": {
+      "title": "Xóa mục này?",
+      "description": "Mục của ngày {{date}} sẽ bị xóa. Không thể hoàn tác.",
+      "confirm": "Xóa"
     }
   }
 }

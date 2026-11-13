@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { addDays, formatLongDate, isIsoDate, isoWeekday, todayIn, weekdayNames } from './dates'
+import {
+  addDays,
+  addMonths,
+  formatLongDate,
+  formatMonth,
+  isIsoDate,
+  isIsoMonth,
+  isoWeekday,
+  monthOf,
+  todayIn,
+  weekdayNames,
+} from './dates'
 
 describe('todayIn', () => {
   it('returns the calendar date in the given time zone, not in UTC', () => {
@@ -57,5 +68,30 @@ describe('formatLongDate', () => {
 describe('weekdayNames', () => {
   it('lists seven short names starting on Monday', () => {
     expect(weekdayNames('en')).toEqual(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
+  })
+})
+
+describe('months', () => {
+  it('takes the month of a date', () => {
+    expect(monthOf('2026-11-12')).toBe('2026-11')
+  })
+
+  it('moves between months across year boundaries', () => {
+    expect(addMonths('2026-11', 1)).toBe('2026-12')
+    expect(addMonths('2026-12', 1)).toBe('2027-01')
+    expect(addMonths('2026-01', -1)).toBe('2025-12')
+    expect(addMonths('2026-03', -14)).toBe('2025-01')
+  })
+
+  it('accepts only real months written as YYYY-MM', () => {
+    expect(isIsoMonth('2026-01')).toBe(true)
+    for (const bad of ['2026-13', '2026-00', '2026-1', '2026-01-01', 'abc', '']) {
+      expect(isIsoMonth(bad)).toBe(false)
+    }
+  })
+
+  it('formats a month in the given language', () => {
+    expect(formatMonth('2026-11', 'en')).toBe('November 2026')
+    expect(formatMonth('2026-11', 'vi')).toMatch(/2026/)
   })
 })

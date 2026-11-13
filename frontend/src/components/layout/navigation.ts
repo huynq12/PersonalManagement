@@ -1,11 +1,14 @@
 import {
   BookOpen,
+  Briefcase,
   CalendarCheck,
   ChartColumn,
+  Landmark,
   ListChecks,
   Settings,
   ShoppingCart,
   Soup,
+  Tags,
   Timer,
   Utensils,
   type LucideIcon,
@@ -21,6 +24,9 @@ type NavLabelKey =
   | 'nav.mealPlanShort'
   | 'nav.dishes'
   | 'nav.shoppingList'
+  | 'nav.workLog'
+  | 'nav.finances'
+  | 'nav.financeCategories'
   | 'nav.settings'
 
 type NavGroupLabelKey =
@@ -28,6 +34,7 @@ type NavGroupLabelKey =
   | 'nav.groups.checklist'
   | 'nav.groups.study'
   | 'nav.groups.meals'
+  | 'nav.groups.money'
 
 export interface NavItem {
   /** Route path; matches the screen list in SPEC.md. */
@@ -61,6 +68,14 @@ const SHOPPING_LIST: NavItem = {
   icon: ShoppingCart,
 }
 
+const WORK_LOG: NavItem = { path: '/work-log', labelKey: 'nav.workLog', icon: Briefcase }
+const FINANCES: NavItem = { path: '/finances', labelKey: 'nav.finances', icon: Landmark }
+const FINANCE_CATEGORIES: NavItem = {
+  path: '/finance-categories',
+  labelKey: 'nav.financeCategories',
+  icon: Tags,
+}
+
 export const SETTINGS_ITEM: NavItem = {
   path: '/settings',
   labelKey: 'nav.settings',
@@ -73,6 +88,7 @@ export const NAV_GROUPS: NavGroup[] = [
   { labelKey: 'nav.groups.checklist', items: [HABITS] },
   { labelKey: 'nav.groups.study', items: [POMODORO, SUBJECTS] },
   { labelKey: 'nav.groups.meals', items: [MEAL_PLAN, DISHES, SHOPPING_LIST] },
+  { labelKey: 'nav.groups.money', items: [WORK_LOG, FINANCES, FINANCE_CATEGORIES] },
 ]
 
 /** The phone bottom bar: the screens used every day. Everything else is under "More". */
@@ -88,4 +104,4 @@ export const MORE_SHEET_GROUPS: NavGroup[] = NAV_GROUPS.map((group) => ({
 export const UNBUILT_ITEMS: NavItem[] = [
   ...NAV_GROUPS.flatMap((group) => group.items),
   SETTINGS_ITEM,
-].filter((item) => item !== TODAY && item !== HABITS && item !== SETTINGS_ITEM)
+].filter((item) => item !== TODAY && item !== HABITS && item !== WORK_LOG && item !== SETTINGS_ITEM)
