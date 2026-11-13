@@ -209,6 +209,88 @@ async fn create_rejects_weekday_outside_1_to_7(db: PgPool) {
 }
 
 #[sqlx::test]
+async fn create_defaults_to_hidden_on_low_energy_days(db: PgPool) {
+    let app = common::app(db);
+    let token = sign_up(&app, ADA).await;
+
+    let response = create_habit(&app, &token, json!({ "name": "Read" })).await;
+
+    assert_eq!(response.body["low_energy"], false);
+    assert_eq!(response.body["low_energy_name"], Value::Null);
+}
+
+#[sqlx::test]
+async fn create_stores_the_low_energy_fields(db: PgPool) {
+    let app = common::app(db);
+    let token = sign_up(&app, ADA).await;
+
+    let response = create_habit(
+        &app,
+        &token,
+        json!({ "name": "Run 5 km", "low_energy": true, "low_energy_name": "  Walk 5 minutes  " }),
+    )
+    .await;
+
+    assert_eq!(response.status, StatusCode::CREATED);
+    assert_eq!(response.body["low_energy"], true);
+    assert_eq!(response.body["low_energy_name"], "Walk 5 minutes");
+    let listed = list_habits(&app, &token, "").await;
+    assert_eq!(listed.body[0]["low_energy_name"], "Walk 5 minutes");
+}
+
+#[sqlx::test]
+async fn create_stores_a_blank_easier_name_as_null(db: PgPool) {
+    let app = common::app(db);
+    let token = sign_up(&app, ADA).await;
+
+    let response = create_habit(
+        &app,
+        &token,
+        json!({ "name": "Read", "low_energy": true, "low_energy_name": "   " }),
+    )
+    .await;
+
+    assert_eq!(response.body["low_energy"], true);
+    assert_eq!(response.body["low_energy_name"], Value::Null);
+}
+
+#[sqlx::test]
+async fn create_ignores_an_easier_name_when_the_habit_is_not_kept(db: PgPool) {
+    let app = common::app(db);
+    let token = sign_up(&app, ADA).await;
+
+    let response = create_habit(
+        &app,
+        &token,
+        json!({ "name": "Read", "low_energy_name": "Read a page" }),
+    )
+    .await;
+
+    assert_eq!(response.status, StatusCode::CREATED);
+    assert_eq!(response.body["low_energy"], false);
+    assert_eq!(response.body["low_energy_name"], Value::Null);
+}
+
+#[sqlx::test]
+async fn create_rejects_easier_name_longer_than_100_characters(db: PgPool) {
+    let app = common::app(db);
+    let token = sign_up(&app, ADA).await;
+
+    let response = create_habit(
+        &app,
+        &token,
+        json!({ "name": "Read", "low_energy": true, "low_energy_name": "a".repeat(101) }),
+    )
+    .await;
+
+    assert_eq!(response.status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(
+        response.body["error"]["details"]["fields"]["low_energy_name"],
+        json!(["length"])
+    );
+}
+
+#[sqlx::test]
 async fn create_requires_authentication(db: PgPool) {
     let app = common::app(db);
 
@@ -280,6 +362,137 @@ async fn update_changes_only_the_given_fields(db: PgPool) {
     assert_eq!(response.status, StatusCode::OK);
     assert_eq!(response.body["name"], "Read");
     assert_eq!(response.body["weekdays"], json!([6, 7]));
+}
+
+#[sqlx::test]
+async fn update_turns_the_low_energy_flag_on_with_an_easier_name(db: PgPool) {
+    let app = common::app(db);
+    let token = sign_up(&app, ADA).await;
+    let id = create_daily_habit(&app, &token, "Run 5 km").await;
+
+    let response = patch_habit(
+        &app,
+        &token,
+        &id,
+        json!({ "low_energy": true, "low_energy_name": "Walk 5 minutes" }),
+    )
+    .await;
+
+    assert_eq!(response.status, StatusCode::OK);
+    assert_eq!(response.body["low_energy"], true);
+    assert_eq!(response.body["low_energy_name"], "Walk 5 minutes");
+}
+
+#[sqlx::test]
+async fn update_without_low_energy_fields_keeps_them(db: PgPool) {
+    let app = common::app(db);
+    let token = sign_up(&app, ADA).await;
+    let id = create_habit(
+        &app,
+        &token,
+        json!({ "name": "Run", "low_energy": true, "low_energy_name": "Walk" }),
+    )
+    .await
+    .body["id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+
+    let response = patch_habit(&app, &token, &id, json!({ "name": "Run 5 km" })).await;
+
+    assert_eq!(response.body["low_energy"], true);
+    assert_eq!(response.body["low_energy_name"], "Walk");
+}
+
+#[sqlx::test]
+async fn update_changes_only_the_easier_name_of_a_kept_habit(db: PgPool) {
+    let app = common::app(db);
+    let token = sign_up(&app, ADA).await;
+    let id = create_habit(
+        &app,
+        &token,
+        json!({ "name": "Run", "low_energy": true, "low_energy_name": "Walk" }),
+    )
+    .await
+    .body["id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+
+    let renamed = patch_habit(&app, &token, &id, json!({ "low_energy_name": "Stretch" })).await;
+    let cleared = patch_habit(&app, &token, &id, json!({ "low_energy_name": "" })).await;
+
+    assert_eq!(renamed.body["low_energy"], true);
+    assert_eq!(renamed.body["low_energy_name"], "Stretch");
+    assert_eq!(cleared.body["low_energy"], true);
+    assert_eq!(cleared.body["low_energy_name"], Value::Null);
+}
+
+#[sqlx::test]
+async fn update_turning_the_flag_off_clears_the_easier_name(db: PgPool) {
+    let app = common::app(db);
+    let token = sign_up(&app, ADA).await;
+    let id = create_habit(
+        &app,
+        &token,
+        json!({ "name": "Run", "low_energy": true, "low_energy_name": "Walk" }),
+    )
+    .await
+    .body["id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+
+    // The name in the same request is ignored: a habit that is not kept has no easier version.
+    let response = patch_habit(
+        &app,
+        &token,
+        &id,
+        json!({ "low_energy": false, "low_energy_name": "Ignored" }),
+    )
+    .await;
+
+    assert_eq!(response.body["low_energy"], false);
+    assert_eq!(response.body["low_energy_name"], Value::Null);
+    let listed = list_habits(&app, &token, "").await;
+    assert_eq!(listed.body[0]["low_energy_name"], Value::Null);
+}
+
+#[sqlx::test]
+async fn update_rejects_easier_name_longer_than_100_characters(db: PgPool) {
+    let app = common::app(db);
+    let token = sign_up(&app, ADA).await;
+    let id = create_daily_habit(&app, &token, "Read").await;
+
+    let response = patch_habit(
+        &app,
+        &token,
+        &id,
+        json!({ "low_energy": true, "low_energy_name": "a".repeat(101) }),
+    )
+    .await;
+
+    assert_eq!(response.status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(
+        response.body["error"]["details"]["fields"]["low_energy_name"],
+        json!(["length"])
+    );
+}
+
+#[sqlx::test]
+async fn update_of_another_users_low_energy_fields_is_not_found(db: PgPool) {
+    let app = common::app(db);
+    let ada = sign_up(&app, ADA).await;
+    let grace = sign_up(&app, GRACE).await;
+    let id = create_daily_habit(&app, &ada, "Read").await;
+
+    let response = patch_habit(&app, &grace, &id, json!({ "low_energy": true })).await;
+
+    assert_eq!(response.status, StatusCode::NOT_FOUND);
+    assert_eq!(
+        list_habits(&app, &ada, "").await.body[0]["low_energy"],
+        false
+    );
 }
 
 #[sqlx::test]
@@ -586,4 +799,138 @@ async fn streak_uses_the_current_schedule_for_the_past(db: PgPool) {
     patch_habit(&app, &token, &id, json!({ "weekdays": [weekday(today)] })).await;
 
     assert_eq!(only_streak(&app, &token).await, 2);
+}
+
+// ---------------------------------------------------------------------------------------------
+// Low-energy days
+// ---------------------------------------------------------------------------------------------
+
+/// Marks a date as a low-energy day for the user. The API only changes today, so tests write
+/// past days directly.
+async fn mark_low_energy_day(db: &PgPool, email: &str, date: NaiveDate) {
+    sqlx::query(
+        "INSERT INTO low_energy_days (user_id, date) SELECT id, $2 FROM users WHERE email = $1",
+    )
+    .bind(email)
+    .bind(date)
+    .execute(db)
+    .await
+    .unwrap();
+}
+
+#[sqlx::test]
+async fn streak_continues_across_a_low_energy_day_for_a_hidden_habit(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let id = create_daily_habit(&app, &token, "Read").await;
+    let today = today(&db).await;
+    mark_low_energy_day(&db, ADA, days_ago(today, 1)).await;
+    for days in [0, 2, 3] {
+        complete(&app, &token, &id, days_ago(today, days)).await;
+    }
+
+    assert_eq!(only_streak(&app, &token).await, 3);
+}
+
+#[sqlx::test]
+async fn streak_of_a_kept_habit_is_broken_by_missing_a_low_energy_day(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let response = create_habit(&app, &token, json!({ "name": "Read", "low_energy": true })).await;
+    let id = response.body["id"].as_str().unwrap();
+    let today = today(&db).await;
+    mark_low_energy_day(&db, ADA, days_ago(today, 1)).await;
+    for days in [0, 2, 3] {
+        complete(&app, &token, id, days_ago(today, days)).await;
+    }
+
+    assert_eq!(only_streak(&app, &token).await, 1);
+}
+
+#[sqlx::test]
+async fn streak_of_a_kept_habit_grows_when_done_on_a_low_energy_day(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let response = create_habit(&app, &token, json!({ "name": "Read", "low_energy": true })).await;
+    let id = response.body["id"].as_str().unwrap();
+    let today = today(&db).await;
+    mark_low_energy_day(&db, ADA, days_ago(today, 1)).await;
+    for days in 0..4 {
+        let completed = complete(&app, &token, id, days_ago(today, days)).await;
+        assert_eq!(completed.status, StatusCode::NO_CONTENT);
+    }
+
+    assert_eq!(only_streak(&app, &token).await, 4);
+}
+
+#[sqlx::test]
+async fn streak_changes_when_the_habit_stops_being_kept(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let response = create_habit(&app, &token, json!({ "name": "Read", "low_energy": true })).await;
+    let id = response.body["id"].as_str().unwrap();
+    let today = today(&db).await;
+    mark_low_energy_day(&db, ADA, days_ago(today, 1)).await;
+    for days in [0, 2, 3] {
+        complete(&app, &token, id, days_ago(today, days)).await;
+    }
+
+    // The current settings apply to the past: once hidden, the low-energy day no longer breaks it.
+    patch_habit(&app, &token, id, json!({ "low_energy": false })).await;
+
+    assert_eq!(only_streak(&app, &token).await, 3);
+}
+
+#[sqlx::test]
+async fn completing_a_hidden_habit_on_a_low_energy_day_is_rejected(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let id = create_daily_habit(&app, &token, "Read").await;
+    let today = today(&db).await;
+    let yesterday = days_ago(today, 1);
+    mark_low_energy_day(&db, ADA, yesterday).await;
+
+    let response = complete(&app, &token, &id, yesterday).await;
+
+    assert_eq!(response.status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(
+        response.body["error"]["details"]["fields"]["date"],
+        json!(["not_scheduled"])
+    );
+}
+
+#[sqlx::test]
+async fn completing_a_hidden_habit_today_after_switching_to_low_energy_is_rejected(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let id = create_daily_habit(&app, &token, "Read").await;
+    let today = today(&db).await;
+    let switched = TestRequest::new(Method::PUT, &format!("/api/v1/days/{today}/mode"))
+        .bearer(&token)
+        .json(&json!({ "mode": "low_energy" }))
+        .send(&app)
+        .await;
+    assert_eq!(switched.status, StatusCode::NO_CONTENT);
+
+    let response = complete(&app, &token, &id, today).await;
+
+    assert_eq!(response.status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(
+        response.body["error"]["details"]["fields"]["date"],
+        json!(["not_scheduled"])
+    );
+}
+
+#[sqlx::test]
+async fn a_low_energy_day_of_another_user_does_not_affect_the_habit(db: PgPool) {
+    let app = common::app(db.clone());
+    let ada = sign_up(&app, ADA).await;
+    sign_up(&app, GRACE).await;
+    let id = create_daily_habit(&app, &ada, "Read").await;
+    let today = today(&db).await;
+    mark_low_energy_day(&db, GRACE, today).await;
+
+    let response = complete(&app, &ada, &id, today).await;
+
+    assert_eq!(response.status, StatusCode::NO_CONTENT);
 }

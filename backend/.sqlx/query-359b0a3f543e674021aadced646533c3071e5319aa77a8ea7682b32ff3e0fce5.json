@@ -1,0 +1,78 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE habits\n        SET name = COALESCE($3, name),\n            weekdays = COALESCE($4, weekdays),\n            low_energy = COALESCE($5, low_energy),\n            low_energy_name = CASE\n                -- A habit that is not kept has no easier version.\n                WHEN NOT COALESCE($5, low_energy) THEN NULL\n                WHEN $6::text IS NULL THEN low_energy_name\n                ELSE NULLIF($6, '')\n            END,\n            sort_order = COALESCE($7, sort_order),\n            archived_at = CASE\n                WHEN $8::boolean IS NULL THEN archived_at\n                -- Archiving twice keeps the first archive time.\n                WHEN $8 THEN COALESCE(archived_at, $9)\n                ELSE NULL\n            END\n        WHERE id = $2 AND user_id = $1\n        RETURNING id, name, weekdays, low_energy, low_energy_name, sort_order, archived_at,\n                  created_at,\n                  habit_current_streak(id, user_id, weekdays, low_energy, user_today($1, $9)) AS \"current_streak!\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "weekdays",
+        "type_info": "Int2Array"
+      },
+      {
+        "ordinal": 3,
+        "name": "low_energy",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 4,
+        "name": "low_energy_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "sort_order",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "archived_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "current_streak!",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Int2Array",
+        "Bool",
+        "Text",
+        "Int4",
+        "Bool",
+        "Timestamptz"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      null
+    ]
+  },
+  "hash": "359b0a3f543e674021aadced646533c3071e5319aa77a8ea7682b32ff3e0fce5"
+}

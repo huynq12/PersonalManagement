@@ -1,17 +1,52 @@
-//! Response body of the day view.
+//! Request and response bodies of the day endpoints.
 
 use chrono::NaiveDate;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use validator::Validate;
 
 use crate::tasks::model::Task;
+
+/// Whether a day is a normal day or a low-energy day.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub(super) enum DayMode {
+    Normal,
+    LowEnergy,
+}
+
+impl DayMode {
+    /// The mode of a day, given whether it is marked as a low-energy day.
+    pub(super) fn from_low_energy(is_low_energy: bool) -> Self {
+        if is_low_energy {
+            Self::LowEnergy
+        } else {
+            Self::Normal
+        }
+    }
+}
+
+/// Body of `PUT /days/{date}/mode`.
+#[derive(Debug, Deserialize, Validate)]
+pub(super) struct SetDayModeRequest {
+    pub mode: DayMode,
+}
 
 /// A habit as shown on one day: whether it is done on that day.
 #[derive(Debug, Serialize)]
 pub(super) struct DayHabit {
     pub id: Uuid,
+    /// The easier name on a low-energy day when the habit has one, otherwise the habit's name.
     pub name: String,
     pub completed: bool,
+}
+
+/// The mode of a day and whether the user may change it.
+#[derive(Debug)]
+pub(super) struct DayModeState {
+    pub is_low_energy: bool,
+    /// The date is not today, or a habit is already checked for today.
+    pub locked: bool,
 }
 
 /// Body of `GET /days/{date}`: everything the Today screen shows for one date.
@@ -20,7 +55,11 @@ pub(super) struct DayHabit {
 #[derive(Debug, Serialize)]
 pub(super) struct DayView {
     pub date: NaiveDate,
-    /// Active habits scheduled for the date's weekday, in display order.
+    pub mode: DayMode,
+    /// Whether `PUT /days/{date}/mode` would currently be refused.
+    pub mode_locked: bool,
+    /// Active habits scheduled for the date, in display order. On a low-energy day only the
+    /// habits kept for such days.
     pub habits: Vec<DayHabit>,
     /// The to-dos of the date, in display order.
     pub tasks: Vec<Task>,

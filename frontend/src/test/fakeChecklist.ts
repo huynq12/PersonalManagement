@@ -1,10 +1,12 @@
-import { isoWeekday } from '../lib/dates'
-import { errorResponse, jsonResponse, type RecordedRequest } from './testUtils'
+import { isoWeekday, todayIn } from '../lib/dates'
+import { errorResponse, jsonResponse, USER, type RecordedRequest } from './testUtils'
 
 export interface FakeHabit {
   id: string
   name: string
   weekdays: number[]
+  low_energy: boolean
+  low_energy_name: string | null
   sort_order: number
   archived_at: string | null
   created_at: string
@@ -29,12 +31,19 @@ export function habit(id: string, name: string, overrides: Partial<FakeHabit> = 
     id,
     name,
     weekdays: EVERY_DAY,
+    low_energy: false,
+    low_energy_name: null,
     sort_order: 0,
     archived_at: null,
     created_at: CREATED_AT,
     current_streak: 0,
     ...overrides,
   }
+}
+
+/** A blank easier name is stored as null, as the server does. */
+function easierName(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() !== '' ? value.trim() : null
 }
 
 export function task(id: string, date: string, title: string, isDone = false): FakeTask {
@@ -58,6 +67,8 @@ export class FakeChecklist {
   tasks: FakeTask[]
   /** Completed habit days as `"<habit id>|<date>"`. */
   completions = new Set<string>()
+  /** Dates marked as low-energy days. */
+  lowEnergyDays = new Set<string>()
   /** When set, requests it returns true for fail with a 500. */
   failWhen: ((request: RecordedRequest) => boolean) | null = null
   private nextId = 1
@@ -80,6 +91,9 @@ export class FakeChecklist {
     const segments = path.split('/').filter(Boolean)
     const body = (request.body ?? {}) as Record<string, unknown>
 
+    if (segments[0] === 'days' && segments[2] === 'mode' && request.method === 'PUT') {
+      return this.setMode(segments[1], body.mode)
+    }
     if (segments[0] === 'days' && request.method === 'GET') {
       return this.day(segments[1])
     }
@@ -94,17 +108,55 @@ export class FakeChecklist {
 
   private day(date: string): Response {
     const weekday = isoWeekday(date)
+    const isLowEnergy = this.lowEnergyDays.has(date)
     return jsonResponse(200, {
       date,
+      mode: isLowEnergy ? 'low_energy' : 'normal',
+      mode_locked: this.isModeLocked(date),
       habits: this.sortedHabits()
-        .filter((item) => item.archived_at === null && item.weekdays.includes(weekday))
+        .filter(
+          (item) =>
+            item.archived_at === null &&
+            item.weekdays.includes(weekday) &&
+            (!isLowEnergy || item.low_energy),
+        )
         .map((item) => ({
           id: item.id,
-          name: item.name,
+          name: isLowEnergy ? (item.low_energy_name ?? item.name) : item.name,
           completed: this.completions.has(`${item.id}|${date}`),
         })),
       tasks: this.tasks.filter((item) => item.date === date),
     })
+  }
+
+  /** The mode can change only today, and only while no habit is checked. */
+  private isModeLocked(date: string): boolean {
+    const hasCompletion = [...this.completions].some((key) => key.endsWith(`|${date}`))
+    return date !== todayIn(USER.timezone) || hasCompletion
+  }
+
+  private setMode(date: string, mode: unknown): Response {
+    if (date !== todayIn(USER.timezone)) {
+      return jsonResponse(422, {
+        error: {
+          code: 'validation_failed',
+          message: 'invalid',
+          details: { fields: { date: ['not_today'] } },
+        },
+      })
+    }
+    const wantsLowEnergy = mode === 'low_energy'
+    if (wantsLowEnergy !== this.lowEnergyDays.has(date)) {
+      if (this.isModeLocked(date)) {
+        return errorResponse(409, 'day_mode_locked')
+      }
+      if (wantsLowEnergy) {
+        this.lowEnergyDays.add(date)
+      } else {
+        this.lowEnergyDays.delete(date)
+      }
+    }
+    return new Response(null, { status: 204 })
   }
 
   private sortedHabits(): FakeHabit[] {
@@ -125,6 +177,8 @@ export class FakeChecklist {
       if (method === 'POST') {
         const created = habit(`habit-new-${this.nextId++}`, String(body.name), {
           weekdays: (body.weekdays as number[] | undefined) ?? EVERY_DAY,
+          low_energy: body.low_energy === true,
+          low_energy_name: body.low_energy === true ? easierName(body.low_energy_name) : null,
           sort_order: this.habits.length,
         })
         this.habits.push(created)
@@ -150,6 +204,12 @@ export class FakeChecklist {
     if (method === 'PATCH') {
       if (typeof body.name === 'string') found.name = body.name
       if (Array.isArray(body.weekdays)) found.weekdays = body.weekdays as number[]
+      if (typeof body.low_energy === 'boolean') found.low_energy = body.low_energy
+      if (typeof body.low_energy_name === 'string') {
+        found.low_energy_name = easierName(body.low_energy_name)
+      }
+      // Like the server: a habit that is not kept has no easier version.
+      if (!found.low_energy) found.low_energy_name = null
       if (typeof body.sort_order === 'number') found.sort_order = body.sort_order
       if (typeof body.archived === 'boolean') {
         found.archived_at = body.archived ? CREATED_AT : null

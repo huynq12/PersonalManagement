@@ -21,6 +21,9 @@ export type TaskForm = z.infer<typeof taskFormSchema>
 export const habitFormSchema = z.object({
   name: z.string().trim().min(1, required).max(100, habitNameLength),
   weekdays: z.array(z.number()).min(1, weekdaysRequired),
+  low_energy: z.boolean(),
+  // Optional, and only used while `low_energy` is on.
+  low_energy_name: z.string().trim().max(100, habitNameLength),
 })
 
 export type HabitForm = z.infer<typeof habitFormSchema>

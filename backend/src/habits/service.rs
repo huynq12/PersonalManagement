@@ -35,8 +35,24 @@ pub(super) async fn create(
         .weekdays
         .map_or_else(|| EVERY_DAY.to_vec(), normalize_weekdays);
 
-    let habit =
-        repository::insert_habit(db, user_id, request.name.trim(), &weekdays, Utc::now()).await?;
+    let low_energy = request.low_energy.unwrap_or(false);
+    // A habit that is not kept has no easier version; a blank one means "use the normal name".
+    let low_energy_name = request
+        .low_energy_name
+        .as_deref()
+        .map(str::trim)
+        .filter(|name| low_energy && !name.is_empty());
+
+    let habit = repository::insert_habit(
+        db,
+        user_id,
+        request.name.trim(),
+        &weekdays,
+        low_energy,
+        low_energy_name,
+        Utc::now(),
+    )
+    .await?;
     Ok(habit)
 }
 
@@ -55,6 +71,8 @@ pub(super) async fn update(
     let changes = HabitChanges {
         name: request.name.as_deref().map(str::trim),
         weekdays: weekdays.as_deref(),
+        low_energy: request.low_energy,
+        low_energy_name: request.low_energy_name.as_deref().map(str::trim),
         sort_order: request.sort_order,
         archived: request.archived,
     };

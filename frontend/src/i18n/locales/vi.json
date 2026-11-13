@@ -48,7 +48,8 @@
       "title": "Thói quen",
       "empty": "Không có thói quen nào theo lịch cho ngày này.",
       "manage": "Quản lý thói quen",
-      "futureNote": "Không thể đánh dấu thói quen trước ngày thực hiện."
+      "futureNote": "Không thể đánh dấu thói quen trước ngày thực hiện.",
+      "emptyLowEnergy": "Không có thói quen nào được giữ lại cho ngày ít năng lượng."
     },
     "tasks": {
       "title": "Việc cần làm",
@@ -59,6 +60,13 @@
       "titleLabel": "Tên việc",
       "edit": "Sửa {{title}}",
       "delete": "Xóa {{title}}"
+    },
+    "mode": {
+      "label": "Chế độ ngày",
+      "normal": "Bình thường",
+      "lowEnergy": "Ít năng lượng",
+      "lockedNotToday": "Chỉ có thể đổi chế độ của hôm nay.",
+      "lockedChecked": "Hãy bỏ đánh dấu mọi thói quen để đổi chế độ."
     }
   },
   "habits": {
@@ -86,13 +94,19 @@
       "addTitle": "Thêm thói quen",
       "editTitle": "Sửa thói quen",
       "name": "Tên",
-      "weekdays": "Lặp lại vào"
+      "weekdays": "Lặp lại vào",
+      "lowEnergy": "Giữ lại vào ngày ít năng lượng",
+      "lowEnergyHint": "Vào ngày ít năng lượng, bạn chỉ thấy các thói quen được giữ lại.",
+      "lowEnergyName": "Bản nhẹ hơn (không bắt buộc)",
+      "lowEnergyNameHint": "Hiển thị thay cho tên vào ngày ít năng lượng."
     },
     "deleteDialog": {
       "title": "Xóa thói quen này?",
       "description": "\"{{name}}\" và toàn bộ lịch sử của nó sẽ bị xóa vĩnh viễn. Không thể hoàn tác. Hãy lưu trữ nếu bạn muốn giữ lịch sử.",
       "confirm": "Xóa vĩnh viễn"
-    }
+    },
+    "keptOnLowEnergy": "Giữ lại vào ngày ít năng lượng",
+    "easierVersion": "Bản nhẹ hơn: {{name}}"
   },
   "common": {
     "save": "Lưu",
@@ -157,6 +171,7 @@
     "google_account_already_linked": "Tài khoản Google này đã được liên kết với tài khoản khác, hoặc tài khoản của bạn đã liên kết một tài khoản Google.",
     "subject_name_taken": "Bạn đã có một môn học trùng tên này.",
     "study_session_already_running": "Một phiên học đang chạy.",
-    "study_session_not_running": "Phiên học này đã kết thúc."
+    "study_session_not_running": "Phiên học này đã kết thúc.",
+    "day_mode_locked": "Không thể đổi chế độ khi đã có thói quen được đánh dấu. Hãy bỏ đánh dấu các thói quen trước."
   }
 }

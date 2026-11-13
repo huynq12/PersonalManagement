@@ -178,6 +178,248 @@ async fn day_shows_only_the_data_of_the_signed_in_user(db: PgPool) {
     assert_eq!(day.body["tasks"], json!([]));
 }
 
+// ---------------------------------------------------------------------------------------------
+// Day mode
+// ---------------------------------------------------------------------------------------------
+
+async fn put_mode(app: &Router, token: &str, date: NaiveDate, mode: &str) -> TestResponse {
+    TestRequest::new(Method::PUT, &format!("/api/v1/days/{date}/mode"))
+        .bearer(token)
+        .json(&json!({ "mode": mode }))
+        .send(app)
+        .await
+}
+
+async fn uncomplete(app: &Router, token: &str, habit_id: &str, date: NaiveDate) {
+    let response = TestRequest::new(
+        Method::DELETE,
+        &format!("/api/v1/habits/{habit_id}/completions/{date}"),
+    )
+    .bearer(token)
+    .send(app)
+    .await;
+    assert_eq!(response.status, StatusCode::NO_CONTENT);
+}
+
+#[sqlx::test]
+async fn day_mode_is_normal_and_unlocked_by_default(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let today = today(&db).await;
+
+    let day = get_day(&app, &token, today).await;
+
+    assert_eq!(day.body["mode"], "normal");
+    assert_eq!(day.body["mode_locked"], false);
+}
+
+#[sqlx::test]
+async fn day_mode_can_be_set_to_low_energy_and_back(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let today = today(&db).await;
+
+    let set = put_mode(&app, &token, today, "low_energy").await;
+    let low = get_day(&app, &token, today).await;
+    let reset = put_mode(&app, &token, today, "normal").await;
+    let normal = get_day(&app, &token, today).await;
+
+    assert_eq!(set.status, StatusCode::NO_CONTENT);
+    assert_eq!(low.body["mode"], "low_energy");
+    assert_eq!(low.body["mode_locked"], false);
+    assert_eq!(reset.status, StatusCode::NO_CONTENT);
+    assert_eq!(normal.body["mode"], "normal");
+}
+
+#[sqlx::test]
+async fn setting_the_same_mode_twice_succeeds(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let today = today(&db).await;
+
+    let normal = put_mode(&app, &token, today, "normal").await;
+    put_mode(&app, &token, today, "low_energy").await;
+    let low_again = put_mode(&app, &token, today, "low_energy").await;
+
+    assert_eq!(normal.status, StatusCode::NO_CONTENT);
+    assert_eq!(low_again.status, StatusCode::NO_CONTENT);
+    assert_eq!(
+        get_day(&app, &token, today).await.body["mode"],
+        "low_energy"
+    );
+}
+
+#[sqlx::test]
+async fn day_mode_cannot_be_set_for_another_day(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let today = today(&db).await;
+    let yesterday = today.checked_sub_days(Days::new(1)).unwrap();
+    let tomorrow = today.succ_opt().unwrap();
+
+    for date in [yesterday, tomorrow] {
+        let response = put_mode(&app, &token, date, "low_energy").await;
+
+        assert_eq!(response.status, StatusCode::UNPROCESSABLE_ENTITY);
+        assert_eq!(
+            response.body["error"]["details"]["fields"]["date"],
+            json!(["not_today"])
+        );
+        assert_eq!(get_day(&app, &token, date).await.body["mode"], "normal");
+    }
+}
+
+#[sqlx::test]
+async fn day_mode_is_locked_for_days_other_than_today(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let today = today(&db).await;
+    let yesterday = today.checked_sub_days(Days::new(1)).unwrap();
+
+    let past = get_day(&app, &token, yesterday).await;
+    let future = get_day(&app, &token, today.succ_opt().unwrap()).await;
+
+    assert_eq!(past.body["mode_locked"], true);
+    assert_eq!(future.body["mode_locked"], true);
+}
+
+#[sqlx::test]
+async fn day_mode_is_locked_by_a_completion_and_unlocked_by_removing_it(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let today = today(&db).await;
+    let habit = add_habit(&app, &token, json!({ "name": "Read" })).await;
+    complete(&app, &token, &habit, today).await;
+
+    let locked_view = get_day(&app, &token, today).await;
+    let rejected = put_mode(&app, &token, today, "low_energy").await;
+    uncomplete(&app, &token, &habit, today).await;
+    let unlocked_view = get_day(&app, &token, today).await;
+    let accepted = put_mode(&app, &token, today, "low_energy").await;
+
+    assert_eq!(locked_view.body["mode_locked"], true);
+    assert_eq!(rejected.status, StatusCode::CONFLICT);
+    assert_eq!(rejected.body["error"]["code"], "day_mode_locked");
+    assert_eq!(unlocked_view.body["mode_locked"], false);
+    assert_eq!(accepted.status, StatusCode::NO_CONTENT);
+}
+
+#[sqlx::test]
+async fn day_mode_is_not_locked_by_a_completion_of_an_archived_habit(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let today = today(&db).await;
+    let habit = add_habit(&app, &token, json!({ "name": "Old" })).await;
+    complete(&app, &token, &habit, today).await;
+    TestRequest::new(Method::PATCH, &format!("/api/v1/habits/{habit}"))
+        .bearer(&token)
+        .json(&json!({ "archived": true }))
+        .send(&app)
+        .await;
+
+    let view = get_day(&app, &token, today).await;
+    let to_low_energy = put_mode(&app, &token, today, "low_energy").await;
+    let to_normal = put_mode(&app, &token, today, "normal").await;
+
+    assert_eq!(view.body["mode_locked"], false);
+    assert_eq!(to_low_energy.status, StatusCode::NO_CONTENT);
+    assert_eq!(to_normal.status, StatusCode::NO_CONTENT);
+}
+
+#[sqlx::test]
+async fn day_mode_cannot_return_to_normal_while_a_kept_habit_is_checked(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let today = today(&db).await;
+    let habit = add_habit(&app, &token, json!({ "name": "Read", "low_energy": true })).await;
+    put_mode(&app, &token, today, "low_energy").await;
+    complete(&app, &token, &habit, today).await;
+
+    let response = put_mode(&app, &token, today, "normal").await;
+
+    assert_eq!(response.status, StatusCode::CONFLICT);
+    assert_eq!(response.body["error"]["code"], "day_mode_locked");
+    assert_eq!(
+        get_day(&app, &token, today).await.body["mode"],
+        "low_energy"
+    );
+}
+
+#[sqlx::test]
+async fn setting_the_current_mode_succeeds_even_when_locked(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let today = today(&db).await;
+    let habit = add_habit(&app, &token, json!({ "name": "Read" })).await;
+    complete(&app, &token, &habit, today).await;
+
+    let response = put_mode(&app, &token, today, "normal").await;
+
+    assert_eq!(response.status, StatusCode::NO_CONTENT);
+}
+
+#[sqlx::test]
+async fn low_energy_day_shows_only_kept_habits_under_their_easier_names(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let today = today(&db).await;
+    add_habit(&app, &token, json!({ "name": "Hidden" })).await;
+    add_habit(
+        &app,
+        &token,
+        json!({ "name": "Run 5 km", "low_energy": true, "low_energy_name": "Walk 5 minutes" }),
+    )
+    .await;
+    add_habit(&app, &token, json!({ "name": "Read", "low_energy": true })).await;
+
+    let normal = get_day(&app, &token, today).await;
+    put_mode(&app, &token, today, "low_energy").await;
+    let low = get_day(&app, &token, today).await;
+
+    assert_eq!(
+        names(&normal, "habits", "name"),
+        ["Hidden", "Run 5 km", "Read"]
+    );
+    assert_eq!(names(&low, "habits", "name"), ["Walk 5 minutes", "Read"]);
+}
+
+#[sqlx::test]
+async fn day_mode_is_not_visible_to_another_user(db: PgPool) {
+    let app = common::app(db.clone());
+    let ada = sign_up(&app, ADA).await;
+    let grace = sign_up(&app, GRACE).await;
+    let today = today(&db).await;
+    put_mode(&app, &ada, today, "low_energy").await;
+
+    let day = get_day(&app, &grace, today).await;
+
+    assert_eq!(day.body["mode"], "normal");
+}
+
+#[sqlx::test]
+async fn day_mode_rejects_an_unknown_mode(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let today = today(&db).await;
+
+    let response = put_mode(&app, &token, today, "sleepy").await;
+
+    assert_eq!(response.status, StatusCode::BAD_REQUEST);
+    assert_eq!(response.body["error"]["code"], "invalid_request");
+}
+
+#[sqlx::test]
+async fn day_mode_requires_authentication(db: PgPool) {
+    let app = common::app(db);
+
+    let response = TestRequest::new(Method::PUT, "/api/v1/days/2026-11-12/mode")
+        .json(&json!({ "mode": "normal" }))
+        .send(&app)
+        .await;
+
+    assert_eq!(response.status, StatusCode::UNAUTHORIZED);
+}
+
 #[sqlx::test]
 async fn day_rejects_malformed_date(db: PgPool) {
     let app = common::app(db);

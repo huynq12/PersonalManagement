@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        UPDATE habits\n        SET name = COALESCE($3, name),\n            weekdays = COALESCE($4, weekdays),\n            sort_order = COALESCE($5, sort_order),\n            archived_at = CASE\n                WHEN $6::boolean IS NULL THEN archived_at\n                -- Archiving twice keeps the first archive time.\n                WHEN $6 THEN COALESCE(archived_at, $7)\n                ELSE NULL\n            END\n        WHERE id = $2 AND user_id = $1\n        RETURNING id, name, weekdays, sort_order, archived_at, created_at,\n                  habit_current_streak(id, weekdays, user_today($1, $7)) AS \"current_streak!\"\n        ",
+  "query": "\n        INSERT INTO habits (user_id, name, weekdays, low_energy, low_energy_name, sort_order)\n        VALUES (\n            $1, $2, $3, $4, $5,\n            (SELECT COALESCE(max(sort_order) + 1, 0) FROM habits WHERE user_id = $1)\n        )\n        RETURNING id, name, weekdays, low_energy, low_energy_name, sort_order, archived_at,\n                  created_at,\n                  habit_current_streak(id, user_id, weekdays, low_energy, user_today($1, $6)) AS \"current_streak!\"\n        ",
   "describe": {
     "columns": [
       {
@@ -20,21 +20,31 @@
       },
       {
         "ordinal": 3,
+        "name": "low_energy",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 4,
+        "name": "low_energy_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
         "name": "sort_order",
         "type_info": "Int4"
       },
       {
-        "ordinal": 4,
+        "ordinal": 6,
         "name": "archived_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 5,
+        "ordinal": 7,
         "name": "created_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 6,
+        "ordinal": 8,
         "name": "current_streak!",
         "type_info": "Int4"
       }
@@ -42,11 +52,10 @@
     "parameters": {
       "Left": [
         "Uuid",
-        "Uuid",
         "Text",
         "Int2Array",
-        "Int4",
         "Bool",
+        "Text",
         "Timestamptz"
       ]
     },
@@ -57,8 +66,10 @@
       false,
       true,
       false,
+      true,
+      false,
       null
     ]
   },
-  "hash": "43d919388cc5b298ba7fb530583f38f701577e9d4a503770bd10346657a918f2"
+  "hash": "06a50ba4b733f513c8b04ce29af5fa5cefdd77d7b2803627445653d64b1b7ac2"
 }

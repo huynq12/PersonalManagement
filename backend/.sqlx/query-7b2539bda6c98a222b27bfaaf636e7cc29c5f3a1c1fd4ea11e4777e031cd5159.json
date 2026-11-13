@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO low_energy_days (user_id, date)\n        SELECT $1, $2::date\n        WHERE NOT EXISTS (\n            SELECT 1 FROM habit_completions c\n            JOIN habits h ON h.id = c.habit_id\n            WHERE h.user_id = $1 AND h.archived_at IS NULL AND c.date = $2\n        )\n        ON CONFLICT (user_id, date) DO NOTHING\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Date"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7b2539bda6c98a222b27bfaaf636e7cc29c5f3a1c1fd4ea11e4777e031cd5159"
+}

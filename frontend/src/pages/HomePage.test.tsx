@@ -186,6 +186,123 @@ describe('habits on the Today screen', () => {
   })
 })
 
+describe('day mode', () => {
+  const modeGroup = () => within(screen.getByRole('group', { name: 'Day mode' }))
+  const lowEnergyButton = () => modeGroup().getByRole('button', { name: 'Low energy' })
+  const normalButton = () => modeGroup().getByRole('button', { name: 'Normal' })
+
+  beforeEach(() => {
+    backend.completions.clear()
+    backend.habits = [
+      habit('habit-hidden', 'Gym'),
+      habit('habit-kept', 'Run 5 km', {
+        sort_order: 1,
+        low_energy: true,
+        low_energy_name: 'Walk 5 minutes',
+      }),
+    ]
+  })
+
+  it('shows the current mode', async () => {
+    backend.lowEnergyDays.add(TODAY)
+
+    renderToday()
+
+    await screen.findByRole('group', { name: 'Day mode' })
+    expect(lowEnergyButton().getAttribute('aria-pressed')).toBe('true')
+    expect(normalButton().getAttribute('aria-pressed')).toBe('false')
+  })
+
+  it('switches today to low energy and shows only the kept habits under their easier names', async () => {
+    const requests = renderToday()
+    expect(await screen.findByRole('checkbox', { name: 'Gym' })).toBeTruthy()
+    expect(screen.getByRole('checkbox', { name: 'Run 5 km' })).toBeTruthy()
+
+    await userEvent.click(lowEnergyButton())
+
+    expect(await screen.findByRole('checkbox', { name: 'Walk 5 minutes' })).toBeTruthy()
+    expect(screen.queryByRole('checkbox', { name: 'Gym' })).toBeNull()
+    expect(lowEnergyButton().getAttribute('aria-pressed')).toBe('true')
+    const change = requests.find((request) => request.method === 'PUT')
+    expect(change?.path).toBe(`/days/${TODAY}/mode`)
+    expect(change?.body).toEqual({ mode: 'low_energy' })
+  })
+
+  it('switches back to a normal day', async () => {
+    backend.lowEnergyDays.add(TODAY)
+    const requests = renderToday()
+    await screen.findByRole('checkbox', { name: 'Walk 5 minutes' })
+
+    await userEvent.click(normalButton())
+
+    expect(await screen.findByRole('checkbox', { name: 'Gym' })).toBeTruthy()
+    expect(requests.find((request) => request.method === 'PUT')?.body).toEqual({ mode: 'normal' })
+  })
+
+  it('is disabled with an explanation while a habit is checked', async () => {
+    backend.complete('habit-hidden', TODAY)
+    const requests = renderToday()
+    await screen.findByRole('checkbox', { name: 'Gym' })
+
+    expect(lowEnergyButton()).toHaveProperty('disabled', true)
+    expect(normalButton()).toHaveProperty('disabled', true)
+    expect(screen.getByText('Uncheck all habits to change the mode.')).toBeTruthy()
+    await userEvent.click(lowEnergyButton())
+    expect(requests.some((request) => request.method === 'PUT')).toBe(false)
+  })
+
+  it('is disabled with an explanation on a day other than today', async () => {
+    renderToday(`/?date=${YESTERDAY}`)
+    await screen.findByRole('checkbox', { name: 'Gym' })
+
+    expect(lowEnergyButton()).toHaveProperty('disabled', true)
+    expect(screen.getByText('The mode can only be changed for today.')).toBeTruthy()
+  })
+
+  it('locks after a habit is checked and unlocks after it is unchecked', async () => {
+    renderToday()
+    await userEvent.click(await screen.findByRole('checkbox', { name: 'Gym' }))
+
+    await waitFor(() => expect(lowEnergyButton()).toHaveProperty('disabled', true))
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Gym' }))
+
+    await waitFor(() => expect(lowEnergyButton()).toHaveProperty('disabled', false))
+  })
+
+  it('reports a conflict from another tab and reloads the locked state', async () => {
+    renderToday()
+    await screen.findByRole('checkbox', { name: 'Gym' })
+    // Another tab checks a habit after this screen loaded.
+    backend.complete('habit-hidden', TODAY)
+
+    await userEvent.click(lowEnergyButton())
+
+    expect((await screen.findByRole('alert')).textContent).toBe(
+      'The mode cannot be changed while a habit is checked. Uncheck your habits first.',
+    )
+    await waitFor(() => expect(lowEnergyButton()).toHaveProperty('disabled', true))
+    expect(normalButton().getAttribute('aria-pressed')).toBe('true')
+  })
+
+  it('says so when no habit is kept for low-energy days', async () => {
+    backend.habits = [habit('habit-hidden', 'Gym')]
+    backend.lowEnergyDays.add(TODAY)
+
+    renderToday()
+
+    expect(await screen.findByText('No habits are kept for low-energy days.')).toBeTruthy()
+  })
+
+  it('renders in Vietnamese', async () => {
+    await i18n.changeLanguage('vi')
+
+    renderToday()
+
+    const group = await screen.findByRole('group', { name: viLocale.home.mode.label })
+    expect(within(group).getByRole('button', { name: viLocale.home.mode.lowEnergy })).toBeTruthy()
+  })
+})
+
 describe('to-dos on the Today screen', () => {
   it('adds a to-do for the day being viewed', async () => {
     const requests = renderToday()

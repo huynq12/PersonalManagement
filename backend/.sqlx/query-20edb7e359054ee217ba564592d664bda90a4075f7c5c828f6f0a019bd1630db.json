@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        DELETE FROM low_energy_days\n        WHERE user_id = $1 AND date = $2\n          AND NOT EXISTS (\n              SELECT 1 FROM habit_completions c\n              JOIN habits h ON h.id = c.habit_id\n              WHERE h.user_id = $1 AND h.archived_at IS NULL AND c.date = $2\n          )\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Date"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "20edb7e359054ee217ba564592d664bda90a4075f7c5c828f6f0a019bd1630db"
+}

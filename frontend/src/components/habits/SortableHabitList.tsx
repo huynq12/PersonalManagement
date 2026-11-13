@@ -16,7 +16,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Archive, Flame, GripVertical, Pencil, Trash2 } from 'lucide-react'
+import { Archive, BatteryLow, Flame, GripVertical, Pencil, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { Habit } from '../../lib/checklist'
 import { weekdayNames } from '../../lib/dates'
@@ -150,7 +150,18 @@ function SortableHabitRow({ habit, onEdit, onArchive, onDelete }: SortableHabitR
             <Flame className="size-3.5" aria-hidden="true" />
             {t('habits.streak', { count: habit.current_streak })}
           </span>
+          {habit.low_energy ? (
+            <span className="flex items-center gap-1">
+              <BatteryLow className="size-3.5" aria-hidden="true" />
+              {t('habits.keptOnLowEnergy')}
+            </span>
+          ) : null}
         </span>
+        {habit.low_energy && habit.low_energy_name ? (
+          <span className="truncate text-xs text-muted-foreground">
+            {t('habits.easierVersion', { name: habit.low_energy_name })}
+          </span>
+        ) : null}
       </div>
 
       <IconButton

@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useId } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useCreateHabit, useUpdateHabit } from '../../hooks/useHabits'
@@ -9,6 +10,7 @@ import { EVERY_WEEKDAY, habitFormSchema, type HabitForm } from '../../lib/checkl
 import { weekdayNames } from '../../lib/dates'
 import Alert from '../ui/Alert'
 import Button from '../ui/Button'
+import Checkbox from '../ui/Checkbox'
 import Dialog from '../ui/Dialog'
 import TextField from '../ui/TextField'
 
@@ -21,6 +23,8 @@ interface HabitFormDialogProps {
 /** Dialog with the habit form: a name and the weekdays the habit repeats on. */
 export default function HabitFormDialog({ habit, onClose }: HabitFormDialogProps) {
   const { t, i18n } = useTranslation()
+  const lowEnergyId = useId()
+  const lowEnergyHintId = `${lowEnergyId}-hint`
   const create = useCreateHabit()
   const update = useUpdateHabit()
   const save = habit ? update : create
@@ -36,9 +40,12 @@ export default function HabitFormDialog({ habit, onClose }: HabitFormDialogProps
     defaultValues: {
       name: habit?.name ?? '',
       weekdays: habit?.weekdays ?? EVERY_WEEKDAY,
+      low_energy: habit?.low_energy ?? false,
+      low_energy_name: habit?.low_energy_name ?? '',
     },
   })
   const selected = useWatch({ control, name: 'weekdays' })
+  const keptOnLowEnergy = useWatch({ control, name: 'low_energy' })
 
   const toggleWeekday = (weekday: number) => {
     const next = selected.includes(weekday)
@@ -49,10 +56,16 @@ export default function HabitFormDialog({ habit, onClose }: HabitFormDialogProps
   }
 
   const onSubmit = handleSubmit((values) => {
+    // A habit that is not kept has no easier version. For a kept one, an empty string (rather
+    // than null) tells the server to clear it, because null means "leave unchanged".
+    const input = {
+      ...values,
+      low_energy_name: values.low_energy ? values.low_energy_name : null,
+    }
     if (habit) {
-      update.mutate({ id: habit.id, changes: values }, { onSuccess: onClose })
+      update.mutate({ id: habit.id, changes: input }, { onSuccess: onClose })
     } else {
-      create.mutate(values, { onSuccess: onClose })
+      create.mutate(input, { onSuccess: onClose })
     }
   })
 
@@ -106,6 +119,35 @@ export default function HabitFormDialog({ habit, onClose }: HabitFormDialogProps
             </div>
           </div>
           {weekdaysError ? <p className="text-sm text-destructive">{weekdaysError}</p> : null}
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <div className="flex items-start gap-3">
+            <Checkbox
+              id={lowEnergyId}
+              role="switch"
+              aria-describedby={lowEnergyHintId}
+              className="mt-0.5"
+              {...register('low_energy')}
+            />
+            <div className="flex flex-col gap-0.5">
+              <label htmlFor={lowEnergyId} className="cursor-pointer text-sm font-medium">
+                {t('habits.form.lowEnergy')}
+              </label>
+              <p id={lowEnergyHintId} className="text-sm text-muted-foreground">
+                {t('habits.form.lowEnergyHint')}
+              </p>
+            </div>
+          </div>
+          {keptOnLowEnergy ? (
+            <TextField
+              label={t('habits.form.lowEnergyName')}
+              hint={t('habits.form.lowEnergyNameHint')}
+              autoComplete="off"
+              error={fieldError(errors.low_energy_name?.message)}
+              {...register('low_energy_name')}
+            />
+          ) : null}
         </div>
 
         <div className="flex justify-end gap-2">

@@ -1,0 +1,31 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT (\n                   EXTRACT(ISODOW FROM $3::date)::smallint = ANY (weekdays)\n                   AND (\n                       low_energy\n                       OR NOT EXISTS (\n                           SELECT 1 FROM low_energy_days l WHERE l.user_id = $1 AND l.date = $3\n                       )\n                   )\n               ) AS \"is_scheduled!\",\n               $3::date > user_today($1, $4) AS \"is_future!\"\n        FROM habits\n        WHERE id = $2 AND user_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "is_scheduled!",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 1,
+        "name": "is_future!",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Date",
+        "Timestamptz"
+      ]
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "c24eda49c363583314acb8861732b43e297383f48b22121080cbef3914bae220"
+}

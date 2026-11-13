@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        INSERT INTO habits (user_id, name, weekdays, sort_order)\n        VALUES (\n            $1, $2, $3,\n            (SELECT COALESCE(max(sort_order) + 1, 0) FROM habits WHERE user_id = $1)\n        )\n        RETURNING id, name, weekdays, sort_order, archived_at, created_at,\n                  habit_current_streak(id, weekdays, user_today($1, $4)) AS \"current_streak!\"\n        ",
+  "query": "\n        SELECT id, name, weekdays, low_energy, low_energy_name, sort_order, archived_at, created_at,\n               habit_current_streak(id, user_id, weekdays, low_energy, user_today($1, $3)) AS \"current_streak!\"\n        FROM habits\n        WHERE user_id = $1 AND ($2 OR archived_at IS NULL)\n        ORDER BY sort_order, created_at\n        ",
   "describe": {
     "columns": [
       {
@@ -20,21 +20,31 @@
       },
       {
         "ordinal": 3,
+        "name": "low_energy",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 4,
+        "name": "low_energy_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
         "name": "sort_order",
         "type_info": "Int4"
       },
       {
-        "ordinal": 4,
+        "ordinal": 6,
         "name": "archived_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 5,
+        "ordinal": 7,
         "name": "created_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 6,
+        "ordinal": 8,
         "name": "current_streak!",
         "type_info": "Int4"
       }
@@ -42,8 +52,7 @@
     "parameters": {
       "Left": [
         "Uuid",
-        "Text",
-        "Int2Array",
+        "Bool",
         "Timestamptz"
       ]
     },
@@ -54,8 +63,10 @@
       false,
       true,
       false,
+      true,
+      false,
       null
     ]
   },
-  "hash": "439d2dd866307752c61f194ad4f43aff2fcaf1e5571769183651f4b6f02230ab"
+  "hash": "6158f5afbbd16a2589fc7f376bcdd36bf4741604ef1e4e061e61fc295d663fcf"
 }
