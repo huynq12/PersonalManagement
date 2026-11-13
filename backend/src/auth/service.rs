@@ -6,14 +6,15 @@ use uuid::Uuid;
 
 use super::{
     google::{self, CallbackQuery, Flow, GoogleClient, GoogleProfile},
-    model::{Locale, LoginRequest, RegisterRequest, User},
+    model::{Locale, LoginRequest, RegisterRequest, UpdateMeRequest, User},
     password,
-    repository::{self, NewUser},
+    repository::{self, NewUser, UserChanges},
     token,
 };
 use crate::{
     config::Config,
     error::{AppError, AppResult, is_unique_violation},
+    validation::field_error,
 };
 
 /// A signed-in session: what the handler turns into a response body and a cookie.
@@ -186,6 +187,37 @@ pub(super) async fn logout(db: &PgPool, refresh_token: &str) -> AppResult<()> {
 /// Returns [`AppError::Unauthorized`] if the account no longer exists.
 pub(super) async fn current_user(db: &PgPool, user_id: Uuid) -> AppResult<User> {
     repository::find_user_by_id(db, user_id)
+        .await?
+        .ok_or(AppError::Unauthorized)
+}
+
+/// Updates the signed-in user's account fields.
+///
+/// # Errors
+///
+/// Returns a validation error on `timezone` if PostgreSQL does not know the zone, and
+/// [`AppError::Unauthorized`] if the user no longer exists.
+pub(super) async fn update_current_user(
+    db: &PgPool,
+    user_id: Uuid,
+    request: UpdateMeRequest,
+) -> AppResult<User> {
+    let timezone = match request.timezone.as_deref() {
+        Some(name) => Some(
+            repository::find_timezone_name(db, name.trim())
+                .await?
+                .ok_or_else(|| field_error("timezone", "timezone"))?,
+        ),
+        None => None,
+    };
+
+    let changes = UserChanges {
+        display_name: request.display_name.as_deref().map(str::trim),
+        timezone: timezone.as_deref(),
+        locale: request.locale.map(Locale::as_str),
+        currency: request.currency.as_deref(),
+    };
+    repository::update_user(db, user_id, changes)
         .await?
         .ok_or(AppError::Unauthorized)
 }

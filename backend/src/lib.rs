@@ -18,6 +18,7 @@ pub mod days;
 pub mod error;
 pub mod habits;
 pub mod health;
+pub mod settings;
 pub mod study_sessions;
 pub mod subjects;
 pub mod tasks;
@@ -85,6 +86,7 @@ pub fn app(state: AppState) -> anyhow::Result<Router> {
     let api = Router::new()
         .merge(health::router())
         .merge(auth::router())
+        .merge(settings::router())
         .merge(habits::router())
         .merge(subjects::router())
         .merge(study_sessions::router())

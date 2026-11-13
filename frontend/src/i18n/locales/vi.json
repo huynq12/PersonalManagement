@@ -151,7 +151,11 @@
     "displayNameLength": "Hãy dùng tối đa 100 ký tự.",
     "habitNameLength": "Hãy dùng tối đa 100 ký tự.",
     "taskTitleLength": "Hãy dùng tối đa 200 ký tự.",
-    "weekdaysRequired": "Hãy chọn ít nhất một ngày."
+    "weekdaysRequired": "Hãy chọn ít nhất một ngày.",
+    "minutesRange": "Nhập một số nguyên từ 1 đến 240.",
+    "longBreakEveryRange": "Nhập một số nguyên từ 1 đến 12.",
+    "moneyInvalid": "Nhập số tiền lớn hơn 0, chỉ gồm chữ số và tối đa một dấu thập phân, không quá số chữ số thập phân của tiền tệ.",
+    "hoursInvalid": "Nhập số giờ lớn hơn 0 và tối đa 24, tối đa hai chữ số thập phân."
   },
   "errors": {
     "unknown": "Đã có lỗi xảy ra. Vui lòng thử lại.",
@@ -173,5 +177,34 @@
     "study_session_already_running": "Một phiên học đang chạy.",
     "study_session_not_running": "Phiên học này đã kết thúc.",
     "day_mode_locked": "Không thể đổi chế độ khi đã có thói quen được đánh dấu. Hãy bỏ đánh dấu các thói quen trước."
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "description": "Tiền tệ, công việc, ngân sách và Pomodoro.",
+    "saved": "Đã lưu.",
+    "currency": {
+      "title": "Tiền tệ",
+      "label": "Tiền tệ",
+      "warning": "Các khoản tiền đã có không được quy đổi. Đổi tiền tệ chỉ thay đổi cách nhập và hiển thị số tiền."
+    },
+    "work": {
+      "title": "Công việc",
+      "description": "Dùng cho nhật ký làm việc. Mỗi bản ghi giữ mức lương và số giờ chuẩn tại thời điểm tạo, nên thay đổi sau này không ảnh hưởng đến nó.",
+      "hourlyWage": "Lương theo giờ ({{currency}})",
+      "baseHours": "Số giờ chuẩn mỗi ngày",
+      "baseHoursHint": "Ngày làm việc thông thường của bạn, ví dụ 8 hoặc 7,5. Để trống để xóa."
+    },
+    "budget": {
+      "title": "Ngân sách tháng",
+      "label": "Ngân sách chi tiêu hằng tháng ({{currency}})",
+      "hint": "Để trống nếu không đặt ngân sách."
+    },
+    "pomodoro": {
+      "title": "Pomodoro",
+      "focus": "Tập trung (phút)",
+      "shortBreak": "Nghỉ ngắn (phút)",
+      "longBreak": "Nghỉ dài (phút)",
+      "longBreakEvery": "Số phiên tập trung trước mỗi lần nghỉ dài"
+    }
   }
 }

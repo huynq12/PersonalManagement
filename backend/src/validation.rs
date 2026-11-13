@@ -124,6 +124,25 @@ pub fn not_blank(text: &str) -> Result<(), ValidationError> {
     Ok(())
 }
 
+const MAX_HOURS_PER_DAY: f64 = 24.0;
+
+/// Converts hours to whole hundredths of an hour, or `None` if the value is out of range or
+/// has more than two decimals.
+pub(crate) fn to_hundredths(hours: f64) -> Option<i32> {
+    if !hours.is_finite() || hours <= 0.0 || hours > MAX_HOURS_PER_DAY {
+        return None;
+    }
+    let scaled = hours * 100.0;
+    let rounded = scaled.round();
+    // Tolerates binary representation error such as 7.25 * 100 = 724.9999999999999.
+    if (scaled - rounded).abs() > 1e-6 {
+        return None;
+    }
+    // The range check above keeps `rounded` within 1..=2400.
+    #[allow(clippy::cast_possible_truncation)]
+    Some(rounded as i32)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -133,5 +152,21 @@ mod tests {
         assert!(not_blank("").is_err());
         assert!(not_blank(" \t\n").is_err());
         assert!(not_blank(" a ").is_ok());
+    }
+
+    #[test]
+    fn to_hundredths_accepts_up_to_two_decimals_in_range() {
+        assert_eq!(to_hundredths(8.0), Some(800));
+        assert_eq!(to_hundredths(7.25), Some(725));
+        assert_eq!(to_hundredths(0.01), Some(1));
+        assert_eq!(to_hundredths(24.0), Some(2400));
+        assert_eq!(to_hundredths(1.1), Some(110));
+    }
+
+    #[test]
+    fn to_hundredths_rejects_everything_else() {
+        for hours in [0.0, -1.0, 24.01, 7.255, f64::NAN, f64::INFINITY] {
+            assert_eq!(to_hundredths(hours), None, "{hours}");
+        }
     }
 }

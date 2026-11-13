@@ -3,7 +3,9 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use validator::Validate;
+use validator::{Validate, ValidationError};
+
+use crate::validation::not_blank;
 
 /// Interface languages a user can choose.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -33,6 +35,8 @@ pub(super) struct User {
     pub display_name: String,
     pub timezone: String,
     pub locale: String,
+    /// ISO 4217 code from the supported list.
+    pub currency: String,
 }
 
 /// The columns of `refresh_tokens` needed to decide whether a token may be rotated.
@@ -67,6 +71,34 @@ pub(super) struct LoginRequest {
     pub password: String,
 }
 
+/// Currencies a user can choose. Keep in sync with the `users_currency_supported` constraint.
+pub(super) const SUPPORTED_CURRENCIES: [&str; 10] = [
+    "VND", "USD", "EUR", "GBP", "JPY", "KRW", "CNY", "SGD", "THB", "AUD",
+];
+
+/// Longest display name, in characters.
+const MAX_DISPLAY_NAME_LENGTH: u64 = 100;
+
+/// Body of `PATCH /me`. Fields left out keep their value.
+#[derive(Debug, Deserialize, Validate)]
+pub(super) struct UpdateMeRequest {
+    #[validate(length(max = MAX_DISPLAY_NAME_LENGTH), custom(function = "not_blank"))]
+    pub display_name: Option<String>,
+    /// An IANA time zone name; checked against the database's list in the service.
+    pub timezone: Option<String>,
+    pub locale: Option<Locale>,
+    #[validate(custom(function = "supported_currency"))]
+    pub currency: Option<String>,
+}
+
+/// `validator` rule: the code must be one of [`SUPPORTED_CURRENCIES`]. Code: `currency`.
+fn supported_currency(code: &str) -> Result<(), ValidationError> {
+    if !SUPPORTED_CURRENCIES.contains(&code) {
+        return Err(ValidationError::new("currency"));
+    }
+    Ok(())
+}
+
 /// The public view of a user. Never includes the password hash.
 #[derive(Debug, Serialize)]
 pub(super) struct UserResponse {
@@ -75,6 +107,7 @@ pub(super) struct UserResponse {
     pub display_name: String,
     pub timezone: String,
     pub locale: String,
+    pub currency: String,
 }
 
 impl From<User> for UserResponse {
@@ -85,6 +118,7 @@ impl From<User> for UserResponse {
             display_name: user.display_name,
             timezone: user.timezone,
             locale: user.locale,
+            currency: user.currency,
         }
     }
 }
@@ -111,4 +145,21 @@ pub(super) struct GoogleStartQuery {
 pub(super) struct GoogleLinkResponse {
     /// The Google URL the browser must navigate to.
     pub authorization_url: String,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn supported_currency_accepts_only_listed_uppercase_codes() {
+        assert!(supported_currency("VND").is_ok());
+        assert!(supported_currency("AUD").is_ok());
+        for code in ["", "vnd", "XXX", "USD "] {
+            assert!(
+                supported_currency(code).is_err(),
+                "{code:?} should be rejected"
+            );
+        }
+    }
 }

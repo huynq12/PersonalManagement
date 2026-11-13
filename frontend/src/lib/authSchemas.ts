@@ -9,6 +9,10 @@ export type ValidationMessageKey =
   | 'validation.habitNameLength'
   | 'validation.taskTitleLength'
   | 'validation.weekdaysRequired'
+  | 'validation.minutesRange'
+  | 'validation.longBreakEveryRange'
+  | 'validation.moneyInvalid'
+  | 'validation.hoursInvalid'
 
 const required: ValidationMessageKey = 'validation.required'
 const emailInvalid: ValidationMessageKey = 'validation.emailInvalid'

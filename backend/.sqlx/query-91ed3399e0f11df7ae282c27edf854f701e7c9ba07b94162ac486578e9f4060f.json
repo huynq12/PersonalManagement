@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT id, email::text AS \"email!\", password_hash, display_name, timezone, locale\n        FROM users\n        WHERE email = $1::text::citext\n        ",
+  "query": "\n        INSERT INTO users (email, password_hash, display_name, locale)\n        VALUES ($1::text::citext, $2, $3, $4)\n        RETURNING id, email::text AS \"email!\", password_hash, display_name, timezone, locale,\n               currency\n        ",
   "describe": {
     "columns": [
       {
@@ -32,10 +32,18 @@
         "ordinal": 5,
         "name": "locale",
         "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "currency",
+        "type_info": "Text"
       }
     ],
     "parameters": {
       "Left": [
+        "Text",
+        "Text",
+        "Text",
         "Text"
       ]
     },
@@ -45,8 +53,9 @@
       true,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "66af678895e4e4f54d25bb6ea9fcf41223e4eefd2a194db1c12a0176ccc7639e"
+  "hash": "91ed3399e0f11df7ae282c27edf854f701e7c9ba07b94162ac486578e9f4060f"
 }

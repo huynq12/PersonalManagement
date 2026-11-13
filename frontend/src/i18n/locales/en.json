@@ -151,7 +151,11 @@
     "displayNameLength": "Use at most 100 characters.",
     "habitNameLength": "Use at most 100 characters.",
     "taskTitleLength": "Use at most 200 characters.",
-    "weekdaysRequired": "Choose at least one day."
+    "weekdaysRequired": "Choose at least one day.",
+    "minutesRange": "Enter a whole number from 1 to 240.",
+    "longBreakEveryRange": "Enter a whole number from 1 to 12.",
+    "moneyInvalid": "Enter an amount greater than 0, using digits and at most one decimal point, with no more decimals than the currency has.",
+    "hoursInvalid": "Enter hours greater than 0 and at most 24, with up to two decimals."
   },
   "errors": {
     "unknown": "Something went wrong. Please try again.",
@@ -173,5 +177,34 @@
     "study_session_already_running": "A study session is already running.",
     "study_session_not_running": "This study session has already ended.",
     "day_mode_locked": "The mode cannot be changed while a habit is checked. Uncheck your habits first."
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Currency, work, budget, and Pomodoro preferences.",
+    "saved": "Saved.",
+    "currency": {
+      "title": "Currency",
+      "label": "Currency",
+      "warning": "Existing amounts are not converted. Changing the currency only changes how amounts are entered and shown."
+    },
+    "work": {
+      "title": "Work",
+      "description": "Used by the work log. Each entry keeps the wage and base hours it was created with, so later changes do not affect it.",
+      "hourlyWage": "Hourly wage ({{currency}})",
+      "baseHours": "Base hours per day",
+      "baseHoursHint": "Your usual working day, such as 8 or 7.5. Leave empty to clear."
+    },
+    "budget": {
+      "title": "Monthly budget",
+      "label": "Monthly expense budget ({{currency}})",
+      "hint": "Leave empty for no budget."
+    },
+    "pomodoro": {
+      "title": "Pomodoro",
+      "focus": "Focus (minutes)",
+      "shortBreak": "Short break (minutes)",
+      "longBreak": "Long break (minutes)",
+      "longBreakEvery": "Focus sessions before a long break"
+    }
   }
 }
