@@ -7,7 +7,7 @@
 use serde::{Deserialize, Deserializer, Serialize};
 use validator::{Validate, ValidationError};
 
-use crate::validation::to_hundredths;
+use crate::validation::{present, to_hundredths};
 
 /// Largest hourly wage or monthly budget, in minor units. Keeps every amount below 2^53, the
 /// largest integer JavaScript represents exactly.
@@ -84,16 +84,6 @@ pub(super) struct UpdateSettingsRequest {
     #[serde(default, deserialize_with = "present")]
     #[validate(custom(function = "valid_money"))]
     pub monthly_budget: Option<Option<i64>>,
-}
-
-/// Deserializes a field that may be absent, `null`, or a value into `None`, `Some(None)`, or
-/// `Some(Some(value))`. Use together with `#[serde(default)]`.
-fn present<'de, T, D>(deserializer: D) -> Result<Option<Option<T>>, D::Error>
-where
-    T: Deserialize<'de>,
-    D: Deserializer<'de>,
-{
-    Option::<T>::deserialize(deserializer).map(Some)
 }
 
 /// Deserializes a field that may be absent or a value, and rejects `null`. Use together with

@@ -162,7 +162,8 @@
     "hoursInvalid": "Enter hours greater than 0 and at most 24, with up to two decimals.",
     "dateInvalid": "Enter a valid date.",
     "dateInFuture": "Choose today or an earlier day.",
-    "noteLength": "Use at most 500 characters."
+    "noteLength": "Use at most 500 characters.",
+    "categoryNameLength": "Use at most 100 characters."
   },
   "errors": {
     "unknown": "Something went wrong. Please try again.",
@@ -184,7 +185,9 @@
     "study_session_already_running": "A study session is already running.",
     "study_session_not_running": "This study session has already ended.",
     "day_mode_locked": "The mode cannot be changed while a habit is checked. Uncheck your habits first.",
-    "work_settings_missing": "Set your hourly wage and base hours in Settings first."
+    "work_settings_missing": "Set your hourly wage and base hours in Settings first.",
+    "finance_category_name_taken": "You already have a category with this name.",
+    "finance_category_in_use": "This category has transactions, so it cannot be deleted. Archive it instead."
   },
   "settings": {
     "title": "Settings",
@@ -259,6 +262,94 @@
       "title": "Delete this entry?",
       "description": "The entry for {{date}} will be removed. This cannot be undone.",
       "confirm": "Delete"
+    }
+  },
+  "finances": {
+    "title": "Finances",
+    "description": "Your income and expenses for each month.",
+    "summary": {
+      "income": "Income",
+      "expenses": "Expenses",
+      "balance": "Balance"
+    },
+    "budget": {
+      "title": "Monthly budget",
+      "none": "No budget is set.",
+      "setLink": "Set a budget in Settings",
+      "used": "{{spent}} of {{budget}}",
+      "left": "{{amount}} left this month.",
+      "over": "Over budget by {{amount}}."
+    },
+    "byCategory": {
+      "title": "Expenses by category",
+      "empty": "No expenses this month."
+    },
+    "form": {
+      "title": "Add a transaction",
+      "editTitle": "Edit transaction",
+      "kind": "Type",
+      "expense": "Expense",
+      "income": "Income",
+      "amount": "Amount ({{currency}})",
+      "date": "Date",
+      "category": "Category",
+      "categoryPlaceholder": "Choose a category",
+      "noCategories": "There is no category of this type yet.",
+      "manageCategories": "Manage categories",
+      "note": "Note",
+      "save": "Save transaction",
+      "cancelEdit": "Cancel editing"
+    },
+    "list": {
+      "title": "Transactions",
+      "empty": "No transactions this month.",
+      "edit": "Edit {{category}}, {{date}}",
+      "delete": "Delete {{category}}, {{date}}"
+    },
+    "deleteDialog": {
+      "title": "Delete this transaction?",
+      "description": "The {{category}} transaction of {{date}} will be removed. This cannot be undone.",
+      "confirm": "Delete"
+    },
+    "suggestedCategories": {
+      "expense": {
+        "food": "Food",
+        "transport": "Transport",
+        "housing": "Housing",
+        "bills": "Bills",
+        "shopping": "Shopping",
+        "health": "Health",
+        "entertainment": "Entertainment",
+        "education": "Education",
+        "other": "Other"
+      },
+      "income": {
+        "salary": "Salary",
+        "bonus": "Bonus",
+        "other": "Other"
+      }
+    }
+  },
+  "financeCategories": {
+    "title": "Finance categories",
+    "description": "The categories you sort income and expenses into.",
+    "expenseTitle": "Expense categories",
+    "incomeTitle": "Income categories",
+    "empty": "No categories yet.",
+    "showArchived": "Show archived categories",
+    "archivedBadge": "archived",
+    "name": "Name",
+    "color": "Color",
+    "add": "Add category",
+    "addForm": "Add to {{kind}}",
+    "edit": "Edit {{name}}",
+    "editTitle": "Edit category",
+    "archive": "Archive {{name}}",
+    "restore": "Restore {{name}}",
+    "suggested": {
+      "title": "Start with a suggested set",
+      "description": "Add common expense and income categories in one step. You can rename or archive them later.",
+      "button": "Add suggested categories"
     }
   }
 }

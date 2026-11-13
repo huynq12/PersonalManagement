@@ -5,12 +5,12 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use super::{
-    model::{MonthView, PutWorkEntryRequest, Summary, WorkEntry, parse_month},
+    model::{MonthView, PutWorkEntryRequest, Summary, WorkEntry},
     repository,
 };
 use crate::{
     error::{AppError, AppResult},
-    validation::{field_error, to_hundredths},
+    validation::{field_error, parse_month, to_hundredths},
 };
 
 /// The month's entries and totals.

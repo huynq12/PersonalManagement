@@ -1,0 +1,71 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT t.id, c.kind, t.amount, t.date, t.note, t.created_at,\n               c.id AS category_id, c.name AS category_name, c.color AS category_color\n        FROM transactions t\n        JOIN finance_categories c ON c.id = t.category_id\n        WHERE t.id = $2 AND t.user_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "kind",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "amount",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "date",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 4,
+        "name": "note",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "category_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 7,
+        "name": "category_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "category_color",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "30282061d50193d4531b7ce828f7c1884bed1f830920a59a9a80413cc6a10355"
+}

@@ -7,6 +7,7 @@ export type ValidationMessageKey =
   | 'validation.passwordLength'
   | 'validation.displayNameLength'
   | 'validation.habitNameLength'
+  | 'validation.categoryNameLength'
   | 'validation.taskTitleLength'
   | 'validation.weekdaysRequired'
   | 'validation.minutesRange'

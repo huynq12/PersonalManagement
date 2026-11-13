@@ -100,8 +100,10 @@ export const MORE_SHEET_GROUPS: NavGroup[] = NAV_GROUPS.map((group) => ({
   items: group.items.filter((item) => !BOTTOM_BAR_ITEMS.includes(item)),
 })).filter((group) => group.items.length > 0)
 
+const BUILT_ITEMS: NavItem[] = [TODAY, HABITS, WORK_LOG, FINANCES, FINANCE_CATEGORIES, SETTINGS_ITEM]
+
 /** Screens that have a menu entry but are not built yet; they show a placeholder page. */
 export const UNBUILT_ITEMS: NavItem[] = [
   ...NAV_GROUPS.flatMap((group) => group.items),
   SETTINGS_ITEM,
-].filter((item) => item !== TODAY && item !== HABITS && item !== WORK_LOG && item !== SETTINGS_ITEM)
+].filter((item) => !BUILT_ITEMS.includes(item))

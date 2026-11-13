@@ -55,6 +55,12 @@ pub enum AppError {
     /// Another subject of the same user already has this name, ignoring case.
     #[error("subject name is already in use")]
     SubjectNameTaken,
+    /// Another finance category of the same user and kind already has this name, ignoring case.
+    #[error("finance category name is already in use")]
+    FinanceCategoryNameTaken,
+    /// A transaction still uses the finance category, so it cannot be deleted.
+    #[error("finance category is used by transactions")]
+    FinanceCategoryInUse,
     /// The user already has a running study session.
     #[error("a study session is already running")]
     StudySessionAlreadyRunning,
@@ -101,6 +107,8 @@ impl AppError {
                 (StatusCode::CONFLICT, "google_account_already_linked")
             }
             Self::SubjectNameTaken => (StatusCode::CONFLICT, "subject_name_taken"),
+            Self::FinanceCategoryNameTaken => (StatusCode::CONFLICT, "finance_category_name_taken"),
+            Self::FinanceCategoryInUse => (StatusCode::CONFLICT, "finance_category_in_use"),
             Self::StudySessionAlreadyRunning => {
                 (StatusCode::CONFLICT, "study_session_already_running")
             }

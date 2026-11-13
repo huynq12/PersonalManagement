@@ -1,0 +1,47 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT c.kind, c.id, c.name, c.color, sum(t.amount)::int8 AS \"total!\"\n        FROM transactions t\n        JOIN finance_categories c ON c.id = t.category_id\n        WHERE t.user_id = $1\n          AND t.date >= $2 AND t.date < ($2::date + interval '1 month')::date\n        GROUP BY c.id\n        ORDER BY c.kind, 5 DESC, lower(c.name), c.id\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "kind",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "color",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "total!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Date"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "dc76cf49ad67aee1f35f9c754cc9b4c2e2aeeca9e4e1921b39d8deb8ae8a09ee"
+}

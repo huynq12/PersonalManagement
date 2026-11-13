@@ -16,6 +16,7 @@ pub mod auth;
 pub mod config;
 pub mod days;
 pub mod error;
+pub mod finances;
 pub mod habits;
 pub mod health;
 pub mod settings;
@@ -93,7 +94,8 @@ pub fn app(state: AppState) -> anyhow::Result<Router> {
         .merge(study_sessions::router())
         .merge(tasks::router())
         .merge(days::router())
-        .merge(work_entries::router());
+        .merge(work_entries::router())
+        .merge(finances::router());
 
     Ok(Router::new()
         .nest("/api/v1", api)
