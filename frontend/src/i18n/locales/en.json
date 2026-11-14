@@ -71,6 +71,15 @@
       "lowEnergy": "Low energy",
       "lockedNotToday": "The mode can only be changed for today.",
       "lockedChecked": "Uncheck all habits to change the mode."
+    },
+    "money": {
+      "title": "Money",
+      "hoursWorked": "Hours worked",
+      "pay": "Pay",
+      "noWork": "No hours logged for this day.",
+      "spent": "Spent",
+      "workLog": "Work log",
+      "finances": "Finances"
     }
   },
   "habits": {

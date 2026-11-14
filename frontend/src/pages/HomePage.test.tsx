@@ -93,6 +93,60 @@ describe('Today screen', () => {
   })
 })
 
+describe('money card', () => {
+  function moneyCard() {
+    return within(screen.getByRole('region', { name: 'Money' }))
+  }
+
+  it('shows the hours, the pay, and the total spent of the day', async () => {
+    backend.work.set(TODAY, { hours: 7.5, pay: 225_000 })
+    backend.expenses.set(TODAY, 85_000)
+
+    renderToday()
+
+    await screen.findByRole('checkbox', { name: 'Read' })
+    expect(moneyCard().getByText('7.5')).toBeTruthy()
+    expect(moneyCard().getByText(/225,000/)).toBeTruthy()
+    expect(moneyCard().getByText(/85,000/)).toBeTruthy()
+  })
+
+  it('says no hours were logged and shows zero spent when the day has no money data', async () => {
+    renderToday()
+
+    await screen.findByRole('checkbox', { name: 'Read' })
+    expect(moneyCard().getByText('No hours logged for this day.')).toBeTruthy()
+    expect(moneyCard().getByText('₫0')).toBeTruthy()
+  })
+
+  it('links to the work log and to the finances screen', async () => {
+    renderToday()
+
+    await screen.findByRole('checkbox', { name: 'Read' })
+    expect(moneyCard().getByRole('link', { name: 'Work log' }).getAttribute('href')).toBe(
+      '/work-log',
+    )
+    expect(moneyCard().getByRole('link', { name: 'Finances' }).getAttribute('href')).toBe(
+      '/finances',
+    )
+  })
+
+  it('has no inputs, so nothing can be entered on the card', async () => {
+    renderToday()
+
+    await screen.findByRole('checkbox', { name: 'Read' })
+    expect(moneyCard().queryAllByRole('textbox')).toHaveLength(0)
+    expect(moneyCard().queryAllByRole('button')).toHaveLength(0)
+  })
+
+  it('renders in Vietnamese', async () => {
+    await i18n.changeLanguage('vi')
+
+    renderToday()
+
+    expect(await screen.findByRole('region', { name: viLocale.home.money.title })).toBeTruthy()
+  })
+})
+
 describe('day navigation', () => {
   it('loads the previous day and keeps it in the URL', async () => {
     backend.tasks.push(task('task-old', YESTERDAY, 'Old to-do'))

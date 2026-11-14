@@ -69,6 +69,10 @@ export class FakeChecklist {
   completions = new Set<string>()
   /** Dates marked as low-energy days. */
   lowEnergyDays = new Set<string>()
+  /** Work entries by date: the hours and the pay of the day. */
+  work = new Map<string, { hours: number; pay: number }>()
+  /** Total spent by date, in minor units; a date without a value means nothing was spent. */
+  expenses = new Map<string, number>()
   /** When set, requests it returns true for fail with a 500. */
   failWhen: ((request: RecordedRequest) => boolean) | null = null
   private nextId = 1
@@ -126,6 +130,8 @@ export class FakeChecklist {
           completed: this.completions.has(`${item.id}|${date}`),
         })),
       tasks: this.tasks.filter((item) => item.date === date),
+      work: this.work.get(date) ?? null,
+      expense_total: this.expenses.get(date) ?? 0,
     })
   }
 

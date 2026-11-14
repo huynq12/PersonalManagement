@@ -50,6 +50,10 @@ export const dayViewSchema = z.object({
   mode_locked: z.boolean(),
   habits: z.array(dayHabitSchema),
   tasks: z.array(taskSchema),
+  /** The day's work entry; `null` when no hours were logged. */
+  work: z.object({ hours: z.number(), pay: z.number().int() }).nullable(),
+  /** Total expenses of the day in minor units. */
+  expense_total: z.number().int(),
 })
 
 export type DayView = z.infer<typeof dayViewSchema>

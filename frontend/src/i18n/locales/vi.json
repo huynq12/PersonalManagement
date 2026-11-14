@@ -71,6 +71,15 @@
       "lowEnergy": "Ít năng lượng",
       "lockedNotToday": "Chỉ có thể đổi chế độ của hôm nay.",
       "lockedChecked": "Hãy bỏ đánh dấu mọi thói quen để đổi chế độ."
+    },
+    "money": {
+      "title": "Tiền bạc",
+      "hoursWorked": "Số giờ làm",
+      "pay": "Tiền công",
+      "noWork": "Chưa ghi giờ làm cho ngày này.",
+      "spent": "Đã chi",
+      "workLog": "Nhật ký làm việc",
+      "finances": "Tài chính"
     }
   },
   "habits": {
