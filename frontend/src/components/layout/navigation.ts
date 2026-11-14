@@ -104,6 +104,7 @@ const BUILT_ITEMS: NavItem[] = [
   TODAY,
   STATS,
   HABITS,
+  POMODORO,
   SUBJECTS,
   WORK_LOG,
   FINANCES,

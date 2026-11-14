@@ -192,7 +192,7 @@
     "email_already_registered": "Email này đã được đăng ký bằng mật khẩu. Hãy đăng nhập bằng mật khẩu, sau đó liên kết Google trong phần Cài đặt.",
     "google_account_already_linked": "Tài khoản Google này đã được liên kết với tài khoản khác, hoặc tài khoản của bạn đã liên kết một tài khoản Google.",
     "subject_name_taken": "Bạn đã có một môn học trùng tên này.",
-    "study_session_already_running": "Một phiên học đang chạy.",
+    "study_session_already_running": "Đang có một phiên học chạy. Hãy hoàn thành hoặc hủy phiên đó trước.",
     "study_session_not_running": "Phiên học này đã kết thúc.",
     "day_mode_locked": "Không thể đổi chế độ khi đã có thói quen được đánh dấu. Hãy bỏ đánh dấu các thói quen trước.",
     "work_settings_missing": "Hãy đặt lương theo giờ và số giờ làm chuẩn trong Cài đặt trước.",
@@ -465,6 +465,30 @@
       "title": "Xóa môn học này?",
       "description": "\"{{name}}\" sẽ bị xóa. Các phiên học trước đây vẫn được giữ lại nhưng không còn môn học. Hãy lưu trữ nếu chỉ muốn ẩn môn này khỏi bộ đếm giờ.",
       "confirm": "Xóa"
+    }
+  },
+  "pomodoro": {
+    "title": "Pomodoro",
+    "description": "Tập trung vào một môn mỗi lần, rồi nghỉ ngơi.",
+    "subject": "Môn học",
+    "noSubject": "Không có môn",
+    "manageSubjects": "Quản lý môn học",
+    "start": "Bắt đầu tập trung",
+    "cancel": "Hủy phiên",
+    "skipBreak": "Bỏ qua giờ nghỉ",
+    "saving": "Đang lưu phiên học…",
+    "phase": {
+      "ready": "Sẵn sàng",
+      "focus": "Tập trung",
+      "shortBreak": "Nghỉ ngắn",
+      "longBreak": "Nghỉ dài"
+    },
+    "history": {
+      "title": "Phiên học hôm nay",
+      "empty": "Hôm nay chưa có phiên nào hoàn thành.",
+      "summary_one": "{{count}} phiên · {{total}}",
+      "summary_other": "{{count}} phiên · {{total}}",
+      "delete": "Xóa phiên lúc {{time}}"
     }
   }
 }
