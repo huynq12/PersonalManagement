@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router'
 import DayModeControl from '../components/today/DayModeControl'
 import DayNavigation from '../components/today/DayNavigation'
 import HabitChecklist from '../components/today/HabitChecklist'
+import MoneyCard from '../components/today/MoneyCard'
 import TaskList from '../components/today/TaskList'
 import Alert from '../components/ui/Alert'
 import Button from '../components/ui/Button'
@@ -17,6 +18,7 @@ import { isIsoDate, todayIn } from '../lib/dates'
  *
  * The day comes from the URL (`/?date=YYYY-MM-DD`); without it, or with an invalid value, the
  * screen shows today. The menu and the study time arrive with those features (SPEC.md, Today).
+ * The money card is read-only; hours and spending are entered on their own screens.
  */
 export default function HomePage() {
   const { t } = useTranslation()
@@ -66,6 +68,7 @@ export default function HomePage() {
             isFuture={date > today}
           />
           <TaskList date={date} tasks={day.data.tasks} />
+          <MoneyCard work={day.data.work} expenseTotal={day.data.expense_total} />
         </div>
       )}
     </main>

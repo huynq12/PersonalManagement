@@ -49,7 +49,7 @@ Progress through this guide:
 | B — Settings and currency | Done, except the profile, time zone, and Google linking sections of the Settings screen, which Phase B left to their own work |
 | C — Work log | Done |
 | D — Finances | Done |
-| E — Today money card | Not started |
+| E — Today money card | Done |
 | F — Weekly statistics | Not started |
 
 - Backend features under `backend/src/`: `auth` (including `GET` and `PATCH /me`), `days`, `finances`, `habits`, `health`, `settings`, `study_sessions`, `subjects`, `tasks`, `work_entries`. There is no meal plan, statistics, or OpenAPI code yet.

@@ -4,7 +4,7 @@ use chrono::{DateTime, NaiveDate, Utc};
 use sqlx::PgExecutor;
 use uuid::Uuid;
 
-use super::model::{DayHabit, DayModeState};
+use super::model::{DayHabit, DayModeState, DayWork};
 
 /// Lists the user's active habits scheduled for the weekday of `date`, each with whether it is
 /// completed on that date.
@@ -140,4 +140,48 @@ pub(super) async fn unmark_low_energy(
     .execute(executor)
     .await?;
     Ok(result.rows_affected() > 0)
+}
+
+/// The user's work entry for `date`, if any.
+pub(super) async fn day_work(
+    executor: impl PgExecutor<'_>,
+    user_id: Uuid,
+    date: NaiveDate,
+) -> sqlx::Result<Option<DayWork>> {
+    let row = sqlx::query!(
+        r#"
+        SELECT (hours * 100)::int4 AS "hours_hundredths!",
+               round(hours * hourly_wage)::int8 AS "pay!"
+        FROM work_entries
+        WHERE user_id = $1 AND date = $2
+        "#,
+        user_id,
+        date,
+    )
+    .fetch_optional(executor)
+    .await?;
+    Ok(row.map(|row| DayWork {
+        hours: f64::from(row.hours_hundredths) / 100.0,
+        pay: row.pay,
+    }))
+}
+
+/// The total of the user's expense transactions dated `date`; 0 when there are none.
+pub(super) async fn day_expense_total(
+    executor: impl PgExecutor<'_>,
+    user_id: Uuid,
+    date: NaiveDate,
+) -> sqlx::Result<i64> {
+    sqlx::query_scalar!(
+        r#"
+        SELECT COALESCE(sum(t.amount), 0)::int8 AS "total!"
+        FROM transactions t
+        JOIN finance_categories c ON c.id = t.category_id
+        WHERE t.user_id = $1 AND t.date = $2 AND c.kind = 'expense'
+        "#,
+        user_id,
+        date,
+    )
+    .fetch_one(executor)
+    .await
 }
