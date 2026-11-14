@@ -14,15 +14,17 @@ use crate::{
     validation::field_error,
 };
 
-/// Loads the mode, the scheduled habits, the to-dos, and the money figures of one date.
+/// Loads the mode, the scheduled habits, the to-dos, the money figures, and the study time of
+/// one date.
 pub(super) async fn day_view(db: &PgPool, user_id: Uuid, date: NaiveDate) -> AppResult<DayView> {
     // The queries are independent, so run them concurrently.
-    let (mode, habits, tasks, work, expense_total) = tokio::try_join!(
+    let (mode, habits, tasks, work, expense_total, study_seconds) = tokio::try_join!(
         repository::day_mode_state(db, user_id, date, Utc::now()),
         repository::list_day_habits(db, user_id, date),
         tasks::repository::list_tasks(db, user_id, date),
         repository::day_work(db, user_id, date),
         repository::day_expense_total(db, user_id, date),
+        repository::day_study_seconds(db, user_id, date),
     )?;
 
     Ok(DayView {
@@ -33,6 +35,7 @@ pub(super) async fn day_view(db: &PgPool, user_id: Uuid, date: NaiveDate) -> App
         tasks,
         work,
         expense_total,
+        study_seconds,
     })
 }
 

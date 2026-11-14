@@ -80,6 +80,12 @@
       "spent": "Đã chi",
       "workLog": "Nhật ký làm việc",
       "finances": "Tài chính"
+    },
+    "study": {
+      "title": "Học tập",
+      "timeStudied": "Thời gian đã học",
+      "none": "Chưa có thời gian học.",
+      "openPomodoro": "Mở Pomodoro"
     }
   },
   "habits": {

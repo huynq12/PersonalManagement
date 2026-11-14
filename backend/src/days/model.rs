@@ -59,7 +59,7 @@ pub(super) struct DayWork {
 
 /// Body of `GET /days/{date}`: everything the Today screen shows for one date.
 ///
-/// The menu and the study time described in SPEC.md are added together with those features.
+/// The menu described in SPEC.md is added together with the meal plan.
 #[derive(Debug, Serialize)]
 pub(super) struct DayView {
     pub date: NaiveDate,
@@ -75,4 +75,6 @@ pub(super) struct DayView {
     pub work: Option<DayWork>,
     /// Total of the date's expense transactions in minor units; 0 when nothing was spent.
     pub expense_total: i64,
+    /// Total time of the date's completed study sessions, in seconds; 0 when there are none.
+    pub study_seconds: i64,
 }

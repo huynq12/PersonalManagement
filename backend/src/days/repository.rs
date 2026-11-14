@@ -184,3 +184,23 @@ pub(super) async fn day_expense_total(
     .fetch_one(executor)
     .await
 }
+
+/// The total duration of the user's completed study sessions that started on `date`; 0 when there
+/// are none. Cancelled and running sessions do not count.
+pub(super) async fn day_study_seconds(
+    executor: impl PgExecutor<'_>,
+    user_id: Uuid,
+    date: NaiveDate,
+) -> sqlx::Result<i64> {
+    sqlx::query_scalar!(
+        r#"
+        SELECT COALESCE(sum(duration_seconds), 0)::int8 AS "total!"
+        FROM study_sessions
+        WHERE user_id = $1 AND local_date = $2 AND status = 'completed'
+        "#,
+        user_id,
+        date,
+    )
+    .fetch_one(executor)
+    .await
+}
