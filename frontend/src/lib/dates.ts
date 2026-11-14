@@ -105,3 +105,18 @@ export function formatShortDate(date: IsoDate, language: string | undefined): st
     timeZone: 'UTC',
   }).format(toUtc(date))
 }
+
+/** The Monday of the week that contains `date`; weeks start on Monday (SPEC.md). */
+export function mondayOf(date: IsoDate): IsoDate {
+  return addDays(date, 1 - isoWeekday(date))
+}
+
+/** A localized range for the week that starts on `start`, such as "Nov 9 – 15, 2026". */
+export function formatWeekRange(start: IsoDate, language: string | undefined): string {
+  return new Intl.DateTimeFormat(language, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).formatRange(toUtc(start), toUtc(addDays(start, 6)))
+}

@@ -10,14 +10,14 @@ use crate::tasks::model::Task;
 /// Whether a day is a normal day or a low-energy day.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub(super) enum DayMode {
+pub(crate) enum DayMode {
     Normal,
     LowEnergy,
 }
 
 impl DayMode {
     /// The mode of a day, given whether it is marked as a low-energy day.
-    pub(super) fn from_low_energy(is_low_energy: bool) -> Self {
+    pub(crate) fn from_low_energy(is_low_energy: bool) -> Self {
         if is_low_energy {
             Self::LowEnergy
         } else {

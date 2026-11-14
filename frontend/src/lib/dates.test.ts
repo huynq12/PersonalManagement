@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
+  formatWeekRange,
+  mondayOf,
   addDays,
   addMonths,
   formatLongDate,
@@ -93,5 +95,23 @@ describe('months', () => {
   it('formats a month in the given language', () => {
     expect(formatMonth('2026-11', 'en')).toBe('November 2026')
     expect(formatMonth('2026-11', 'vi')).toMatch(/2026/)
+  })
+})
+
+describe('mondayOf', () => {
+  it('maps every day of a week to its Monday, across a month boundary', () => {
+    // 2026-11-09 is a Monday and 2026-11-15 the Sunday that ends that week.
+    for (const date of ['2026-11-09', '2026-11-11', '2026-11-15']) {
+      expect(mondayOf(date)).toBe('2026-11-09')
+    }
+    expect(mondayOf('2026-11-16')).toBe('2026-11-16')
+    expect(mondayOf('2026-12-01')).toBe('2026-11-30')
+  })
+})
+
+describe('formatWeekRange', () => {
+  it('formats the seven days from the Monday', () => {
+    // ICU puts thin spaces around the dash; compare with plain spaces.
+    expect(formatWeekRange('2026-11-09', 'en').replace(/\s/g, ' ')).toBe('Nov 9 – 15, 2026')
   })
 })

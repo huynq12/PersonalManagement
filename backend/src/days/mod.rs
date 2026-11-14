@@ -8,7 +8,7 @@ use axum::{
 use crate::AppState;
 
 mod handler;
-mod model;
+pub(crate) mod model;
 mod repository;
 mod service;
 

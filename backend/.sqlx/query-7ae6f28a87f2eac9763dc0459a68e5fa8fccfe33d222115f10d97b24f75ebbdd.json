@@ -1,0 +1,48 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT s.subject_id AS \"subject_id?\",\n               sub.name AS \"name?\",\n               sub.color AS \"color?\",\n               COALESCE(sum(s.duration_seconds), 0)::int8 AS \"study_seconds!\",\n               count(*) AS \"pomodoros!\"\n        FROM study_sessions s\n        LEFT JOIN subjects sub ON sub.id = s.subject_id\n        WHERE s.user_id = $1 AND s.status = 'completed' AND s.local_date BETWEEN $2 AND $3\n        GROUP BY s.subject_id, sub.name, sub.color\n        ORDER BY COALESCE(sum(s.duration_seconds), 0) DESC, sub.name\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "subject_id?",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "color?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "study_seconds!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "pomodoros!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Date",
+        "Date"
+      ]
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      null,
+      null
+    ]
+  },
+  "hash": "7ae6f28a87f2eac9763dc0459a68e5fa8fccfe33d222115f10d97b24f75ebbdd"
+}

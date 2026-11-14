@@ -464,7 +464,7 @@ Status as of 2026-11-14, describing what is merged into `main`. Update the Statu
 | 6 | Meal plan (ingredients, dishes, weekly template, shopping list). | Not started |
 | 7 | Settings endpoint and screen, currency, then the work log. | Partly done: the settings API, currency, and the work log are done; the Settings screen lacks profile, time zone, and Google linking. |
 | 8 | Finances (categories, transactions, monthly summary, budget). | Done, including the money card on the Today screen (`work` and `expense_total` in `GET /days/{date}`). |
-| 9 | Weekly statistics. | Not started |
+| 9 | Weekly statistics. | Done: `GET /stats/weekly` and the `/stats` screen. |
 | 10 | OpenAPI, deployment. | Not started: a backend Dockerfile and a Vercel SPA config exist; there is no OpenAPI document, and nothing is deployed. |
 
 `docs/IMPLEMENTATION_GUIDE.md` breaks steps 5, 7, and 8 into ordered tasks for AI coding agents.

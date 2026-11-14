@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT h.id,\n               CASE WHEN mode.is_low_energy THEN COALESCE(h.low_energy_name, h.name)\n                    ELSE h.name\n               END AS \"name!\",\n               EXISTS (\n                   SELECT 1 FROM habit_completions c\n                   WHERE c.habit_id = h.id AND c.date = $2\n               ) AS \"completed!\"\n        FROM habits h\n        CROSS JOIN (\n            SELECT EXISTS (\n                SELECT 1 FROM low_energy_days d WHERE d.user_id = $1 AND d.date = $2\n            ) AS is_low_energy\n        ) AS mode\n        WHERE h.user_id = $1\n          AND h.archived_at IS NULL\n          AND habit_scheduled_on(h.user_id, h.weekdays, h.low_energy, $2)\n        ORDER BY h.sort_order, h.created_at\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "completed!",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Date"
+      ]
+    },
+    "nullable": [
+      false,
+      null,
+      null
+    ]
+  },
+  "hash": "23ab1b1096e237dc58688996c152742971021a2b18fd44240c5caa074c3478d8"
+}

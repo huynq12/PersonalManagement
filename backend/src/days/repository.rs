@@ -35,8 +35,7 @@ pub(super) async fn list_day_habits(
         ) AS mode
         WHERE h.user_id = $1
           AND h.archived_at IS NULL
-          AND EXTRACT(ISODOW FROM $2::date)::smallint = ANY (h.weekdays)
-          AND (NOT mode.is_low_energy OR h.low_energy)
+          AND habit_scheduled_on(h.user_id, h.weekdays, h.low_energy, $2)
         ORDER BY h.sort_order, h.created_at
         "#,
         user_id,

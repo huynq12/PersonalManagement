@@ -1,0 +1,66 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT day::date AS \"date!\",\n               EXISTS (\n                   SELECT 1 FROM low_energy_days l WHERE l.user_id = $1 AND l.date = day::date\n               ) AS \"is_low_energy!\",\n               COALESCE((\n                   SELECT sum(s.duration_seconds) FROM study_sessions s\n                   WHERE s.user_id = $1 AND s.local_date = day::date AND s.status = 'completed'\n               ), 0)::int8 AS \"study_seconds!\",\n               (\n                   SELECT count(*) FROM study_sessions s\n                   WHERE s.user_id = $1 AND s.local_date = day::date AND s.status = 'completed'\n               ) AS \"pomodoros!\",\n               (\n                   SELECT count(*) FROM habits h\n                   WHERE h.user_id = $1 AND h.archived_at IS NULL\n                     AND habit_scheduled_on($1, h.weekdays, h.low_energy, day::date)\n               ) AS \"habits_scheduled!\",\n               (\n                   SELECT count(*) FROM habit_completions c\n                   JOIN habits h ON h.id = c.habit_id\n                   WHERE h.user_id = $1 AND h.archived_at IS NULL AND c.date = day::date\n                     AND habit_scheduled_on($1, h.weekdays, h.low_energy, day::date)\n               ) AS \"habits_done!\",\n               (\n                   SELECT count(*) FROM tasks t WHERE t.user_id = $1 AND t.date = day::date\n               ) AS \"tasks_total!\",\n               (\n                   SELECT count(*) FROM tasks t\n                   WHERE t.user_id = $1 AND t.date = day::date AND t.is_done\n               ) AS \"tasks_done!\"\n        FROM generate_series($2::date::timestamp, $3::date::timestamp, interval '1 day') AS day\n        ORDER BY day\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "date!",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 1,
+        "name": "is_low_energy!",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 2,
+        "name": "study_seconds!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "pomodoros!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "habits_scheduled!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "habits_done!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "tasks_total!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 7,
+        "name": "tasks_done!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Date",
+        "Date"
+      ]
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "dec8705a86ecdd1f960faf7798ccfabc03909ffa7a8f98f17d0fb143ab3ebb63"
+}
