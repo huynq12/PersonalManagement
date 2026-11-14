@@ -17,6 +17,7 @@ export type ValidationMessageKey =
   | 'validation.dateInvalid'
   | 'validation.dateInFuture'
   | 'validation.noteLength'
+  | 'validation.subjectNameLength'
 
 const required: ValidationMessageKey = 'validation.required'
 const emailInvalid: ValidationMessageKey = 'validation.emailInvalid'

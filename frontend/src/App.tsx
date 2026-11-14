@@ -13,6 +13,7 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import SettingsPage from './pages/SettingsPage'
 import StatsPage from './pages/StatsPage'
+import SubjectsPage from './pages/SubjectsPage'
 import WorkLogPage from './pages/WorkLogPage'
 
 export default function App() {
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/habits" element={<HabitsPage />} />
           <Route path="/stats" element={<StatsPage />} />
+          <Route path="/subjects" element={<SubjectsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/work-log" element={<WorkLogPage />} />
           <Route path="/finances" element={<FinancesPage />} />

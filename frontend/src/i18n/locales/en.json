@@ -172,7 +172,8 @@
     "dateInvalid": "Enter a valid date.",
     "dateInFuture": "Choose today or an earlier day.",
     "noteLength": "Use at most 500 characters.",
-    "categoryNameLength": "Use at most 100 characters."
+    "categoryNameLength": "Use at most 100 characters.",
+    "subjectNameLength": "Use at most 100 characters."
   },
   "errors": {
     "unknown": "Something went wrong. Please try again.",
@@ -430,6 +431,40 @@
       "longest": "Longest",
       "days_one": "{{count}} day",
       "days_other": "{{count}} days"
+    }
+  },
+  "subjects": {
+    "title": "Subjects",
+    "description": "What you study. Pick one when you start a focus session.",
+    "add": "Add subject",
+    "empty": "You have no subjects yet. Add one to start tracking study time.",
+    "edit": "Edit {{name}}",
+    "archive": "Archive {{name}}",
+    "restore": "Restore {{name}}",
+    "delete": "Delete {{name}}",
+    "archived": "Archived ({{count}})",
+    "form": {
+      "addTitle": "Add subject",
+      "editTitle": "Edit subject",
+      "name": "Name",
+      "color": "Color"
+    },
+    "colors": {
+      "red": "Red",
+      "orange": "Orange",
+      "yellow": "Yellow",
+      "green": "Green",
+      "teal": "Teal",
+      "blue": "Blue",
+      "purple": "Purple",
+      "pink": "Pink",
+      "gray": "Gray",
+      "custom": "Custom"
+    },
+    "deleteDialog": {
+      "title": "Delete this subject?",
+      "description": "\"{{name}}\" will be deleted. Your past study sessions are kept, but they will no longer have a subject. Archive it instead to hide it from the timer.",
+      "confirm": "Delete"
     }
   }
 }
