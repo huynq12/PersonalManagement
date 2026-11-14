@@ -24,7 +24,7 @@ export interface RecordedRequest {
   authorization: string | null
 }
 
-type Handler = (request: RecordedRequest) => Response
+export type Handler = (request: RecordedRequest) => Response
 
 /** Answers requests that no fixed route matched; `undefined` means "not mine". */
 type DynamicHandler = (request: RecordedRequest) => Response | undefined

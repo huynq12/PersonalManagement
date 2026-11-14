@@ -193,6 +193,12 @@
     "title": "Cài đặt",
     "description": "Tiền tệ, công việc, ngân sách và Pomodoro.",
     "saved": "Đã lưu.",
+    "google": {
+      "title": "Tài khoản Google",
+      "description": "Liên kết tài khoản Google để đăng nhập bằng Google bên cạnh mật khẩu.",
+      "link": "Liên kết Google",
+      "linked": "Đã liên kết tài khoản Google."
+    },
     "currency": {
       "title": "Tiền tệ",
       "label": "Tiền tệ",
