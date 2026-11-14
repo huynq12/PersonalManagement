@@ -457,14 +457,14 @@ Status as of 2026-11-14, describing what is merged into `main`. Update the Statu
 | # | Step | Status |
 |---|---|---|
 | 1 | Project skeleton: monorepo, Axum + SQLx + migrations, Docker Compose for local Postgres, CI running tests. | Done |
-| 2 | Auth: email + password first, then Google OAuth (sign-in and linking) on the backend; then the sign-in and registration screens. The app connects to Supabase from this step on. | Partly done: the backend and the sign-in and registration screens are done; linking Google from Settings has no UI yet. |
+| 2 | Auth: email + password first, then Google OAuth (sign-in and linking) on the backend; then the sign-in and registration screens. The app connects to Supabase from this step on. | Done |
 | 3 | Checklist (habits, to-dos, Today screen). | Done. The Today screen shows the money card but not the menu or the study time yet; they arrive with steps 4 and 6. |
 | 4 | Pomodoro (subjects, sessions, settings). | Partly done: the API and the Pomodoro settings are done; the Pomodoro and Subjects screens are not built. |
 | 5 | Day modes (low-energy days): habit fields, day mode, the new streak rule. Done before statistics because it changes how streaks and rates are computed. | Done |
 | 6 | Meal plan (ingredients, dishes, weekly template, shopping list). | Not started |
-| 7 | Settings endpoint and screen, currency, then the work log. | Partly done: the settings API, currency, and the work log are done; the Settings screen lacks profile, time zone, and Google linking. |
+| 7 | Settings endpoint and screen, currency, then the work log. | Partly done: the settings API, currency, Google linking, and the work log are done; the Settings screen lacks profile, time zone, language, and sign out. |
 | 8 | Finances (categories, transactions, monthly summary, budget). | Done, including the money card on the Today screen (`work` and `expense_total` in `GET /days/{date}`). |
 | 9 | Weekly statistics. | Done: `GET /stats/weekly` and the `/stats` screen. |
 | 10 | OpenAPI, deployment. | Not started: a backend Dockerfile and a Vercel SPA config exist; there is no OpenAPI document, and nothing is deployed. |
 
-`docs/IMPLEMENTATION_GUIDE.md` breaks steps 5, 7, and 8 into ordered tasks for AI coding agents.
+`docs/IMPLEMENTATION_GUIDE.md` breaks steps 5, 7, 8, and 9 (plus the Today money card) into ordered tasks for AI coding agents.

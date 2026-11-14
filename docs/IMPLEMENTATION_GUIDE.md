@@ -1,10 +1,12 @@
-# Implementation guide: day modes, work log, finances
+# Implementation guide: day modes, work log, finances, statistics
 
-This guide is for AI coding agents implementing three additions to PersonalManagement:
+This guide is for AI coding agents implementing these additions to PersonalManagement:
 
 - **Day modes** — the user marks today as a normal or a low-energy day; a low-energy day shows fewer, easier habits.
 - **Work log** — the user enters the hours worked on a day and the app computes that day's pay.
 - **Finances** — income and expense tracking with categories and one monthly budget.
+- **Today money card** — a read-only card on the Today screen with the day's pay and spending.
+- **Weekly statistics** — the `/stats` screen, aware of low-energy days.
 
 It says *how* and *in what order* to build them. It does not define them: `SPEC.md` does. When this guide and `SPEC.md` disagree, `SPEC.md` wins; tell the owner about the mismatch.
 
@@ -46,7 +48,7 @@ Progress through this guide:
 | Phase | Status |
 |---|---|
 | A — Day modes | Done |
-| B — Settings and currency | Done, except the profile, time zone, and Google linking sections of the Settings screen, which Phase B left to their own work |
+| B — Settings and currency | Done. Google linking was added later; the profile, time zone, language, and sign-out sections of the Settings screen are left to their own work |
 | C — Work log | Done |
 | D — Finances | Done |
 | E — Today money card | Done |
@@ -55,9 +57,9 @@ Progress through this guide:
 - Backend features under `backend/src/`: `auth` (including `GET` and `PATCH /me`), `days`, `finances`, `habits`, `health`, `settings`, `stats`, `study_sessions`, `subjects`, `tasks`, `work_entries`. There is no meal plan or OpenAPI code yet.
 - `backend/src/validation.rs` holds the shared helpers: `parse_month` and the deserializer that tells an absent field from an explicit `null`.
 - `backend/migrations/20261114010000_streak_skips_low_energy_days.sql` defines the current `habit_current_streak`; `user_today(p_user_id, p_at)` comes from `20261112000000_create_checklist_tables.sql`.
-- `backend/src/days/model.rs` defines the `GET /days/{date}` response (`DayView`, `DayHabit`). It has `mode` and `mode_locked` but not yet the menu, the study time, `work`, or `expense_total`.
+- `backend/src/days/model.rs` defines the `GET /days/{date}` response (`DayView`, `DayHabit`). It has `mode`, `mode_locked`, `work`, and `expense_total`, but not yet the menu or the study time.
 - `backend/src/error.rs` holds `AppError`; each conflict has its own variant and stable code.
-- Frontend pages in `src/pages/`: `HomePage` (the Today screen), `HabitsPage`, `StatsPage`, `SettingsPage` (currency, work, budget, and Pomodoro sections), `WorkLogPage`, `FinancesPage`, `FinanceCategoriesPage`, and `ComingSoonPage` for unbuilt screens (Pomodoro, Subjects, the three meal plan screens).
+- Frontend pages in `src/pages/`: `HomePage` (the Today screen), `HabitsPage`, `StatsPage`, `SettingsPage` (currency, work, budget, Pomodoro, and Google linking sections), `WorkLogPage`, `FinancesPage`, `FinanceCategoriesPage`, and `ComingSoonPage` for unbuilt screens (Pomodoro, Subjects, the three meal plan screens).
 - Frontend support code: `src/components/{today,habits,settings,work,finance,stats}/`, `src/components/layout/navigation.ts` (menu entries and the list of built screens), `src/lib/` (API calls, Zod schemas, `money.ts`, `dates.ts`), `src/hooks/` (`useDay`, `useHabits`, `useSettings`, `useWorkEntries`, `useFinance`, `useWeeklyStats`).
 
 ## Rules that are easy to get wrong here
@@ -183,7 +185,7 @@ Read: `SPEC.md` user stories F1–F5, the `finance_categories` and `transactions
 - Backend: `GET /days/{date}` adds `work` (`{ "hours", "pay" }` or null) and `expense_total` (0 when nothing was spent). Extend `backend/tests/days.rs`.
 - Frontend: one read-only card on the Today screen showing the hours and pay of the day (or a "no hours logged" line), the total spent, and links to `/work-log` and `/finances`. No input on this card.
 
-## Phase F — Weekly statistics (roadmap step 9, when it is built)
+## Phase F — Weekly statistics (roadmap step 9)
 
 `GET /stats/weekly` returns the mode of each day, and the screen marks low-energy days. The checklist rate must use the scheduled-day rule from Phase A, so reuse that logic rather than writing a second version.
 
