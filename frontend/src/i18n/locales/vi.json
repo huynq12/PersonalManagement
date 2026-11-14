@@ -366,5 +366,70 @@
       "description": "Thêm các danh mục chi tiêu và thu nhập phổ biến chỉ với một bước. Bạn có thể đổi tên hoặc lưu trữ chúng sau.",
       "button": "Thêm danh mục gợi ý"
     }
+  },
+  "stats": {
+    "title": "Thống kê tuần",
+    "description": "Thời gian học, tiến độ checklist và chuỗi thói quen trong một tuần.",
+    "week": {
+      "previous": "Tuần trước",
+      "next": "Tuần sau"
+    },
+    "summary": {
+      "studyTime": "Thời gian học",
+      "pomodoros": "Số Pomodoro",
+      "checklist": "Tỉ lệ hoàn thành checklist",
+      "noData": "Chưa có dữ liệu"
+    },
+    "comparison": {
+      "up": "Nhiều hơn tuần trước {{value}}",
+      "down": "Ít hơn tuần trước {{value}}",
+      "same": "Bằng tuần trước",
+      "none": "Tuần trước chưa có dữ liệu"
+    },
+    "points": "{{count}} điểm %",
+    "duration": {
+      "minutes": "{{count}} phút",
+      "hours": "{{hours}} giờ",
+      "hoursMinutes": "{{hours}} giờ {{minutes}} phút"
+    },
+    "studyPerDay": {
+      "title": "Thời gian học mỗi ngày",
+      "chart": "Thời gian học mỗi ngày, tính bằng phút"
+    },
+    "subjects": {
+      "title": "Thời gian học theo môn",
+      "empty": "Tuần này chưa có phiên học nào.",
+      "none": "Không có môn",
+      "pomodoros_one": "{{count}} Pomodoro",
+      "pomodoros_other": "{{count}} Pomodoro"
+    },
+    "rate": {
+      "title": "Tỉ lệ hoàn thành checklist mỗi ngày",
+      "chart": "Tỉ lệ hoàn thành checklist mỗi ngày, tính bằng phần trăm"
+    },
+    "legend": {
+      "normal": "Ngày bình thường",
+      "lowEnergy": "Ngày ít năng lượng"
+    },
+    "days": {
+      "title": "Từng ngày",
+      "day": "Ngày",
+      "mode": "Chế độ",
+      "study": "Học",
+      "pomodoros": "Pomodoro",
+      "checklist": "Checklist",
+      "lowEnergy": "Ít năng lượng",
+      "normal": "Bình thường",
+      "checklistValue": "{{done}} trên {{total}}",
+      "noChecklist": "Không có việc nào"
+    },
+    "habits": {
+      "title": "Chuỗi thói quen",
+      "empty": "Bạn chưa có thói quen nào đang theo dõi.",
+      "current": "Hiện tại",
+      "longest": "Dài nhất",
+      "days_one": "{{count}} ngày",
+      "days_other": "{{count}} ngày"
+    }
   }
 }

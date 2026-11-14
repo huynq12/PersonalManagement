@@ -50,15 +50,15 @@ Progress through this guide:
 | C — Work log | Done |
 | D — Finances | Done |
 | E — Today money card | Done |
-| F — Weekly statistics | Not started |
+| F — Weekly statistics | Done |
 
-- Backend features under `backend/src/`: `auth` (including `GET` and `PATCH /me`), `days`, `finances`, `habits`, `health`, `settings`, `study_sessions`, `subjects`, `tasks`, `work_entries`. There is no meal plan, statistics, or OpenAPI code yet.
+- Backend features under `backend/src/`: `auth` (including `GET` and `PATCH /me`), `days`, `finances`, `habits`, `health`, `settings`, `stats`, `study_sessions`, `subjects`, `tasks`, `work_entries`. There is no meal plan or OpenAPI code yet.
 - `backend/src/validation.rs` holds the shared helpers: `parse_month` and the deserializer that tells an absent field from an explicit `null`.
 - `backend/migrations/20261114010000_streak_skips_low_energy_days.sql` defines the current `habit_current_streak`; `user_today(p_user_id, p_at)` comes from `20261112000000_create_checklist_tables.sql`.
 - `backend/src/days/model.rs` defines the `GET /days/{date}` response (`DayView`, `DayHabit`). It has `mode` and `mode_locked` but not yet the menu, the study time, `work`, or `expense_total`.
 - `backend/src/error.rs` holds `AppError`; each conflict has its own variant and stable code.
-- Frontend pages in `src/pages/`: `HomePage` (the Today screen), `HabitsPage`, `SettingsPage` (currency, work, budget, and Pomodoro sections), `WorkLogPage`, `FinancesPage`, `FinanceCategoriesPage`, and `ComingSoonPage` for unbuilt screens (Pomodoro, Subjects, the three meal plan screens, Weekly statistics).
-- Frontend support code: `src/components/{today,habits,settings,work,finance}/`, `src/components/layout/navigation.ts` (menu entries and the list of built screens), `src/lib/` (API calls, Zod schemas, `money.ts`, `dates.ts`), `src/hooks/` (`useDay`, `useHabits`, `useSettings`, `useWorkEntries`, `useFinance`).
+- Frontend pages in `src/pages/`: `HomePage` (the Today screen), `HabitsPage`, `StatsPage`, `SettingsPage` (currency, work, budget, and Pomodoro sections), `WorkLogPage`, `FinancesPage`, `FinanceCategoriesPage`, and `ComingSoonPage` for unbuilt screens (Pomodoro, Subjects, the three meal plan screens).
+- Frontend support code: `src/components/{today,habits,settings,work,finance,stats}/`, `src/components/layout/navigation.ts` (menu entries and the list of built screens), `src/lib/` (API calls, Zod schemas, `money.ts`, `dates.ts`), `src/hooks/` (`useDay`, `useHabits`, `useSettings`, `useWorkEntries`, `useFinance`, `useWeeklyStats`).
 
 ## Rules that are easy to get wrong here
 

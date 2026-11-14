@@ -366,5 +366,70 @@
       "description": "Add common expense and income categories in one step. You can rename or archive them later.",
       "button": "Add suggested categories"
     }
+  },
+  "stats": {
+    "title": "Weekly stats",
+    "description": "Study time, checklist progress, and habit streaks for one week.",
+    "week": {
+      "previous": "Previous week",
+      "next": "Next week"
+    },
+    "summary": {
+      "studyTime": "Study time",
+      "pomodoros": "Pomodoros",
+      "checklist": "Checklist completion",
+      "noData": "No data"
+    },
+    "comparison": {
+      "up": "{{value}} more than last week",
+      "down": "{{value}} less than last week",
+      "same": "Same as last week",
+      "none": "No data for last week"
+    },
+    "points": "{{count}} pts",
+    "duration": {
+      "minutes": "{{count}} min",
+      "hours": "{{hours}} h",
+      "hoursMinutes": "{{hours}} h {{minutes}} min"
+    },
+    "studyPerDay": {
+      "title": "Study time per day",
+      "chart": "Study time per day, in minutes"
+    },
+    "subjects": {
+      "title": "Study time per subject",
+      "empty": "No study sessions this week.",
+      "none": "No subject",
+      "pomodoros_one": "{{count}} Pomodoro",
+      "pomodoros_other": "{{count}} Pomodoros"
+    },
+    "rate": {
+      "title": "Checklist completion per day",
+      "chart": "Checklist completion per day, in percent"
+    },
+    "legend": {
+      "normal": "Normal day",
+      "lowEnergy": "Low-energy day"
+    },
+    "days": {
+      "title": "Day by day",
+      "day": "Day",
+      "mode": "Mode",
+      "study": "Study",
+      "pomodoros": "Pomodoros",
+      "checklist": "Checklist",
+      "lowEnergy": "Low energy",
+      "normal": "Normal",
+      "checklistValue": "{{done}} of {{total}}",
+      "noChecklist": "Nothing scheduled"
+    },
+    "habits": {
+      "title": "Habit streaks",
+      "empty": "You have no active habits.",
+      "current": "Current",
+      "longest": "Longest",
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days"
+    }
   }
 }
