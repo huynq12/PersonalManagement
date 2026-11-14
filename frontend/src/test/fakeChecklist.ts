@@ -73,6 +73,8 @@ export class FakeChecklist {
   work = new Map<string, { hours: number; pay: number }>()
   /** Total spent by date, in minor units; a date without a value means nothing was spent. */
   expenses = new Map<string, number>()
+  /** Completed study time by date, in seconds; a date without a value means none. */
+  studySeconds = new Map<string, number>()
   /** When set, requests it returns true for fail with a 500. */
   failWhen: ((request: RecordedRequest) => boolean) | null = null
   private nextId = 1
@@ -132,6 +134,7 @@ export class FakeChecklist {
       tasks: this.tasks.filter((item) => item.date === date),
       work: this.work.get(date) ?? null,
       expense_total: this.expenses.get(date) ?? 0,
+      study_seconds: this.studySeconds.get(date) ?? 0,
     })
   }
 

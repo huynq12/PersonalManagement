@@ -147,6 +147,45 @@ describe('money card', () => {
   })
 })
 
+describe('study card', () => {
+  function studyCard() {
+    return within(screen.getByRole('region', { name: 'Study' }))
+  }
+
+  it('shows the study time of the day', async () => {
+    backend.studySeconds.set(TODAY, 5_100)
+
+    renderToday()
+
+    await screen.findByRole('checkbox', { name: 'Read' })
+    expect(studyCard().getByText('1 h 25 min')).toBeTruthy()
+  })
+
+  it('says nothing was studied when the day has no completed sessions', async () => {
+    renderToday()
+
+    await screen.findByRole('checkbox', { name: 'Read' })
+    expect(studyCard().getByText('No study time yet.')).toBeTruthy()
+  })
+
+  it('links to the Pomodoro screen', async () => {
+    renderToday()
+
+    await screen.findByRole('checkbox', { name: 'Read' })
+    expect(studyCard().getByRole('link', { name: 'Open Pomodoro' }).getAttribute('href')).toBe(
+      '/pomodoro',
+    )
+  })
+
+  it('renders in Vietnamese', async () => {
+    await i18n.changeLanguage('vi')
+
+    renderToday()
+
+    expect(await screen.findByRole('region', { name: viLocale.home.study.title })).toBeTruthy()
+  })
+})
+
 describe('day navigation', () => {
   it('loads the previous day and keeps it in the URL', async () => {
     backend.tasks.push(task('task-old', YESTERDAY, 'Old to-do'))

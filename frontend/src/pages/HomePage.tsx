@@ -5,6 +5,7 @@ import DayModeControl from '../components/today/DayModeControl'
 import DayNavigation from '../components/today/DayNavigation'
 import HabitChecklist from '../components/today/HabitChecklist'
 import MoneyCard from '../components/today/MoneyCard'
+import StudyCard from '../components/today/StudyCard'
 import TaskList from '../components/today/TaskList'
 import Alert from '../components/ui/Alert'
 import Button from '../components/ui/Button'
@@ -17,8 +18,8 @@ import { isIsoDate, todayIn } from '../lib/dates'
  * The Today screen: the habits scheduled for a day and its to-dos.
  *
  * The day comes from the URL (`/?date=YYYY-MM-DD`); without it, or with an invalid value, the
- * screen shows today. The menu and the study time arrive with those features (SPEC.md, Today).
- * The money card is read-only; hours and spending are entered on their own screens.
+ * screen shows today. The menu arrives with the meal plan (SPEC.md, Today).
+ * The study and money cards are read-only; hours and spending are entered on their own screens.
  */
 export default function HomePage() {
   const { t } = useTranslation()
@@ -68,6 +69,7 @@ export default function HomePage() {
             isFuture={date > today}
           />
           <TaskList date={date} tasks={day.data.tasks} />
+          <StudyCard studySeconds={day.data.study_seconds} />
           <MoneyCard work={day.data.work} expenseTotal={day.data.expense_total} />
         </div>
       )}

@@ -10,9 +10,11 @@ import FinancesPage from './pages/FinancesPage'
 import HabitsPage from './pages/HabitsPage'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
+import PomodoroPage from './pages/PomodoroPage'
 import RegisterPage from './pages/RegisterPage'
 import SettingsPage from './pages/SettingsPage'
 import StatsPage from './pages/StatsPage'
+import SubjectsPage from './pages/SubjectsPage'
 import WorkLogPage from './pages/WorkLogPage'
 
 export default function App() {
@@ -29,7 +31,9 @@ export default function App() {
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/habits" element={<HabitsPage />} />
+          <Route path="/pomodoro" element={<PomodoroPage />} />
           <Route path="/stats" element={<StatsPage />} />
+          <Route path="/subjects" element={<SubjectsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/work-log" element={<WorkLogPage />} />
           <Route path="/finances" element={<FinancesPage />} />
