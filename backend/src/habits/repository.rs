@@ -161,15 +161,7 @@ pub(super) async fn check_completion_date(
     sqlx::query_as!(
         CompletionDateCheck,
         r#"
-        SELECT (
-                   EXTRACT(ISODOW FROM $3::date)::smallint = ANY (weekdays)
-                   AND (
-                       low_energy
-                       OR NOT EXISTS (
-                           SELECT 1 FROM low_energy_days l WHERE l.user_id = $1 AND l.date = $3
-                       )
-                   )
-               ) AS "is_scheduled!",
+        SELECT habit_scheduled_on($1, weekdays, low_energy, $3) AS "is_scheduled!",
                $3::date > user_today($1, $4) AS "is_future!"
         FROM habits
         WHERE id = $2 AND user_id = $1

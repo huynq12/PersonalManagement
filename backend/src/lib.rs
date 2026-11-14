@@ -20,6 +20,7 @@ pub mod finances;
 pub mod habits;
 pub mod health;
 pub mod settings;
+pub mod stats;
 pub mod study_sessions;
 pub mod subjects;
 pub mod tasks;
@@ -92,6 +93,7 @@ pub fn app(state: AppState) -> anyhow::Result<Router> {
         .merge(habits::router())
         .merge(subjects::router())
         .merge(study_sessions::router())
+        .merge(stats::router())
         .merge(tasks::router())
         .merge(days::router())
         .merge(work_entries::router())
