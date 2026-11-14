@@ -452,15 +452,19 @@ Prefix `/api/v1`. Every endpoint requires an access token except the public Auth
 
 ## 8. Suggested roadmap
 
-1. Project skeleton: monorepo, Axum + SQLx + migrations, Docker Compose for local Postgres, CI running tests.
-2. Auth: email + password first, then Google OAuth (sign-in and linking) on the backend; then the sign-in and registration screens. The app connects to Supabase from this step on.
-3. Checklist (habits, to-dos, Today screen).
-4. Pomodoro (subjects, sessions, settings).
-5. Day modes (low-energy days): habit fields, day mode, the new streak rule. Done before statistics because it changes how streaks and rates are computed.
-6. Meal plan (ingredients, dishes, weekly template, shopping list).
-7. Settings endpoint and screen, currency, then the work log.
-8. Finances (categories, transactions, monthly summary, budget).
-9. Weekly statistics.
-10. OpenAPI, deployment.
+Status as of 2026-11-14, describing what is merged into `main`. Update the Status column in the same change that completes a step.
+
+| # | Step | Status |
+|---|---|---|
+| 1 | Project skeleton: monorepo, Axum + SQLx + migrations, Docker Compose for local Postgres, CI running tests. | Done |
+| 2 | Auth: email + password first, then Google OAuth (sign-in and linking) on the backend; then the sign-in and registration screens. The app connects to Supabase from this step on. | Partly done: the backend and the sign-in and registration screens are done; linking Google from Settings has no UI yet. |
+| 3 | Checklist (habits, to-dos, Today screen). | Done. The Today screen does not show the menu, the study time, or the money card yet; they arrive with steps 4, 6, and 8. |
+| 4 | Pomodoro (subjects, sessions, settings). | Partly done: the API and the Pomodoro settings are done; the Pomodoro and Subjects screens are not built. |
+| 5 | Day modes (low-energy days): habit fields, day mode, the new streak rule. Done before statistics because it changes how streaks and rates are computed. | Done |
+| 6 | Meal plan (ingredients, dishes, weekly template, shopping list). | Not started |
+| 7 | Settings endpoint and screen, currency, then the work log. | Partly done: the settings API, currency, and the work log are done; the Settings screen lacks profile, time zone, and Google linking. |
+| 8 | Finances (categories, transactions, monthly summary, budget). | Partly done: the API and both screens are done; the money card on the Today screen (`work` and `expense_total` in `GET /days/{date}`) is not built. |
+| 9 | Weekly statistics. | Not started |
+| 10 | OpenAPI, deployment. | Not started: a backend Dockerfile and a Vercel SPA config exist; there is no OpenAPI document, and nothing is deployed. |
 
 `docs/IMPLEMENTATION_GUIDE.md` breaks steps 5, 7, and 8 into ordered tasks for AI coding agents.

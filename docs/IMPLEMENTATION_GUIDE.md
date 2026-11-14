@@ -39,12 +39,26 @@ Do not reopen these; they are recorded in `SPEC.md`. If a task seems to need a d
 
 ## What exists today (verify before relying on it)
 
-- Backend features under `backend/src/`: `auth`, `days`, `habits`, `tasks`, `subjects`, `study_sessions`, `health`. There is no `settings` feature yet, although the `user_settings` table exists.
-- `backend/migrations/20261112000000_create_checklist_tables.sql` defines `user_today(p_user_id, p_at)` and `habit_current_streak(p_habit_id, p_weekdays, p_today)`.
-- `backend/src/habits/service.rs` rejects a completion with the field codes `future` and `not_scheduled`.
-- `backend/src/days/model.rs` defines the `GET /days/{date}` response (`DayView`, `DayHabit`).
+As of 2026-11-14 on `main`. The roadmap table in `SPEC.md` section 8 tracks the status of every step.
+
+Progress through this guide:
+
+| Phase | Status |
+|---|---|
+| A — Day modes | Done |
+| B — Settings and currency | Done, except the profile, time zone, and Google linking sections of the Settings screen, which Phase B left to their own work |
+| C — Work log | Done |
+| D — Finances | Done |
+| E — Today money card | Not started |
+| F — Weekly statistics | Not started |
+
+- Backend features under `backend/src/`: `auth` (including `GET` and `PATCH /me`), `days`, `finances`, `habits`, `health`, `settings`, `study_sessions`, `subjects`, `tasks`, `work_entries`. There is no meal plan, statistics, or OpenAPI code yet.
+- `backend/src/validation.rs` holds the shared helpers: `parse_month` and the deserializer that tells an absent field from an explicit `null`.
+- `backend/migrations/20261114010000_streak_skips_low_energy_days.sql` defines the current `habit_current_streak`; `user_today(p_user_id, p_at)` comes from `20261112000000_create_checklist_tables.sql`.
+- `backend/src/days/model.rs` defines the `GET /days/{date}` response (`DayView`, `DayHabit`). It has `mode` and `mode_locked` but not yet the menu, the study time, `work`, or `expense_total`.
 - `backend/src/error.rs` holds `AppError`; each conflict has its own variant and stable code.
-- Frontend: `src/pages/` (`HomePage` is the Today screen, `HabitsPage`, `ComingSoonPage` for unbuilt screens), `src/components/today/`, `src/components/habits/`, `src/components/layout/navigation.ts` (menu entries), `src/lib/` (API calls and Zod schemas), `src/hooks/`.
+- Frontend pages in `src/pages/`: `HomePage` (the Today screen), `HabitsPage`, `SettingsPage` (currency, work, budget, and Pomodoro sections), `WorkLogPage`, `FinancesPage`, `FinanceCategoriesPage`, and `ComingSoonPage` for unbuilt screens (Pomodoro, Subjects, the three meal plan screens, Weekly statistics).
+- Frontend support code: `src/components/{today,habits,settings,work,finance}/`, `src/components/layout/navigation.ts` (menu entries and the list of built screens), `src/lib/` (API calls, Zod schemas, `money.ts`, `dates.ts`), `src/hooks/` (`useDay`, `useHabits`, `useSettings`, `useWorkEntries`, `useFinance`).
 
 ## Rules that are easy to get wrong here
 
