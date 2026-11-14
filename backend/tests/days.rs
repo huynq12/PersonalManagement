@@ -443,3 +443,111 @@ async fn day_requires_authentication(db: PgPool) {
     assert_eq!(response.status, StatusCode::UNAUTHORIZED);
     assert_eq!(response.body["error"]["code"], "unauthorized");
 }
+
+async fn set_settings(app: &Router, token: &str, body: Value) {
+    let response = TestRequest::new(Method::PATCH, "/api/v1/settings")
+        .bearer(token)
+        .json(&body)
+        .send(app)
+        .await;
+    assert_eq!(response.status, StatusCode::OK);
+}
+
+async fn log_work(app: &Router, token: &str, date: NaiveDate, hours: f64) {
+    let response = TestRequest::new(Method::PUT, &format!("/api/v1/work-entries/{date}"))
+        .bearer(token)
+        .json(&json!({ "hours": hours }))
+        .send(app)
+        .await;
+    assert_eq!(response.status, StatusCode::OK);
+}
+
+async fn add_category(app: &Router, token: &str, kind: &str) -> String {
+    let response = TestRequest::post("/api/v1/finance-categories")
+        .bearer(token)
+        .json(&json!({ "kind": kind, "name": kind, "color": "#22C55E" }))
+        .send(app)
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED);
+    response.body["id"].as_str().unwrap().to_owned()
+}
+
+async fn add_transaction(app: &Router, token: &str, category: &str, amount: i64, date: NaiveDate) {
+    let response = TestRequest::post("/api/v1/transactions")
+        .bearer(token)
+        .json(&json!({ "category_id": category, "amount": amount, "date": date }))
+        .send(app)
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED);
+}
+
+#[sqlx::test]
+async fn day_has_no_work_and_no_expenses_by_default(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+
+    let day = get_day(&app, &token, today(&db).await).await;
+
+    assert_eq!(day.body["work"], Value::Null);
+    assert_eq!(day.body["expense_total"], 0);
+}
+
+#[sqlx::test]
+async fn day_shows_the_hours_and_pay_of_its_work_entry(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    set_settings(
+        &app,
+        &token,
+        json!({ "hourly_wage": 30_001, "base_work_hours": 8 }),
+    )
+    .await;
+    let today = today(&db).await;
+    log_work(&app, &token, today, 1.25).await;
+
+    let day = get_day(&app, &token, today).await;
+    let yesterday = get_day(&app, &token, today.pred_opt().unwrap()).await;
+
+    // 1.25 x 30,001 = 37,501.25, rounded half up.
+    assert_eq!(day.body["work"], json!({ "hours": 1.25, "pay": 37_501 }));
+    assert_eq!(yesterday.body["work"], Value::Null);
+}
+
+#[sqlx::test]
+async fn day_totals_only_the_expenses_of_that_date(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let today = today(&db).await;
+    let expense = add_category(&app, &token, "expense").await;
+    let income = add_category(&app, &token, "income").await;
+    add_transaction(&app, &token, &expense, 12_000, today).await;
+    add_transaction(&app, &token, &expense, 3_500, today).await;
+    add_transaction(&app, &token, &expense, 99_000, today.pred_opt().unwrap()).await;
+    add_transaction(&app, &token, &income, 500_000, today).await;
+
+    let day = get_day(&app, &token, today).await;
+
+    assert_eq!(day.body["expense_total"], 15_500);
+}
+
+#[sqlx::test]
+async fn day_money_is_not_visible_to_another_user(db: PgPool) {
+    let app = common::app(db.clone());
+    let ada = sign_up(&app, ADA).await;
+    let grace = sign_up(&app, GRACE).await;
+    let today = today(&db).await;
+    set_settings(
+        &app,
+        &ada,
+        json!({ "hourly_wage": 30_000, "base_work_hours": 8 }),
+    )
+    .await;
+    log_work(&app, &ada, today, 8.0).await;
+    let expense = add_category(&app, &ada, "expense").await;
+    add_transaction(&app, &ada, &expense, 10_000, today).await;
+
+    let day = get_day(&app, &grace, today).await;
+
+    assert_eq!(day.body["work"], Value::Null);
+    assert_eq!(day.body["expense_total"], 0);
+}

@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT (hours * 100)::int4 AS \"hours_hundredths!\",\n               round(hours * hourly_wage)::int8 AS \"pay!\"\n        FROM work_entries\n        WHERE user_id = $1 AND date = $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "hours_hundredths!",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "pay!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Date"
+      ]
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "cf19c6b693978c426526cf878d9542c179c509e71b289f1424cb7c9087198df6"
+}

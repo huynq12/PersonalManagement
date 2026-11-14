@@ -49,6 +49,14 @@ pub(super) struct DayModeState {
     pub locked: bool,
 }
 
+/// The hours worked on a day and the pay they earn.
+#[derive(Debug, Serialize)]
+pub(super) struct DayWork {
+    pub hours: f64,
+    /// `hours × hourly_wage` rounded half up, in minor units of the account currency.
+    pub pay: i64,
+}
+
 /// Body of `GET /days/{date}`: everything the Today screen shows for one date.
 ///
 /// The menu and the study time described in SPEC.md are added together with those features.
@@ -63,4 +71,8 @@ pub(super) struct DayView {
     pub habits: Vec<DayHabit>,
     /// The to-dos of the date, in display order.
     pub tasks: Vec<Task>,
+    /// The work entry of the date, or `None` when no hours were logged.
+    pub work: Option<DayWork>,
+    /// Total of the date's expense transactions in minor units; 0 when nothing was spent.
+    pub expense_total: i64,
 }

@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT COALESCE(sum(t.amount), 0)::int8 AS \"total!\"\n        FROM transactions t\n        JOIN finance_categories c ON c.id = t.category_id\n        WHERE t.user_id = $1 AND t.date = $2 AND c.kind = 'expense'\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "total!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Date"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "0ad9d50d9851071f448fffdc5cfd0e35d2b8ab047aa4885b3534d31dbb6c9112"
+}
