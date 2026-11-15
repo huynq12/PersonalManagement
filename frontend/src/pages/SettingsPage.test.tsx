@@ -47,7 +47,7 @@ function renderSettings(path = '/settings', extraHandlers: Record<string, Handle
       return jsonResponse(200, settings)
     },
     'PATCH /me': (request) => {
-      user = { ...user, ...(request.body as { currency: string }) }
+      user = { ...user, ...(request.body as Partial<typeof user>) }
       return jsonResponse(200, user)
     },
     ...extraHandlers,
@@ -251,6 +251,110 @@ describe('Settings screen', () => {
       }),
     ).toBeTruthy()
     expect(await screen.findByRole('region', { name: vi_.settings.work.title })).toBeTruthy()
+  })
+
+  describe('Profile', () => {
+    it('saves a changed display name', async () => {
+      renderSettings()
+      const profile = await section('Profile')
+      const name = profile.getByLabelText('Display name') as HTMLInputElement
+      expect(name.value).toBe('Ada Lovelace')
+
+      await userEvent.clear(name)
+      await userEvent.type(name, '  Grace Hopper ')
+      await userEvent.click(profile.getByRole('button', { name: 'Save' }))
+
+      expect(await profile.findByText('Saved.')).toBeTruthy()
+      expect(patchesTo('/me').map((request) => request.body)).toEqual([
+        { display_name: 'Grace Hopper' },
+      ])
+    })
+
+    it('rejects a blank or over-long name without calling the server', async () => {
+      renderSettings()
+      const profile = await section('Profile')
+      const name = profile.getByLabelText('Display name')
+
+      await userEvent.clear(name)
+      await userEvent.click(profile.getByRole('button', { name: 'Save' }))
+      expect(await profile.findByText('This field is required.')).toBeTruthy()
+
+      await userEvent.type(name, 'x'.repeat(101))
+      await userEvent.click(profile.getByRole('button', { name: 'Save' }))
+      expect(await profile.findByText('Use at most 100 characters.')).toBeTruthy()
+      expect(patchesTo('/me')).toHaveLength(0)
+    })
+  })
+
+  describe('Time zone', () => {
+    it('shows the current time zone and saves another one', async () => {
+      renderSettings()
+      const zone = await section('Time zone')
+      const select = zone.getByLabelText('Time zone') as HTMLSelectElement
+      expect(select.value).toBe('Asia/Ho_Chi_Minh')
+      expect((zone.getByRole('button', { name: 'Save' }) as HTMLButtonElement).disabled).toBe(true)
+
+      await userEvent.selectOptions(select, 'Europe/Paris')
+      await userEvent.click(zone.getByRole('button', { name: 'Save' }))
+
+      expect(await zone.findByText('Saved.')).toBeTruthy()
+      expect(patchesTo('/me').map((request) => request.body)).toEqual([
+        { timezone: 'Europe/Paris' },
+      ])
+    })
+
+    it('keeps a saved time zone that the browser does not list', async () => {
+      user = { ...user, timezone: 'Etc/Unlisted' }
+      renderSettings()
+      const zone = await section('Time zone')
+
+      expect((zone.getByLabelText('Time zone') as HTMLSelectElement).value).toBe('Etc/Unlisted')
+    })
+
+    it('shows the translated error when the server rejects the time zone', async () => {
+      renderSettings('/settings', {
+        'PATCH /me': () => errorResponse(422, 'validation_failed'),
+      })
+      const zone = await section('Time zone')
+
+      await userEvent.selectOptions(zone.getByLabelText('Time zone'), 'Europe/Paris')
+      await userEvent.click(zone.getByRole('button', { name: 'Save' }))
+
+      expect((await zone.findByRole('alert')).textContent).toBe(
+        'Some fields are not valid. Please check them and try again.',
+      )
+    })
+  })
+
+  describe('Language', () => {
+    it('switches the interface and saves the choice on the account', async () => {
+      renderSettings()
+      const language = await section('Language')
+
+      await userEvent.selectOptions(language.getByLabelText('Language'), 'vi')
+
+      expect(
+        await screen.findByRole('heading', {
+          name: vi_.settings.title,
+          level: 1,
+        }),
+      ).toBeTruthy()
+      expect(patchesTo('/me').map((request) => request.body)).toEqual([{ locale: 'vi' }])
+    })
+  })
+
+  describe('Sign out', () => {
+    it('ends the session and returns to the sign-in page', async () => {
+      renderSettings('/settings', {
+        'POST /auth/logout': () => new Response(null, { status: 204 }),
+      })
+      const account = await section('Sign out')
+
+      await userEvent.click(account.getByRole('button', { name: 'Sign out' }))
+
+      expect(await screen.findByRole('heading', { name: 'Sign in', level: 1 })).toBeTruthy()
+      expect(requests.some((request) => request.path === '/auth/logout')).toBe(true)
+    })
   })
 
   describe('Google linking', () => {

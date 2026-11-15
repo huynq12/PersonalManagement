@@ -462,7 +462,7 @@ Status as of 2026-11-14, describing what is merged into `main`. Update the Statu
 | 4 | Pomodoro (subjects, sessions, settings). | Done: subjects, study sessions, and the Pomodoro settings (API and screens), and the study time on the Today screen (`study_seconds` in `GET /days/{date}`). |
 | 5 | Day modes (low-energy days): habit fields, day mode, the new streak rule. Done before statistics because it changes how streaks and rates are computed. | Done |
 | 6 | Meal plan (ingredients, dishes, weekly template, shopping list). | Not started |
-| 7 | Settings endpoint and screen, currency, then the work log. | Partly done: the settings API, currency, Google linking, and the work log are done; the Settings screen lacks profile, time zone, language, and sign out. |
+| 7 | Settings endpoint and screen, currency, then the work log. | Done: the settings API, currency, Google linking, the work log, and the Settings screen (profile, time zone, language, sign out). |
 | 8 | Finances (categories, transactions, monthly summary, budget). | Done, including the money card on the Today screen (`work` and `expense_total` in `GET /days/{date}`). |
 | 9 | Weekly statistics. | Done: `GET /stats/weekly` and the `/stats` screen. |
 | 10 | OpenAPI, deployment. | Not started: a backend Dockerfile and a Vercel SPA config exist; there is no OpenAPI document, and nothing is deployed. |
