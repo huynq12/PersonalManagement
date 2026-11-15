@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
-// In production VITE_API_URL points at the backend; in development it is empty and the Vite
-// proxy forwards /api to the local server.
+// VITE_API_URL is normally empty, so the API is called on the page's own origin: in development
+// the Vite proxy forwards /api to the local server, and in production the Vercel rewrite in
+// vercel.json forwards it to the backend. Set it only to call a backend on another origin.
 export const API_BASE_URL = `${import.meta.env.VITE_API_URL ?? ''}/api/v1`
 
 const errorSchema = z.object({
