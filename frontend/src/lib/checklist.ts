@@ -54,6 +54,8 @@ export const dayViewSchema = z.object({
   work: z.object({ hours: z.number(), pay: z.number().int() }).nullable(),
   /** Total expenses of the day in minor units. */
   expense_total: z.number().int(),
+  /** Time of the day's completed study sessions, in seconds. */
+  study_seconds: z.number().int(),
 })
 
 export type DayView = z.infer<typeof dayViewSchema>

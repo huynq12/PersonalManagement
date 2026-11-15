@@ -120,3 +120,14 @@ export function formatWeekRange(start: IsoDate, language: string | undefined): s
     timeZone: 'UTC',
   }).formatRange(toUtc(start), toUtc(addDays(start, 6)))
 }
+
+/** The time of day of an instant in `timeZone`, localized, such as "10:30 AM". */
+export function formatTime(
+  instant: string,
+  language: string | undefined,
+  timeZone: string,
+): string {
+  return new Intl.DateTimeFormat(language, { timeStyle: 'short', timeZone }).format(
+    new Date(instant),
+  )
+}

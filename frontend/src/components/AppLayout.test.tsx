@@ -48,11 +48,11 @@ describe('app shell', () => {
     renderApp('/')
     const nav = await sidebarNav()
 
-    await userEvent.click(nav.getByRole('link', { name: 'Pomodoro' }))
+    await userEvent.click(nav.getByRole('link', { name: 'Dishes' }))
 
-    expect(await screen.findByRole('heading', { name: 'Pomodoro' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Dishes' })).toBeTruthy()
     expect(screen.getByText('This feature is not built yet.')).toBeTruthy()
-    expect(nav.getByRole('link', { name: 'Pomodoro' }).getAttribute('aria-current')).toBe('page')
+    expect(nav.getByRole('link', { name: 'Dishes' }).getAttribute('aria-current')).toBe('page')
   })
 
   it('opens the More sheet with the remaining features and closes it with Escape', async () => {

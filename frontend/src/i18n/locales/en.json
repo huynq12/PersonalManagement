@@ -80,6 +80,12 @@
       "spent": "Spent",
       "workLog": "Work log",
       "finances": "Finances"
+    },
+    "study": {
+      "title": "Study",
+      "timeStudied": "Time studied",
+      "none": "No study time yet.",
+      "openPomodoro": "Open Pomodoro"
     }
   },
   "habits": {
@@ -172,7 +178,8 @@
     "dateInvalid": "Enter a valid date.",
     "dateInFuture": "Choose today or an earlier day.",
     "noteLength": "Use at most 500 characters.",
-    "categoryNameLength": "Use at most 100 characters."
+    "categoryNameLength": "Use at most 100 characters.",
+    "subjectNameLength": "Use at most 100 characters."
   },
   "errors": {
     "unknown": "Something went wrong. Please try again.",
@@ -191,7 +198,7 @@
     "email_already_registered": "This email is already registered with a password. Sign in with your password, then link Google in Settings.",
     "google_account_already_linked": "This Google account is linked to another account, or your account already has a Google account linked.",
     "subject_name_taken": "You already have a subject with this name.",
-    "study_session_already_running": "A study session is already running.",
+    "study_session_already_running": "A study session is already running. Finish or cancel it first.",
     "study_session_not_running": "This study session has already ended.",
     "day_mode_locked": "The mode cannot be changed while a habit is checked. Uncheck your habits first.",
     "work_settings_missing": "Set your hourly wage and base hours in Settings first.",
@@ -430,6 +437,64 @@
       "longest": "Longest",
       "days_one": "{{count}} day",
       "days_other": "{{count}} days"
+    }
+  },
+  "subjects": {
+    "title": "Subjects",
+    "description": "What you study. Pick one when you start a focus session.",
+    "add": "Add subject",
+    "empty": "You have no subjects yet. Add one to start tracking study time.",
+    "edit": "Edit {{name}}",
+    "archive": "Archive {{name}}",
+    "restore": "Restore {{name}}",
+    "delete": "Delete {{name}}",
+    "archived": "Archived ({{count}})",
+    "form": {
+      "addTitle": "Add subject",
+      "editTitle": "Edit subject",
+      "name": "Name",
+      "color": "Color"
+    },
+    "colors": {
+      "red": "Red",
+      "orange": "Orange",
+      "yellow": "Yellow",
+      "green": "Green",
+      "teal": "Teal",
+      "blue": "Blue",
+      "purple": "Purple",
+      "pink": "Pink",
+      "gray": "Gray",
+      "custom": "Custom"
+    },
+    "deleteDialog": {
+      "title": "Delete this subject?",
+      "description": "\"{{name}}\" will be deleted. Your past study sessions are kept, but they will no longer have a subject. Archive it instead to hide it from the timer.",
+      "confirm": "Delete"
+    }
+  },
+  "pomodoro": {
+    "title": "Pomodoro",
+    "description": "Focus on one subject at a time, then take a break.",
+    "subject": "Subject",
+    "noSubject": "No subject",
+    "manageSubjects": "Manage subjects",
+    "start": "Start focus",
+    "cancel": "Cancel session",
+    "skipBreak": "Skip break",
+    "saving": "Saving your session…",
+    "phase": {
+      "ready": "Ready",
+      "focus": "Focus",
+      "shortBreak": "Short break",
+      "longBreak": "Long break"
+    },
+    "history": {
+      "title": "Today's sessions",
+      "empty": "No completed sessions yet today.",
+      "summary_one": "{{count}} session · {{total}}",
+      "summary_other": "{{count}} sessions · {{total}}",
+      "delete": "Delete session at {{time}}"
     }
   }
 }

@@ -363,7 +363,7 @@ Prefix `/api/v1`. Every endpoint requires an access token except the public Auth
 ### Checklist
 | Method | Path | Description |
 |---|---|---|
-| GET | `/days/{date}` | Aggregated data for the Today screen: the day `mode` and whether it can be changed (`mode_locked`), scheduled habits with their state (named by `low_energy_name` on a low-energy day when it is set), to-dos, the menu for that weekday, total study time, the work entry (hours and pay) if any, and total expenses. The work entry and expenses are included; the menu and study time are added to the response together with their features. |
+| GET | `/days/{date}` | Aggregated data for the Today screen: the day `mode` and whether it can be changed (`mode_locked`), scheduled habits with their state (named by `low_energy_name` on a low-energy day when it is set), to-dos, the menu for that weekday, total study time (`study_seconds`, the sum of the day's completed sessions), the work entry (hours and pay) if any, and total expenses. The study time, work entry, and expenses are included; the menu is added to the response together with the meal plan. |
 | PUT | `/days/{date}/mode` | Set the mode with `{ "mode": "normal" }` or `{ "mode": "low_energy" }`. 422 with `details.fields.date` set to `not_today` unless the date is today; 409 `day_mode_locked` when the mode would change and a habit is already checked for today. |
 | GET | `/habits` | List (`?include_archived=`), with streaks |
 | POST | `/habits` | Create |
@@ -458,8 +458,8 @@ Status as of 2026-11-14, describing what is merged into `main`. Update the Statu
 |---|---|---|
 | 1 | Project skeleton: monorepo, Axum + SQLx + migrations, Docker Compose for local Postgres, CI running tests. | Done |
 | 2 | Auth: email + password first, then Google OAuth (sign-in and linking) on the backend; then the sign-in and registration screens. The app connects to Supabase from this step on. | Done |
-| 3 | Checklist (habits, to-dos, Today screen). | Done. The Today screen shows the money card but not the menu or the study time yet; they arrive with steps 4 and 6. |
-| 4 | Pomodoro (subjects, sessions, settings). | Partly done: the API and the Pomodoro settings are done; the Pomodoro and Subjects screens are not built. |
+| 3 | Checklist (habits, to-dos, Today screen). | Done. The Today screen shows the study card and the money card but not the menu yet; it arrives with step 6. |
+| 4 | Pomodoro (subjects, sessions, settings). | Done: subjects, study sessions, and the Pomodoro settings (API and screens), and the study time on the Today screen (`study_seconds` in `GET /days/{date}`). |
 | 5 | Day modes (low-energy days): habit fields, day mode, the new streak rule. Done before statistics because it changes how streaks and rates are computed. | Done |
 | 6 | Meal plan (ingredients, dishes, weekly template, shopping list). | Not started |
 | 7 | Settings endpoint and screen, currency, then the work log. | Partly done: the settings API, currency, Google linking, and the work log are done; the Settings screen lacks profile, time zone, language, and sign out. |

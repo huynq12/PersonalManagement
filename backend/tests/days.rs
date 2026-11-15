@@ -551,3 +551,57 @@ async fn day_money_is_not_visible_to_another_user(db: PgPool) {
     assert_eq!(day.body["work"], Value::Null);
     assert_eq!(day.body["expense_total"], 0);
 }
+
+/// Writes a study session directly, so that a session can be given any status and duration.
+async fn add_session(db: &PgPool, email: &str, status: &str, date: NaiveDate, seconds: i32) {
+    sqlx::query(
+        "INSERT INTO study_sessions
+             (user_id, status, planned_minutes, started_at, ended_at, duration_seconds, local_date)
+         SELECT id, $2, 25, now(), now(), $3, $4 FROM users WHERE email = $1",
+    )
+    .bind(email)
+    .bind(status)
+    .bind(seconds)
+    .bind(date)
+    .execute(db)
+    .await
+    .unwrap();
+}
+
+#[sqlx::test]
+async fn day_has_no_study_time_by_default(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+
+    let day = get_day(&app, &token, today(&db).await).await;
+
+    assert_eq!(day.body["study_seconds"], 0);
+}
+
+#[sqlx::test]
+async fn day_sums_only_completed_sessions_of_that_date(db: PgPool) {
+    let app = common::app(db.clone());
+    let token = sign_up(&app, ADA).await;
+    let today = today(&db).await;
+    add_session(&db, ADA, "completed", today, 1_500).await;
+    add_session(&db, ADA, "completed", today, 900).await;
+    add_session(&db, ADA, "cancelled", today, 700).await;
+    add_session(&db, ADA, "completed", today.pred_opt().unwrap(), 3_000).await;
+
+    let day = get_day(&app, &token, today).await;
+
+    assert_eq!(day.body["study_seconds"], 2_400);
+}
+
+#[sqlx::test]
+async fn day_study_time_is_not_visible_to_another_user(db: PgPool) {
+    let app = common::app(db.clone());
+    sign_up(&app, ADA).await;
+    let grace = sign_up(&app, GRACE).await;
+    let today = today(&db).await;
+    add_session(&db, ADA, "completed", today, 1_500).await;
+
+    let day = get_day(&app, &grace, today).await;
+
+    assert_eq!(day.body["study_seconds"], 0);
+}

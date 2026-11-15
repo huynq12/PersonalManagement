@@ -5,6 +5,7 @@ import {
   addDays,
   addMonths,
   formatLongDate,
+  formatTime,
   formatMonth,
   isIsoDate,
   isIsoMonth,
@@ -113,5 +114,13 @@ describe('formatWeekRange', () => {
   it('formats the seven days from the Monday', () => {
     // ICU puts thin spaces around the dash; compare with plain spaces.
     expect(formatWeekRange('2026-11-09', 'en').replace(/\s/g, ' ')).toBe('Nov 9 – 15, 2026')
+  })
+})
+
+describe('formatTime', () => {
+  it('shows the time of day in the given time zone, not in UTC', () => {
+    // 03:30 UTC is 10:30 in Ho Chi Minh City and 14:30 in Sydney.
+    expect(formatTime('2026-11-12T03:30:00Z', 'en-GB', 'Asia/Ho_Chi_Minh')).toBe('10:30')
+    expect(formatTime('2026-11-12T03:30:00Z', 'en-GB', 'Australia/Sydney')).toBe('14:30')
   })
 })
