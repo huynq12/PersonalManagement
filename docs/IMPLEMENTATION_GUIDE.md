@@ -48,7 +48,7 @@ Progress through this guide:
 | Phase | Status |
 |---|---|
 | A — Day modes | Done |
-| B — Settings and currency | Done. Google linking was added later; the profile, time zone, language, and sign-out sections of the Settings screen are left to their own work |
+| B — Settings and currency | Done. Google linking, and the profile, time zone, language, and sign-out sections of the Settings screen, were added later |
 | C — Work log | Done |
 | D — Finances | Done |
 | E — Today money card | Done |

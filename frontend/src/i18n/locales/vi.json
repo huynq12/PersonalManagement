@@ -207,8 +207,26 @@
   },
   "settings": {
     "title": "Cài đặt",
-    "description": "Tiền tệ, công việc, ngân sách và Pomodoro.",
+    "description": "Hồ sơ, múi giờ, ngôn ngữ, tiền tệ, công việc, ngân sách và Pomodoro.",
     "saved": "Đã lưu.",
+    "profile": {
+      "title": "Hồ sơ",
+      "displayName": "Tên hiển thị",
+      "email": "Email: {{email}}"
+    },
+    "timezone": {
+      "title": "Múi giờ",
+      "label": "Múi giờ",
+      "hint": "Các ngày, như màn hình Hôm nay và thống kê, được tính theo múi giờ này."
+    },
+    "language": {
+      "title": "Ngôn ngữ",
+      "hint": "Lựa chọn cũng được lưu vào tài khoản của bạn."
+    },
+    "signOut": {
+      "title": "Đăng xuất",
+      "description": "Kết thúc phiên đăng nhập trên thiết bị này."
+    },
     "google": {
       "title": "Tài khoản Google",
       "description": "Liên kết tài khoản Google để đăng nhập bằng Google bên cạnh mật khẩu.",

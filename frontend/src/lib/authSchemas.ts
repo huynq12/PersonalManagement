@@ -42,3 +42,9 @@ export const registerFormSchema = z.object({
 })
 
 export type RegisterForm = z.infer<typeof registerFormSchema>
+
+export const profileFormSchema = z.object({
+  displayName: z.string().trim().min(1, required).max(100, displayNameLength),
+})
+
+export type ProfileForm = z.infer<typeof profileFormSchema>

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { SESSION_QUERY_KEY, updateMe } from '../lib/auth'
+import { SESSION_QUERY_KEY, updateMe, type AccountChanges } from '../lib/auth'
 import {
   getSettings,
   SETTINGS_QUERY_KEY,
@@ -24,12 +24,12 @@ export function useUpdateSettings() {
   })
 }
 
-/** Changes the account currency; the signed-in user in the cache is replaced with the result. */
-export function useUpdateCurrency() {
+/** Changes account fields (name, time zone, language, currency); the cached user is replaced. */
+export function useUpdateAccount() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (currency: string) => updateMe({ currency }),
+    mutationFn: (changes: AccountChanges) => updateMe(changes),
     onSuccess: (user) => {
       queryClient.setQueryData(SESSION_QUERY_KEY, user)
     },

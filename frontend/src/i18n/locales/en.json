@@ -207,8 +207,26 @@
   },
   "settings": {
     "title": "Settings",
-    "description": "Currency, work, budget, and Pomodoro preferences.",
+    "description": "Profile, time zone, language, currency, work, budget, and Pomodoro preferences.",
     "saved": "Saved.",
+    "profile": {
+      "title": "Profile",
+      "displayName": "Display name",
+      "email": "Email: {{email}}"
+    },
+    "timezone": {
+      "title": "Time zone",
+      "label": "Time zone",
+      "hint": "Days, such as the Today screen and the statistics, follow this time zone."
+    },
+    "language": {
+      "title": "Language",
+      "hint": "Also remembered on your account."
+    },
+    "signOut": {
+      "title": "Sign out",
+      "description": "End your session on this device."
+    },
     "google": {
       "title": "Google account",
       "description": "Link your Google account to sign in with Google as well as your password.",

@@ -1,6 +1,6 @@
 import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useUpdateCurrency } from '../../hooks/useSettings'
+import { useUpdateAccount } from '../../hooks/useSettings'
 import { SUPPORTED_CURRENCIES } from '../../lib/money'
 import Button from '../ui/Button'
 import Card from '../ui/Card'
@@ -18,7 +18,7 @@ export default function CurrencySection({ currency }: CurrencySectionProps) {
   const id = useId()
   const hintId = `${id}-hint`
   const [selected, setSelected] = useState(currency)
-  const save = useUpdateCurrency()
+  const save = useUpdateAccount()
 
   const names = new Intl.DisplayNames(i18n.resolvedLanguage, { type: 'currency' })
 
@@ -28,7 +28,7 @@ export default function CurrencySection({ currency }: CurrencySectionProps) {
         className="flex flex-col gap-4"
         onSubmit={(event) => {
           event.preventDefault()
-          save.mutate(selected)
+          save.mutate({ currency: selected })
         }}
       >
         <div className="flex flex-col gap-2">
