@@ -80,16 +80,11 @@ describe('Settings screen', () => {
   it('shows the saved settings in the units a person types', async () => {
     settings = {
       ...DEFAULT_SETTINGS,
-      hourly_wage: 30000,
-      base_work_hours: 7.5,
       monthly_budget: 5000000,
       focus_minutes: 50,
     }
     renderSettings()
 
-    const work = await section('Work')
-    expect((work.getByLabelText('Hourly wage (VND)') as HTMLInputElement).value).toBe('30000')
-    expect((work.getByLabelText('Base hours per day') as HTMLInputElement).value).toBe('7.5')
     const budget = await section('Monthly budget')
     expect((budget.getByLabelText('Monthly expense budget (VND)') as HTMLInputElement).value).toBe(
       '5000000',
@@ -115,71 +110,7 @@ describe('Settings screen', () => {
     failing = false
     await userEvent.click(screen.getByRole('button', { name: 'Try again' }))
 
-    expect(await screen.findByRole('region', { name: 'Work' })).toBeTruthy()
-  })
-
-  it('saves the work settings in minor units', async () => {
-    renderSettings()
-    const work = await section('Work')
-
-    await userEvent.type(work.getByLabelText('Hourly wage (VND)'), '30000')
-    await userEvent.type(work.getByLabelText('Base hours per day'), '7.5')
-    await userEvent.click(work.getByRole('button', { name: 'Save' }))
-
-    expect(await work.findByText('Saved.')).toBeTruthy()
-    expect(patchesTo('/settings').map((request) => request.body)).toEqual([
-      { hourly_wage: 30000, base_work_hours: 7.5 },
-    ])
-  })
-
-  it('converts typed amounts using the fraction digits of the account currency', async () => {
-    user = { ...user, currency: 'USD' }
-    renderSettings()
-    const work = await section('Work')
-
-    await userEvent.type(work.getByLabelText('Hourly wage (USD)'), '12.5')
-    await userEvent.click(work.getByRole('button', { name: 'Save' }))
-
-    expect(await work.findByText('Saved.')).toBeTruthy()
-    expect(patchesTo('/settings')[0].body).toEqual({
-      hourly_wage: 1250,
-      base_work_hours: null,
-    })
-    expect((work.getByLabelText('Hourly wage (USD)') as HTMLInputElement).value).toBe('12.5')
-  })
-
-  it('rejects more decimals than the currency has without calling the server', async () => {
-    renderSettings()
-    const work = await section('Work')
-
-    await userEvent.type(work.getByLabelText('Hourly wage (VND)'), '100.5')
-    await userEvent.click(work.getByRole('button', { name: 'Save' }))
-
-    expect(await work.findByText(/Enter an amount greater than 0/)).toBeTruthy()
-    expect(patchesTo('/settings')).toHaveLength(0)
-  })
-
-  it('rejects base hours above 24', async () => {
-    renderSettings()
-    const work = await section('Work')
-
-    await userEvent.type(work.getByLabelText('Base hours per day'), '25')
-    await userEvent.click(work.getByRole('button', { name: 'Save' }))
-
-    expect(await work.findByText(/Enter hours greater than 0/)).toBeTruthy()
-    expect(patchesTo('/settings')).toHaveLength(0)
-  })
-
-  it('clears a setting when its field is emptied', async () => {
-    settings = { ...DEFAULT_SETTINGS, monthly_budget: 5000000 }
-    renderSettings()
-    const budget = await section('Monthly budget')
-
-    await userEvent.clear(budget.getByLabelText('Monthly expense budget (VND)'))
-    await userEvent.click(budget.getByRole('button', { name: 'Save' }))
-
-    expect(await budget.findByText('Saved.')).toBeTruthy()
-    expect(patchesTo('/settings')[0].body).toEqual({ monthly_budget: null })
+    expect(await screen.findByRole('region', { name: 'Pomodoro' })).toBeTruthy()
   })
 
   it('saves the Pomodoro lengths as numbers and rejects values out of range', async () => {
@@ -207,7 +138,7 @@ describe('Settings screen', () => {
   })
 
   it('changes the currency, warns that amounts are not converted, and relabels the fields', async () => {
-    settings = { ...DEFAULT_SETTINGS, hourly_wage: 1250 }
+    settings = { ...DEFAULT_SETTINGS, monthly_budget: 1250 }
     renderSettings()
     const currency = await section('Currency')
     expect(currency.getByText(/Existing amounts are not converted/)).toBeTruthy()
@@ -220,24 +151,33 @@ describe('Settings screen', () => {
 
     expect(await currency.findByText('Saved.')).toBeTruthy()
     expect(patchesTo('/me').map((request) => request.body)).toEqual([{ currency: 'USD' }])
-    const work = await section('Work')
+    const budget = await section('Monthly budget')
     // The stored 1250 is shown as 12.50 once the account currency has two decimals.
-    expect(((await work.findByLabelText('Hourly wage (USD)')) as HTMLInputElement).value).toBe(
-      '12.50',
-    )
+    expect(
+      ((await budget.findByLabelText('Monthly expense budget (USD)')) as HTMLInputElement).value,
+    ).toBe('12.50')
   })
 
   it('shows an error when saving fails', async () => {
     renderSettings()
-    const work = await section('Work')
+    const pomodoro = await section('Pomodoro')
     vi.stubGlobal('fetch', async () => errorResponse(422, 'validation_failed'))
 
-    await userEvent.type(work.getByLabelText('Hourly wage (VND)'), '100')
-    await userEvent.click(work.getByRole('button', { name: 'Save' }))
+    await userEvent.clear(pomodoro.getByLabelText('Focus (minutes)'))
+    await userEvent.type(pomodoro.getByLabelText('Focus (minutes)'), '30')
+    await userEvent.click(pomodoro.getByRole('button', { name: 'Save' }))
 
-    expect((await work.findByRole('alert')).textContent).toBe(
+    expect((await pomodoro.findByRole('alert')).textContent).toBe(
       'Some fields are not valid. Please check them and try again.',
     )
+  })
+
+  it('no longer has the work settings, which live on the Work log', async () => {
+    renderSettings()
+    await section('Pomodoro')
+
+    expect(screen.queryByRole('region', { name: 'Work' })).toBeNull()
+    expect(screen.queryByLabelText('Hourly wage (VND)')).toBeNull()
   })
 
   it('renders in Vietnamese', async () => {
@@ -250,7 +190,7 @@ describe('Settings screen', () => {
         level: 1,
       }),
     ).toBeTruthy()
-    expect(await screen.findByRole('region', { name: vi_.settings.work.title })).toBeTruthy()
+    expect(await screen.findByRole('region', { name: vi_.settings.pomodoro.title })).toBeTruthy()
   })
 
   describe('Profile', () => {

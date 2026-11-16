@@ -7,14 +7,14 @@ import PomodoroSection from '../components/settings/PomodoroSection'
 import ProfileSection from '../components/settings/ProfileSection'
 import SignOutSection from '../components/settings/SignOutSection'
 import TimezoneSection from '../components/settings/TimezoneSection'
-import WorkSection from '../components/settings/WorkSection'
 import Alert from '../components/ui/Alert'
 import Button from '../components/ui/Button'
 import { useSession } from '../hooks/useSession'
 import { useSettings } from '../hooks/useSettings'
 import { errorMessageKey } from '../i18n/errorMessage'
 
-/** The Settings screen: profile, time zone, language, currency, work, budget, Pomodoro, Google linking, and sign out. */
+/** The Settings screen: profile, time zone, language, currency, budget, Pomodoro, Google linking, and sign out.
+ * The work settings live at the bottom of the Work log. */
 export default function SettingsPage() {
   const { t } = useTranslation()
   const settings = useSettings()
@@ -45,12 +45,6 @@ export default function SettingsPage() {
           <TimezoneSection key={`timezone-${user.timezone}`} timezone={user.timezone} />
           <LanguageSection />
           <CurrencySection currency={user.currency} />
-          <WorkSection
-            // A new currency changes how the saved wage is written, so start the form over.
-            key={`work-${user.currency}`}
-            settings={settings.data}
-            currency={user.currency}
-          />
           <BudgetSection key={`budget-${user.currency}`} settings={settings.data} currency={user.currency} />
           <PomodoroSection settings={settings.data} />
           <GoogleSection />

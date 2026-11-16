@@ -114,7 +114,7 @@ The backend is organized by feature: each feature is a directory under `backend/
 - P5. I adjust the focus length, short break, long break, and the number of sessions before a long break.
 
 ### Work log
-- W1. I set my hourly wage and my base working hours per day in Settings.
+- W1. I set my hourly wage and my base working hours per day in a card at the bottom of the Work log.
 - W2. For a day I worked, I enter the number of hours; the app computes that day's pay and marks whether I worked more than, less than, or exactly my base hours.
 - W3. I edit or delete a day's entry.
 - W4. I see a month's entries with the total hours, total pay, and number of days worked, and I move between months.
@@ -147,8 +147,8 @@ The backend is organized by feature: each feature is a directory under `backend/
 | 7 | Dishes | `/dishes`, `/dishes/:id` | Dish library, dish form with ingredients |
 | 8 | Shopping list | `/shopping-list` | Merged ingredients for the week, with temporary check marks kept in the browser |
 | 9 | Weekly statistics | `/stats` | Week picker; study time charts per day and subject; checklist rate; low-energy days marked; streaks; comparison with the previous week |
-| 10 | Settings | `/settings` | Profile, time zone, language, currency, Pomodoro settings, work settings (hourly wage, base hours), monthly budget, Google linking, sign out |
-| 11 | Work log | `/work-log` | Month picker; add or edit a day's hours and note; list of days with hours, pay, and a more/less/equal badge against the base hours; totals for the month |
+| 10 | Settings | `/settings` | Profile, time zone, language, currency, Pomodoro settings, monthly budget, Google linking, sign out |
+| 11 | Work log | `/work-log` | Month picker; a month calendar (Monday first) with one cell per day showing hours and pay, colored by no entry / below / equal / above the base hours, where future days cannot be clicked; clicking a day opens a dialog to add, edit, or delete that day's hours and note; month summary cards (total hours, total pay, days worked); the work settings card (hourly wage, base hours) at the bottom |
 | 12 | Finances | `/finances` | Month picker; income, expenses, balance; budget progress bar; expenses per category; transaction list with add, edit, delete |
 | 13 | Finance categories | `/finance-categories` | Expense and income category CRUD (name, color from the fixed palette), archive; a button that adds the suggested set while the list is empty |
 

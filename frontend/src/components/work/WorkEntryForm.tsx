@@ -8,48 +8,53 @@ import type { ValidationMessageKey } from '../../lib/authSchemas'
 import type { IsoDate } from '../../lib/dates'
 import { parseOptionalHours } from '../../lib/settingsSchemas'
 import type { WorkEntry } from '../../lib/workEntries'
-import { workEntryFormSchema, type WorkEntryForm } from '../../lib/workEntrySchemas'
+import { workEntryFormSchema, type WorkEntryForm as WorkEntryFormValues } from '../../lib/workEntrySchemas'
 import Alert from '../ui/Alert'
 import Button from '../ui/Button'
-import Card from '../ui/Card'
 import TextField from '../ui/TextField'
 
-type PutMutation = UseMutationResult<
+export type PutMutation = UseMutationResult<
   WorkEntry,
   Error,
   { date: IsoDate; hours: number; note: string | null }
 >
 
-interface WorkEntryFormCardProps {
+interface WorkEntryFormProps {
+  /** The day being logged. It is fixed by the clicked calendar cell, so it has no input. */
+  date: IsoDate
   today: IsoDate
-  /** The entry being edited, or `null` to log a new day. */
-  editing: WorkEntry | null
+  /** The day's entry to edit, or `null` to log the day for the first time. */
+  entry: WorkEntry | null
   save: PutMutation
-  onCancelEdit: () => void
   onSaved: () => void
+  onCancel: () => void
+  /** Offers a Delete button when set; only an existing entry can be deleted. */
+  onDelete?: () => void
 }
 
-/** Logs the hours of a day, or edits an entry loaded from the list. */
-export default function WorkEntryFormCard({
+/** The hours and note of one day, with Save, Cancel and, for an existing entry, Delete. */
+export default function WorkEntryForm({
+  date,
   today,
-  editing,
+  entry,
   save,
-  onCancelEdit,
   onSaved,
-}: WorkEntryFormCardProps) {
+  onCancel,
+  onDelete,
+}: WorkEntryFormProps) {
   const { t } = useTranslation()
   const schema = useMemo(() => workEntryFormSchema(today), [today])
-  const emptyValues: WorkEntryForm = { date: today, hours: '', note: '' }
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
-  } = useForm<WorkEntryForm>({
+  } = useForm<WorkEntryFormValues>({
     resolver: zodResolver(schema),
-    defaultValues: editing
-      ? { date: editing.date, hours: String(editing.hours), note: editing.note ?? '' }
-      : emptyValues,
+    defaultValues: {
+      date,
+      hours: entry ? String(entry.hours) : '',
+      note: entry?.note ?? '',
+    },
   })
 
   const fieldError = (message: string | undefined) =>
@@ -62,58 +67,47 @@ export default function WorkEntryFormCard({
       return
     }
     const note = values.note.trim()
-    save.mutate(
-      { date: values.date, hours, note: note === '' ? null : note },
-      {
-        onSuccess: () => {
-          reset(emptyValues)
-          onSaved()
-        },
-      },
-    )
+    save.mutate({ date, hours, note: note === '' ? null : note }, { onSuccess: onSaved })
   })
 
   return (
-    <Card title={editing ? t('workLog.form.editTitle') : t('workLog.form.title')}>
-      <form className="flex flex-col gap-4" noValidate onSubmit={(event) => void onSubmit(event)}>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <TextField
-            label={t('workLog.form.date')}
-            type="date"
-            max={today}
-            error={fieldError(errors.date?.message)}
-            {...register('date')}
-          />
-          <TextField
-            label={t('workLog.form.hours')}
-            hint={t('workLog.form.hoursHint')}
-            inputMode="decimal"
-            autoComplete="off"
-            autoFocus={editing !== null}
-            error={fieldError(errors.hours?.message)}
-            {...register('hours')}
-          />
-        </div>
-        <TextField
-          label={t('workLog.form.note')}
-          autoComplete="off"
-          error={fieldError(errors.note?.message)}
-          {...register('note')}
-        />
+    <form className="flex flex-col gap-4" noValidate onSubmit={(event) => void onSubmit(event)}>
+      <TextField
+        label={t('workLog.form.hours')}
+        hint={t('workLog.form.hoursHint')}
+        inputMode="decimal"
+        autoComplete="off"
+        autoFocus
+        error={fieldError(errors.hours?.message)}
+        {...register('hours')}
+      />
+      <TextField
+        label={t('workLog.form.note')}
+        autoComplete="off"
+        error={fieldError(errors.note?.message)}
+        {...register('note')}
+      />
 
-        {save.isError ? <Alert variant="error">{t(errorMessageKey(save.error))}</Alert> : null}
+      {save.isError ? <Alert variant="error">{t(errorMessageKey(save.error))}</Alert> : null}
 
-        <div className="flex flex-wrap gap-2">
-          <Button type="submit" disabled={save.isPending}>
-            {t('workLog.form.save')}
+      <div className="flex flex-wrap items-center gap-2">
+        {onDelete ? (
+          <Button
+            variant="ghost"
+            className="mr-auto text-destructive"
+            disabled={save.isPending}
+            onClick={onDelete}
+          >
+            {t('workLog.dialog.delete')}
           </Button>
-          {editing ? (
-            <Button variant="ghost" onClick={onCancelEdit}>
-              {t('workLog.form.cancelEdit')}
-            </Button>
-          ) : null}
-        </div>
-      </form>
-    </Card>
+        ) : null}
+        <Button variant="ghost" onClick={onCancel}>
+          {t('common.cancel')}
+        </Button>
+        <Button type="submit" disabled={save.isPending}>
+          {t('common.save')}
+        </Button>
+      </div>
+    </form>
   )
 }

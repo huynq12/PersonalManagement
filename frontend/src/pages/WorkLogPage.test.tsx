@@ -2,8 +2,9 @@ import { cleanup, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import i18n from '../i18n/i18n'
+import vi_ from '../i18n/locales/vi.json'
 import { setAccessToken } from '../lib/api'
-import { addMonths, todayIn } from '../lib/dates'
+import { addMonths, formatLongDate, formatShortDate, todayIn } from '../lib/dates'
 import type { Settings } from '../lib/settings'
 import type { WorkEntry } from '../lib/workEntries'
 import {
@@ -64,7 +65,14 @@ function monthView(month: string) {
 
 function renderWorkLog(path = '/work-log') {
   requests = stubApi(
-    { ...signedIn, 'GET /settings': () => jsonResponse(200, settings) },
+    {
+      ...signedIn,
+      'GET /settings': () => jsonResponse(200, settings),
+      'PATCH /settings': (request) => {
+        settings = { ...settings, ...(request.body as Partial<Settings>) }
+        return jsonResponse(200, settings)
+      },
+    },
     (request) => {
       const url = new URL(request.path, 'http://localhost')
       if (request.method === 'GET' && url.pathname === '/work-entries') {
@@ -100,6 +108,24 @@ function sent(method: string, prefix: string) {
   return requests.filter((request) => request.method === method && request.path.startsWith(prefix))
 }
 
+/** The calendar button of a day, found by its accessible name that starts with the short date. */
+async function day(date: string) {
+  const prefix = `${formatShortDate(date, 'en')}:`
+  return screen.findByRole('button', {
+    name: (name) => name.startsWith(prefix),
+  })
+}
+
+/** The Save button of the open dialog; the Work settings card has a Save button of its own. */
+function saveButton() {
+  return within(screen.getByRole('dialog')).getByRole('button', { name: 'Save' })
+}
+
+/** The Work settings card at the bottom of the page. */
+async function workSettings() {
+  return within(await screen.findByRole('region', { name: 'Work' }))
+}
+
 beforeEach(async () => {
   await i18n.changeLanguage('en')
   settings = { ...SETTINGS }
@@ -114,208 +140,383 @@ afterEach(() => {
 })
 
 describe('Work log screen', () => {
-  it('shows an empty state linking to Settings instead of the form when the wage is not set', async () => {
-    settings = { ...SETTINGS, hourly_wage: null }
+  it('shows the month as a calendar with a cell for every day', async () => {
     renderWorkLog()
 
-    const link = await screen.findByRole('link', { name: 'Open Settings' })
+    const grid = await screen.findByRole('grid')
 
-    expect(link.getAttribute('href')).toBe('/settings')
-    expect(screen.queryByLabelText('Hours')).toBeNull()
-  })
-
-  it('shows the empty state when the base hours are not set', async () => {
-    settings = { ...SETTINGS, base_work_hours: null }
-    renderWorkLog()
-
-    expect(await screen.findByRole('link', { name: 'Open Settings' })).toBeTruthy()
-  })
-
-  it('lists the month with hours, pay, badge, and totals', async () => {
-    entries = [
-      entry(`${THIS_MONTH}-01`, 9, { note: 'Busy day' }),
-      entry(`${THIS_MONTH}-02`, 8),
-      entry(`${THIS_MONTH}-03`, 6.5),
-    ]
-    renderWorkLog()
-
-    const rows = await screen.findAllByRole('row')
-
-    // Header, three days, and the totals row.
-    expect(rows).toHaveLength(5)
-    expect(within(rows[1]).getByText('Above base')).toBeTruthy()
-    expect(within(rows[1]).getByText('Busy day')).toBeTruthy()
-    expect(within(rows[2]).getByText('Equal to base')).toBeTruthy()
-    expect(within(rows[3]).getByText('Below base')).toBeTruthy()
-    expect(within(rows[3]).getByText(/195,000/)).toBeTruthy()
-    const totals = within(rows[4])
-    expect(totals.getByText('23.5')).toBeTruthy()
-    expect(totals.getByText(/705,000/)).toBeTruthy()
-    expect(totals.getByText('3 days')).toBeTruthy()
-  })
-
-  it('shows a hint when the month has no entries', async () => {
-    renderWorkLog()
-
-    expect(await screen.findByText('No hours logged this month.')).toBeTruthy()
-  })
-
-  it('saves an entry for the chosen date and shows it in the list', async () => {
-    renderWorkLog()
-    await userEvent.type(await screen.findByLabelText('Hours'), '7,5')
-    await userEvent.type(screen.getByLabelText('Note'), 'Inventory')
-
-    await userEvent.click(screen.getByRole('button', { name: 'Save entry' }))
-
-    expect(await screen.findByText('Inventory')).toBeTruthy()
-    expect(sent('PUT', '/work-entries/').map((request) => [request.path, request.body])).toEqual([
-      [`/work-entries/${TODAY}`, { hours: 7.5, note: 'Inventory' }],
-    ])
-    expect(screen.getByText('Below base')).toBeTruthy()
-  })
-
-  it('sends no note when the note is left empty', async () => {
-    renderWorkLog()
-    await userEvent.type(await screen.findByLabelText('Hours'), '8')
-
-    await userEvent.click(screen.getByRole('button', { name: 'Save entry' }))
-
-    await screen.findByText('Equal to base')
-    expect(sent('PUT', '/work-entries/')[0].body).toEqual({ hours: 8, note: null })
-  })
-
-  it('does not send invalid hours and shows the validation message', async () => {
-    renderWorkLog()
-    await userEvent.type(await screen.findByLabelText('Hours'), '25')
-
-    await userEvent.click(screen.getByRole('button', { name: 'Save entry' }))
-
+    expect(within(grid).getAllByRole('columnheader')).toHaveLength(7)
+    expect(await day(TODAY)).toBeTruthy()
     expect(
-      await screen.findByText(
-        'Enter hours greater than 0 and at most 24, with up to two decimals.',
-      ),
+      screen.getByRole('heading', { name: new RegExp(String(Number(TODAY.slice(0, 4)))) }),
     ).toBeTruthy()
-    expect(sent('PUT', '/work-entries/')).toEqual([])
   })
 
-  it('loads a row into the form for editing and saves it for the same date', async () => {
-    entries = [entry(`${THIS_MONTH}-01`, 6, { note: 'Short day' })]
+  it('shows hours and pay on the day of an entry and the month totals', async () => {
+    entries = [entry(`${THIS_MONTH}-01`, 9, { note: 'Busy day' }), entry(`${THIS_MONTH}-02`, 6.5)]
     renderWorkLog()
-    await userEvent.click(await screen.findByRole('button', { name: /Edit/ }))
 
-    expect((screen.getByLabelText('Hours') as HTMLInputElement).value).toBe('6')
-    expect((screen.getByLabelText('Note') as HTMLInputElement).value).toBe('Short day')
-    expect((screen.getByLabelText('Date') as HTMLInputElement).value).toBe(`${THIS_MONTH}-01`)
+    const first = await day(`${THIS_MONTH}-01`)
 
-    await userEvent.clear(screen.getByLabelText('Hours'))
-    await userEvent.type(screen.getByLabelText('Hours'), '9')
-    await userEvent.click(screen.getByRole('button', { name: 'Save entry' }))
-
-    expect(await screen.findByText('Above base')).toBeTruthy()
-    expect(sent('PUT', '/work-entries/').map((request) => request.path)).toEqual([
-      `/work-entries/${THIS_MONTH}-01`,
-    ])
+    expect(first.getAttribute('data-status')).toBe('above')
+    expect(first.textContent).toMatch(/270,000/)
+    expect(first.textContent).toContain('Busy day')
+    expect((await day(`${THIS_MONTH}-02`)).getAttribute('data-status')).toBe('below')
+    const totals = within(screen.getByLabelText('Month totals'))
+    expect(totals.getByText('15.5')).toBeTruthy()
+    expect(totals.getByText(/465,000/)).toBeTruthy()
+    expect(totals.getByText('2 days')).toBeTruthy()
   })
 
-  it('asks for confirmation before deleting an entry', async () => {
-    entries = [entry(`${THIS_MONTH}-01`, 6)]
+  it('shows the work settings card below the calendar and no settings link', async () => {
     renderWorkLog()
-    await userEvent.click(await screen.findByRole('button', { name: /Delete/ }))
 
-    const dialog = await screen.findByRole('dialog')
-    expect(sent('DELETE', '/work-entries/')).toEqual([])
-    await userEvent.click(within(dialog).getByRole('button', { name: 'Delete' }))
+    const work = await workSettings()
 
-    expect(await screen.findByText('No hours logged this month.')).toBeTruthy()
-    expect(sent('DELETE', '/work-entries/').map((request) => request.path)).toEqual([
-      `/work-entries/${THIS_MONTH}-01`,
-    ])
+    expect((work.getByLabelText('Hourly wage (VND)') as HTMLInputElement).value).toBe('30000')
+    expect((work.getByLabelText('Base hours per day') as HTMLInputElement).value).toBe('8')
+    expect(screen.queryByRole('link', { name: 'Open Settings' })).toBeNull()
   })
 
-  it('keeps the entry when the delete dialog is cancelled', async () => {
-    entries = [entry(`${THIS_MONTH}-01`, 6)]
-    renderWorkLog()
-    await userEvent.click(await screen.findByRole('button', { name: /Delete/ }))
+  describe('logging hours for a day', () => {
+    it('opens a dialog for the clicked day and saves the hours for that date', async () => {
+      renderWorkLog()
+      await userEvent.click(await day(TODAY))
 
-    await userEvent.click(
-      within(await screen.findByRole('dialog')).getByRole('button', { name: 'Cancel' }),
-    )
+      const dialog = await screen.findByRole('dialog', { name: formatLongDate(TODAY, 'en') })
+      expect(within(dialog).queryByLabelText('Date')).toBeNull()
+      await userEvent.type(within(dialog).getByLabelText('Hours'), '7,5')
+      await userEvent.type(within(dialog).getByLabelText('Note'), 'Inventory')
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Save' }))
 
-    expect(screen.queryByRole('dialog')).toBeNull()
-    expect(sent('DELETE', '/work-entries/')).toEqual([])
+      await vi.waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+      expect(sent('PUT', '/work-entries/').map((request) => [request.path, request.body])).toEqual([
+        [`/work-entries/${TODAY}`, { hours: 7.5, note: 'Inventory' }],
+      ])
+      expect((await day(TODAY)).getAttribute('data-status')).toBe('below')
+    })
+
+    it('sends no note when the note is left empty', async () => {
+      renderWorkLog()
+      await userEvent.click(await day(TODAY))
+      await userEvent.type(await screen.findByLabelText('Hours'), '8')
+
+      await userEvent.click(saveButton())
+
+      await vi.waitFor(() => expect(sent('PUT', '/work-entries/')).toHaveLength(1))
+      expect(sent('PUT', '/work-entries/')[0].body).toEqual({ hours: 8, note: null })
+    })
+
+    it('does not send invalid hours and shows the validation message', async () => {
+      renderWorkLog()
+      await userEvent.click(await day(TODAY))
+      await userEvent.type(await screen.findByLabelText('Hours'), '25')
+
+      await userEvent.click(saveButton())
+
+      expect(
+        await screen.findByText(
+          'Enter hours greater than 0 and at most 24, with up to two decimals.',
+        ),
+      ).toBeTruthy()
+      expect(sent('PUT', '/work-entries/')).toEqual([])
+      expect(screen.getByRole('dialog')).toBeTruthy()
+    })
+
+    it('closes the dialog with Cancel without saving', async () => {
+      renderWorkLog()
+      await userEvent.click(await day(TODAY))
+
+      await userEvent.click(
+        within(await screen.findByRole('dialog')).getByRole('button', { name: 'Cancel' }),
+      )
+
+      expect(screen.queryByRole('dialog')).toBeNull()
+      expect(sent('PUT', '/work-entries/')).toEqual([])
+    })
+
+    it('shows the translated error inside the dialog when saving fails', async () => {
+      putError = 'service_unavailable'
+      renderWorkLog()
+      await userEvent.click(await day(TODAY))
+      await userEvent.type(await screen.findByLabelText('Hours'), '8')
+
+      await userEvent.click(saveButton())
+
+      expect(
+        await within(screen.getByRole('dialog')).findByText(
+          'The service is temporarily unavailable. Please try again shortly.',
+        ),
+      ).toBeTruthy()
+    })
+
+    it('does not offer a delete button for a day without an entry', async () => {
+      renderWorkLog()
+      await userEvent.click(await day(TODAY))
+
+      const dialog = await screen.findByRole('dialog')
+
+      expect(within(dialog).queryByRole('button', { name: 'Delete' })).toBeNull()
+    })
+
+    it('does not open anything when a future day is clicked', async () => {
+      renderWorkLog()
+      const tomorrow = new Date(`${TODAY}T00:00:00Z`)
+      tomorrow.setUTCDate(tomorrow.getUTCDate() + 1)
+      const next = tomorrow.toISOString().slice(0, 10)
+      if (!next.startsWith(THIS_MONTH)) {
+        // Today is the last day of the month: there is no future day in view.
+        return
+      }
+
+      await userEvent.click(await day(next))
+
+      expect(screen.queryByRole('dialog')).toBeNull()
+    })
   })
 
-  it('switches to the empty state when the server reports missing work settings', async () => {
-    putError = 'work_settings_missing'
-    renderWorkLog()
-    await userEvent.type(await screen.findByLabelText('Hours'), '8')
+  describe('editing and deleting an entry', () => {
+    it('opens the existing entry prefilled and saves it for the same date', async () => {
+      entries = [entry(TODAY, 6, { note: 'Short day' })]
+      renderWorkLog()
+      await userEvent.click(await day(TODAY))
 
-    await userEvent.click(screen.getByRole('button', { name: 'Save entry' }))
+      const dialog = await screen.findByRole('dialog')
+      expect((within(dialog).getByLabelText('Hours') as HTMLInputElement).value).toBe('6')
+      expect((within(dialog).getByLabelText('Note') as HTMLInputElement).value).toBe('Short day')
+      await userEvent.clear(within(dialog).getByLabelText('Hours'))
+      await userEvent.type(within(dialog).getByLabelText('Hours'), '9')
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Save' }))
 
-    expect(await screen.findByRole('link', { name: 'Open Settings' })).toBeTruthy()
-    expect(screen.queryByLabelText('Hours')).toBeNull()
+      await vi.waitFor(async () =>
+        expect((await day(TODAY)).getAttribute('data-status')).toBe('above'),
+      )
+      expect(sent('PUT', '/work-entries/').map((request) => request.path)).toEqual([
+        `/work-entries/${TODAY}`,
+      ])
+    })
+
+    it('shows the wage and base hours kept with the entry', async () => {
+      entries = [entry(TODAY, 6)]
+      renderWorkLog()
+      await userEvent.click(await day(TODAY))
+
+      const dialog = await screen.findByRole('dialog')
+
+      expect(within(dialog).getByText(/30,000/)).toBeTruthy()
+      expect(within(dialog).getByText('Below base')).toBeTruthy()
+    })
+
+    it('asks for confirmation before deleting an entry', async () => {
+      entries = [entry(TODAY, 6)]
+      renderWorkLog()
+      await userEvent.click(await day(TODAY))
+      await userEvent.click(
+        within(await screen.findByRole('dialog')).getByRole('button', { name: 'Delete' }),
+      )
+
+      const confirm = await screen.findByRole('dialog', { name: 'Delete this entry?' })
+      expect(sent('DELETE', '/work-entries/')).toEqual([])
+      await userEvent.click(within(confirm).getByRole('button', { name: 'Delete' }))
+
+      await vi.waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+      expect(sent('DELETE', '/work-entries/').map((request) => request.path)).toEqual([
+        `/work-entries/${TODAY}`,
+      ])
+      expect((await day(TODAY)).getAttribute('data-status')).toBe('none')
+    })
+
+    it('keeps the entry when the delete confirmation is cancelled', async () => {
+      entries = [entry(TODAY, 6)]
+      renderWorkLog()
+      await userEvent.click(await day(TODAY))
+      await userEvent.click(
+        within(await screen.findByRole('dialog')).getByRole('button', { name: 'Delete' }),
+      )
+
+      await userEvent.click(
+        within(await screen.findByRole('dialog')).getByRole('button', { name: 'Cancel' }),
+      )
+
+      expect(screen.queryByRole('dialog')).toBeNull()
+      expect(sent('DELETE', '/work-entries/')).toEqual([])
+      expect((await day(TODAY)).getAttribute('data-status')).toBe('below')
+    })
   })
 
-  it('shows the translated error when saving fails for another reason', async () => {
-    putError = 'service_unavailable'
-    renderWorkLog()
-    await userEvent.type(await screen.findByLabelText('Hours'), '8')
+  describe('without a wage or base hours', () => {
+    it('explains where to set them and links to the settings card on the same page', async () => {
+      settings = { ...SETTINGS, hourly_wage: null }
+      renderWorkLog()
 
-    await userEvent.click(screen.getByRole('button', { name: 'Save entry' }))
+      const link = await screen.findByRole('link', { name: 'Go to work settings' })
 
-    expect((await screen.findByRole('alert')).textContent).toBe(
-      'The service is temporarily unavailable. Please try again shortly.',
-    )
-    expect(screen.getByLabelText('Hours')).toBeTruthy()
+      expect(link.getAttribute('href')).toBe('#work-settings')
+      expect(document.getElementById('work-settings')).toBeTruthy()
+    })
+
+    it('shows the notice when only the base hours are missing', async () => {
+      settings = { ...SETTINGS, base_work_hours: null }
+      renderWorkLog()
+
+      expect(await screen.findByRole('link', { name: 'Go to work settings' })).toBeTruthy()
+    })
+
+    it('scrolls to the settings card instead of opening the entry dialog', async () => {
+      settings = { ...SETTINGS, hourly_wage: null }
+      const scrollIntoView = vi.fn()
+      Element.prototype.scrollIntoView = scrollIntoView
+      renderWorkLog()
+      await screen.findByRole('link', { name: 'Go to work settings' })
+
+      await userEvent.click(await day(TODAY))
+
+      expect(screen.queryByRole('dialog')).toBeNull()
+      expect(scrollIntoView).toHaveBeenCalled()
+    })
+
+    it('switches to the notice when the server reports missing work settings', async () => {
+      putError = 'work_settings_missing'
+      renderWorkLog()
+      await userEvent.click(await day(TODAY))
+      await userEvent.type(await screen.findByLabelText('Hours'), '8')
+
+      await userEvent.click(saveButton())
+
+      expect(await screen.findByRole('link', { name: 'Go to work settings' })).toBeTruthy()
+      expect(screen.queryByRole('dialog')).toBeNull()
+    })
   })
 
-  it('moves between months with the previous and next buttons', async () => {
-    renderWorkLog()
-    await screen.findByText('No hours logged this month.')
-    const previousMonth = addMonths(THIS_MONTH, -1)
+  describe('work settings card', () => {
+    it('saves the work settings in minor units and then allows logging without a reload', async () => {
+      settings = { ...SETTINGS, hourly_wage: null, base_work_hours: null }
+      renderWorkLog()
+      const work = await workSettings()
+      await screen.findByRole('link', { name: 'Go to work settings' })
 
-    await userEvent.click(screen.getByRole('button', { name: 'Previous month' }))
+      await userEvent.type(work.getByLabelText('Hourly wage (VND)'), '30000')
+      await userEvent.type(work.getByLabelText('Base hours per day'), '7.5')
+      await userEvent.click(work.getByRole('button', { name: 'Save' }))
 
-    await vi.waitFor(() => {
-      expect(requests.map((request) => request.path)).toContain(
-        `/work-entries?month=${previousMonth}`,
+      expect(await work.findByText('Saved.')).toBeTruthy()
+      expect(
+        requests.filter((request) => request.method === 'PATCH').map((request) => request.body),
+      ).toEqual([{ hourly_wage: 30000, base_work_hours: 7.5 }])
+      await vi.waitFor(() =>
+        expect(screen.queryByRole('link', { name: 'Go to work settings' })).toBeNull(),
+      )
+      await userEvent.click(await day(TODAY))
+      expect(await screen.findByRole('dialog')).toBeTruthy()
+    })
+
+    it('rejects more decimals than the currency has without calling the server', async () => {
+      renderWorkLog()
+      const work = await workSettings()
+
+      await userEvent.clear(work.getByLabelText('Hourly wage (VND)'))
+      await userEvent.type(work.getByLabelText('Hourly wage (VND)'), '100.5')
+      await userEvent.click(work.getByRole('button', { name: 'Save' }))
+
+      expect(await work.findByText(/Enter an amount greater than 0/)).toBeTruthy()
+      expect(requests.filter((request) => request.method === 'PATCH')).toHaveLength(0)
+    })
+
+    it('rejects base hours above 24', async () => {
+      renderWorkLog()
+      const work = await workSettings()
+
+      await userEvent.clear(work.getByLabelText('Base hours per day'))
+      await userEvent.type(work.getByLabelText('Base hours per day'), '25')
+      await userEvent.click(work.getByRole('button', { name: 'Save' }))
+
+      expect(await work.findByText(/Enter hours greater than 0/)).toBeTruthy()
+      expect(requests.filter((request) => request.method === 'PATCH')).toHaveLength(0)
+    })
+
+    it('shows an error when saving fails', async () => {
+      renderWorkLog()
+      const work = await workSettings()
+      await screen.findByRole('grid')
+      stubApi({}, () => errorResponse(422, 'validation_failed'))
+
+      await userEvent.clear(work.getByLabelText('Hourly wage (VND)'))
+      await userEvent.type(work.getByLabelText('Hourly wage (VND)'), '100')
+      await userEvent.click(work.getByRole('button', { name: 'Save' }))
+
+      expect((await work.findByRole('alert')).textContent).toBe(
+        'Some fields are not valid. Please check them and try again.',
       )
     })
-    expect(
-      (screen.getByRole('button', { name: 'Next month' }) as HTMLButtonElement).disabled,
-    ).toBe(false)
-
-    await userEvent.click(screen.getByRole('button', { name: 'Next month' }))
-
-    expect(
-      (screen.getByRole('button', { name: 'Next month' }) as HTMLButtonElement).disabled,
-    ).toBe(true)
   })
 
-  it('does not allow moving past the current month', async () => {
-    renderWorkLog()
-    await screen.findByText('No hours logged this month.')
+  describe('months', () => {
+    it('moves between months with the previous and next buttons', async () => {
+      renderWorkLog()
+      await screen.findByRole('grid')
+      const previousMonth = addMonths(THIS_MONTH, -1)
 
-    expect(
-      (screen.getByRole('button', { name: 'Next month' }) as HTMLButtonElement).disabled,
-    ).toBe(true)
-  })
+      await userEvent.click(screen.getByRole('button', { name: 'Previous month' }))
 
-  it('opens the month given in the URL', async () => {
-    entries = [entry('2026-01-15', 8)]
-    renderWorkLog('/work-log?month=2026-01')
+      await vi.waitFor(() => {
+        expect(requests.map((request) => request.path)).toContain(
+          `/work-entries?month=${previousMonth}`,
+        )
+      })
+      expect(
+        (screen.getByRole('button', { name: 'Next month' }) as HTMLButtonElement).disabled,
+      ).toBe(false)
 
-    expect(await screen.findByText('Equal to base')).toBeTruthy()
-    expect(screen.getByRole('heading', { name: /January 2026/ })).toBeTruthy()
+      await userEvent.click(screen.getByRole('button', { name: 'Next month' }))
+
+      expect(
+        (screen.getByRole('button', { name: 'Next month' }) as HTMLButtonElement).disabled,
+      ).toBe(true)
+    })
+
+    it('does not allow moving past the current month', async () => {
+      renderWorkLog()
+      await screen.findByRole('grid')
+
+      expect(
+        (screen.getByRole('button', { name: 'Next month' }) as HTMLButtonElement).disabled,
+      ).toBe(true)
+    })
+
+    it('makes every day of a past month clickable', async () => {
+      entries = [entry('2026-01-15', 8)]
+      renderWorkLog('/work-log?month=2026-01')
+
+      const grid = await screen.findByRole('grid')
+
+      expect(within(grid).getAllByRole('button')).toHaveLength(31)
+      expect(within(grid).getAllByRole('button').some((cell) => cell.hasAttribute('disabled'))).toBe(
+        false,
+      )
+    })
+
+    it('opens the month given in the URL', async () => {
+      entries = [entry('2026-01-15', 8)]
+      renderWorkLog('/work-log?month=2026-01')
+
+      expect((await day('2026-01-15')).getAttribute('data-status')).toBe('equal')
+      expect(screen.getByRole('heading', { name: /January 2026/ })).toBeTruthy()
+    })
   })
 
   it('formats pay in the account currency', async () => {
     entries = [entry(`${THIS_MONTH}-01`, 1)]
     renderWorkLog()
 
-    const row = (await screen.findAllByRole('row'))[1]
-
     // Vietnamese dong has no decimals and is shown with its symbol.
-    expect(within(row).getByText(/30,000/)).toBeTruthy()
+    expect((await day(`${THIS_MONTH}-01`)).textContent).toMatch(/30,000/)
+  })
+
+  it('renders in Vietnamese', async () => {
+    await i18n.changeLanguage('vi')
+    renderWorkLog()
+
+    expect(await screen.findByRole('heading', { name: vi_.workLog.title, level: 1 })).toBeTruthy()
+    expect(await screen.findByRole('region', { name: vi_.settings.work.title })).toBeTruthy()
   })
 })
