@@ -15,15 +15,18 @@ import {
 import Button from '../ui/Button'
 import Card from '../ui/Card'
 import TextField from '../ui/TextField'
-import SaveStatus from './SaveStatus'
+import SaveStatus from '../settings/SaveStatus'
 
-interface WorkSectionProps {
+interface WorkSettingsCardProps {
   settings: Settings
   currency: string
 }
 
-/** Hourly wage and usual hours per day, which the work log copies into each entry. */
-export default function WorkSection({ settings, currency }: WorkSectionProps) {
+/**
+ * Hourly wage and usual hours per day, which the work log copies into each entry. It sits at the
+ * bottom of the Work log; `#work-settings` links to it.
+ */
+export default function WorkSettingsCard({ settings, currency }: WorkSettingsCardProps) {
   const { t } = useTranslation()
   const save = useUpdateSettings()
   const schema = useMemo(() => workFormSchema(currency), [currency])
@@ -52,7 +55,7 @@ export default function WorkSection({ settings, currency }: WorkSectionProps) {
   })
 
   return (
-    <Card title={t('settings.work.title')}>
+    <Card id="work-settings" title={t('settings.work.title')}>
       <p className="text-sm text-muted-foreground">{t('settings.work.description')}</p>
       <form className="flex flex-col gap-4" noValidate onSubmit={(event) => void onSubmit(event)}>
         <div className="grid gap-4 sm:grid-cols-2">

@@ -10,6 +10,7 @@ import {
   isIsoDate,
   isIsoMonth,
   isoWeekday,
+  monthGrid,
   monthOf,
   todayIn,
   weekdayNames,
@@ -122,5 +123,61 @@ describe('formatTime', () => {
     // 03:30 UTC is 10:30 in Ho Chi Minh City and 14:30 in Sydney.
     expect(formatTime('2026-11-12T03:30:00Z', 'en-GB', 'Asia/Ho_Chi_Minh')).toBe('10:30')
     expect(formatTime('2026-11-12T03:30:00Z', 'en-GB', 'Australia/Sydney')).toBe('14:30')
+  })
+})
+
+describe('monthGrid', () => {
+  const flat = (month: string) => monthGrid(month).flat()
+  const days = (month: string) => flat(month).filter((cell) => cell !== null)
+
+  it('starts each week on Monday and pads with null', () => {
+    // 1 November 2026 is a Sunday, so it ends the first row after six empty cells.
+    const grid = monthGrid('2026-11')
+
+    expect(grid[0]).toEqual([null, null, null, null, null, null, '2026-11-01'])
+    expect(grid[1][0]).toBe('2026-11-02')
+    expect(grid[grid.length - 1]).toEqual(['2026-11-30', null, null, null, null, null, null])
+  })
+
+  it('puts a month that starts on Monday in the first column', () => {
+    // 1 June 2026 is a Monday.
+    const grid = monthGrid('2026-06')
+
+    expect(grid[0][0]).toBe('2026-06-01')
+    expect(grid).toHaveLength(5)
+    expect(grid[4]).toEqual(['2026-06-29', '2026-06-30', null, null, null, null, null])
+  })
+
+  it('has 29 days in February of a leap year and 28 otherwise', () => {
+    expect(days('2028-02')).toHaveLength(29)
+    expect(days('2026-02')).toHaveLength(28)
+    // February 2027 starts on a Monday and has 28 days: exactly four full rows.
+    expect(monthGrid('2027-02')).toHaveLength(4)
+  })
+
+  it('lists every day of 30- and 31-day months once, in order, in rows of seven', () => {
+    for (const [month, count] of [
+      ['2026-04', 30],
+      ['2026-12', 31],
+    ] as const) {
+      const listed = days(month)
+      expect(listed).toHaveLength(count)
+      expect(listed[0]).toBe(`${month}-01`)
+      expect(listed[count - 1]).toBe(`${month}-${count}`)
+      expect([...listed].sort()).toEqual(listed)
+      for (const row of monthGrid(month)) {
+        expect(row).toHaveLength(7)
+      }
+    }
+  })
+
+  it('places every date under its own weekday column', () => {
+    for (const row of monthGrid('2026-11')) {
+      row.forEach((cell, column) => {
+        if (cell !== null) {
+          expect(isoWeekday(cell)).toBe(column + 1)
+        }
+      })
+    }
   })
 })

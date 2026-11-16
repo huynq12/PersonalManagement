@@ -87,6 +87,29 @@ export function addMonths(month: IsoMonth, delta: number): IsoMonth {
   return `${String(newYear).padStart(4, '0')}-${String(newMonth).padStart(2, '0')}`
 }
 
+/**
+ * The weeks of a month for a calendar grid: rows of seven cells, Monday first. Cells before the
+ * 1st and after the last day are `null`.
+ */
+export function monthGrid(month: IsoMonth): (IsoDate | null)[][] {
+  const first = `${month}-01`
+  const cells: (IsoDate | null)[] = Array.from<IsoDate | null>({
+    length: isoWeekday(first) - 1,
+  }).fill(null)
+  for (let day = first; monthOf(day) === month; day = addDays(day, 1)) {
+    cells.push(day)
+  }
+  while (cells.length % 7 !== 0) {
+    cells.push(null)
+  }
+
+  const weeks: (IsoDate | null)[][] = []
+  for (let start = 0; start < cells.length; start += 7) {
+    weeks.push(cells.slice(start, start + 7))
+  }
+  return weeks
+}
+
 /** A localized month and year such as "November 2026". */
 export function formatMonth(month: IsoMonth, language: string | undefined): string {
   return new Intl.DateTimeFormat(language, {

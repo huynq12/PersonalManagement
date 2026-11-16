@@ -266,27 +266,9 @@
       "next": "Next month"
     },
     "form": {
-      "title": "Log hours",
-      "editTitle": "Edit entry",
-      "date": "Date",
       "hours": "Hours",
       "hoursHint": "Up to two decimals, such as 7.5.",
-      "note": "Note",
-      "save": "Save entry",
-      "cancelEdit": "Cancel editing"
-    },
-    "list": {
-      "title": "Entries",
-      "date": "Date",
-      "hours": "Hours",
-      "pay": "Pay",
-      "comparison": "Compared with base",
-      "total": "Total",
-      "daysWorked_one": "{{count}} day",
-      "daysWorked_other": "{{count}} days",
-      "empty": "No hours logged this month.",
-      "edit": "Edit {{date}}",
-      "delete": "Delete {{date}}"
+      "note": "Note"
     },
     "comparison": {
       "above": "Above base",
@@ -295,13 +277,38 @@
     },
     "setup": {
       "title": "Set your wage first",
-      "description": "The work log needs your hourly wage and base hours to compute pay.",
-      "link": "Open Settings"
+      "description": "The work log needs your hourly wage and base hours to compute pay. Set them in the card at the bottom of this page.",
+      "link": "Go to work settings"
     },
     "deleteDialog": {
       "title": "Delete this entry?",
       "description": "The entry for {{date}} will be removed. This cannot be undone.",
       "confirm": "Delete"
+    },
+    "summary": {
+      "title": "Month totals",
+      "hours": "Total hours",
+      "pay": "Total pay",
+      "days": "Days worked",
+      "daysWorked_one": "{{count}} day",
+      "daysWorked_other": "{{count}} days"
+    },
+    "calendar": {
+      "label": "Days of the month",
+      "section": "Calendar",
+      "hoursShort": "{{hours}}h",
+      "entry_one": "{{date}}: {{hours}} hour, {{pay}}, {{status}}",
+      "entry_other": "{{date}}: {{hours}} hours, {{pay}}, {{status}}",
+      "empty": "{{date}}: no hours logged",
+      "future": "{{date}}: not available yet"
+    },
+    "legend": {
+      "title": "Calendar colors",
+      "none": "No hours logged"
+    },
+    "dialog": {
+      "delete": "Delete",
+      "snapshot": "Wage {{wage}} per hour and {{hours}} base hours, kept from when this entry was created."
     }
   },
   "finances": {

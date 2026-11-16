@@ -266,27 +266,9 @@
       "next": "Tháng sau"
     },
     "form": {
-      "title": "Ghi giờ làm",
-      "editTitle": "Sửa mục",
-      "date": "Ngày",
       "hours": "Số giờ",
       "hoursHint": "Tối đa hai chữ số thập phân, ví dụ 7,5.",
-      "note": "Ghi chú",
-      "save": "Lưu mục",
-      "cancelEdit": "Hủy sửa"
-    },
-    "list": {
-      "title": "Các mục",
-      "date": "Ngày",
-      "hours": "Số giờ",
-      "pay": "Tiền công",
-      "comparison": "So với giờ chuẩn",
-      "total": "Tổng",
-      "daysWorked_one": "{{count}} ngày",
-      "daysWorked_other": "{{count}} ngày",
-      "empty": "Tháng này chưa có giờ làm nào.",
-      "edit": "Sửa {{date}}",
-      "delete": "Xóa {{date}}"
+      "note": "Ghi chú"
     },
     "comparison": {
       "above": "Hơn giờ chuẩn",
@@ -295,13 +277,38 @@
     },
     "setup": {
       "title": "Hãy đặt mức lương trước",
-      "description": "Nhật ký công việc cần lương theo giờ và số giờ làm chuẩn để tính tiền công.",
-      "link": "Mở Cài đặt"
+      "description": "Nhật ký công việc cần lương theo giờ và số giờ làm chuẩn để tính tiền công. Hãy nhập chúng ở thẻ cuối trang này.",
+      "link": "Đến phần cài đặt công việc"
     },
     "deleteDialog": {
       "title": "Xóa mục này?",
       "description": "Mục của ngày {{date}} sẽ bị xóa. Không thể hoàn tác.",
       "confirm": "Xóa"
+    },
+    "summary": {
+      "title": "Tổng kết tháng",
+      "hours": "Tổng số giờ",
+      "pay": "Tổng tiền công",
+      "days": "Số ngày làm",
+      "daysWorked_one": "{{count}} ngày",
+      "daysWorked_other": "{{count}} ngày"
+    },
+    "calendar": {
+      "label": "Các ngày trong tháng",
+      "section": "Lịch",
+      "hoursShort": "{{hours}}h",
+      "entry_one": "{{date}}: {{hours}} giờ, {{pay}}, {{status}}",
+      "entry_other": "{{date}}: {{hours}} giờ, {{pay}}, {{status}}",
+      "empty": "{{date}}: chưa ghi giờ",
+      "future": "{{date}}: chưa thể ghi"
+    },
+    "legend": {
+      "title": "Màu trên lịch",
+      "none": "Chưa ghi giờ"
+    },
+    "dialog": {
+      "delete": "Xóa",
+      "snapshot": "Lương {{wage}} mỗi giờ và {{hours}} giờ chuẩn, giữ nguyên từ lúc tạo mục này."
     }
   },
   "finances": {

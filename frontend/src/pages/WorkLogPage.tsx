@@ -5,19 +5,29 @@ import Alert from '../components/ui/Alert'
 import Button from '../components/ui/Button'
 import DeleteWorkEntryDialog from '../components/work/DeleteWorkEntryDialog'
 import MonthPicker from '../components/work/MonthPicker'
-import WorkEntryFormCard from '../components/work/WorkEntryForm'
-import WorkEntryList from '../components/work/WorkEntryList'
+import WorkCalendar from '../components/work/WorkCalendar'
+import WorkEntryDialog from '../components/work/WorkEntryDialog'
+import WorkLegend from '../components/work/WorkLegend'
+import WorkSettingsCard from '../components/work/WorkSettingsCard'
 import WorkSetupNotice from '../components/work/WorkSetupNotice'
+import WorkSummary from '../components/work/WorkSummary'
 import { useSession } from '../hooks/useSession'
 import { useSettings } from '../hooks/useSettings'
 import { usePutWorkEntry, useWorkEntries } from '../hooks/useWorkEntries'
 import { errorMessageKey } from '../i18n/errorMessage'
 import { ApiError } from '../lib/api'
-import { isIsoMonth, monthOf, todayIn, type IsoMonth } from '../lib/dates'
+import { isIsoMonth, monthOf, todayIn, type IsoDate, type IsoMonth } from '../lib/dates'
 import { WORK_SETTINGS_MISSING, type WorkEntry } from '../lib/workEntries'
 
+/** The day whose dialog is open, with its entry when there is one. */
+interface SelectedDay {
+  date: IsoDate
+  entry: WorkEntry | null
+}
+
 /**
- * The Work log screen: hours per day with the pay they earn, for one month at a time.
+ * The Work log screen: a calendar of the month's days with the hours and pay of each, a summary
+ * of the month, and the wage and base hours the pay is computed from.
  *
  * The month comes from the URL (`/work-log?month=YYYY-MM`); without it, or with a value that
  * is invalid or in the future, the screen shows the current month.
@@ -28,7 +38,7 @@ export default function WorkLogPage() {
   const session = useSession()
   const settings = useSettings()
   const save = usePutWorkEntry()
-  const [editing, setEditing] = useState<WorkEntry | null>(null)
+  const [selected, setSelected] = useState<SelectedDay | null>(null)
   const [deleting, setDeleting] = useState<WorkEntry | null>(null)
 
   // "Today" is the date in the user's time zone, not the browser's. Read the clock once per
@@ -44,7 +54,7 @@ export default function WorkLogPage() {
   const currency = session.data?.currency
 
   const changeMonth = (next: IsoMonth) => {
-    setEditing(null)
+    setSelected(null)
     setSearchParams(next === currentMonth ? {} : { month: next })
   }
 
@@ -55,8 +65,19 @@ export default function WorkLogPage() {
     // Another tab may have cleared the settings after this page loaded them.
     !(save.error instanceof ApiError && save.error.code === WORK_SETTINGS_MISSING)
 
+  const selectDay = (date: IsoDate, entry: WorkEntry | null) => {
+    if (!canLogHours) {
+      // Without a wage there is nothing to log yet: take the user to the card that sets it.
+      document.getElementById('work-settings')?.scrollIntoView?.({ behavior: 'smooth' })
+      return
+    }
+    // An error from the last save belongs to that day, not to this one.
+    save.reset()
+    setSelected({ date, entry })
+  }
+
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 md:px-8 md:py-8">
+    <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-6 md:px-8 md:py-8">
       <header className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">{t('workLog.title')}</h1>
         <p className="text-sm text-muted-foreground">{t('workLog.description')}</p>
@@ -73,19 +94,7 @@ export default function WorkLogPage() {
         </div>
       ) : (
         <>
-          {canLogHours ? (
-            <WorkEntryFormCard
-              // A different entry (or none) starts the form over with its own values.
-              key={editing?.date ?? 'new'}
-              today={today}
-              editing={editing}
-              save={save}
-              onCancelEdit={() => setEditing(null)}
-              onSaved={() => setEditing(null)}
-            />
-          ) : (
-            <WorkSetupNotice />
-          )}
+          {canLogHours ? null : <WorkSetupNotice />}
 
           <MonthPicker month={month} latest={currentMonth} onChange={changeMonth} />
 
@@ -99,16 +108,46 @@ export default function WorkLogPage() {
               </Button>
             </div>
           ) : (
-            <WorkEntryList
-              month={entries.data}
-              currency={currency}
-              onEdit={canLogHours ? setEditing : undefined}
-              onDelete={setDeleting}
-            />
+            <>
+              <WorkSummary month={entries.data} currency={currency} />
+              <section aria-label={t('workLog.calendar.section')} className="flex flex-col gap-3">
+                <WorkLegend />
+                <WorkCalendar
+                  month={entries.data}
+                  monthKey={month}
+                  today={today}
+                  currency={currency}
+                  onSelectDay={selectDay}
+                />
+              </section>
+            </>
           )}
+
+          <WorkSettingsCard
+            // A new currency changes how the saved wage is written, so start the form over.
+            key={`work-${currency}`}
+            settings={settings.data}
+            currency={currency}
+          />
         </>
       )}
 
+      {selected && canLogHours && currency ? (
+        <WorkEntryDialog
+          // A different day starts the form over with its own values.
+          key={selected.date}
+          date={selected.date}
+          today={today}
+          entry={selected.entry}
+          currency={currency}
+          save={save}
+          onClose={() => setSelected(null)}
+          onDelete={(entry) => {
+            setSelected(null)
+            setDeleting(entry)
+          }}
+        />
+      ) : null}
       {deleting ? (
         <DeleteWorkEntryDialog entry={deleting} onClose={() => setDeleting(null)} />
       ) : null}
