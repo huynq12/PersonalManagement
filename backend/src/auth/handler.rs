@@ -177,9 +177,10 @@ pub(super) async fn google_callback(
 
 /// Builds the refresh cookie.
 ///
-/// `HttpOnly` keeps the token away from JavaScript. Behind HTTPS the frontend and the API live
-/// on different sites, so the cookie must be `SameSite=None; Secure` to be sent at all; in
-/// local development both run on `localhost`, where `Lax` is enough.
+/// `HttpOnly` keeps the token away from JavaScript. Behind HTTPS the cookie is
+/// `SameSite=None; Secure`, so it is also sent if the frontend calls the API on another site;
+/// in production the frontend proxies `/api` and the cookie is first-party anyway. In local
+/// development both run on `localhost`, where `Lax` is enough.
 fn refresh_cookie(config: &Config, refresh_token: String) -> Cookie<'static> {
     Cookie::build((REFRESH_COOKIE, refresh_token))
         .http_only(true)

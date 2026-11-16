@@ -50,7 +50,7 @@ GitHub ── push ──► GitHub Actions: test, build image, deploy
 | Database | PostgreSQL. The running app (development and production) uses a Supabase-hosted database; tests and CI use a disposable PostgreSQL in Docker. Supabase is used only as a PostgreSQL host, not for Supabase Auth or its client libraries. |
 | Frontend | Vite, React, TypeScript, React Router, TanStack Query, Zod, React Hook Form, Tailwind CSS, i18next, a chart library (Recharts) |
 | Operations | Docker multi-stage builds, GitHub Actions |
-| Hosting (free) | Frontend: Cloudflare Pages or Vercel. Backend: Render or Koyeb. Database: Supabase. Free-tier terms must be re-checked at deployment time. |
+| Hosting (free) | Frontend: Vercel. Backend: Render (Docker web service). Database: Supabase. Free-tier terms must be re-checked at deployment time. `docs/DEPLOYMENT.md` is the step-by-step guide. |
 
 ### Repository layout
 
@@ -66,6 +66,7 @@ The backend is organized by feature: each feature is a directory under `backend/
 - **Money:** each user has one `currency` (an ISO 4217 code, default `VND`) chosen from a fixed list: `VND`, `USD`, `EUR`, `GBP`, `JPY`, `KRW`, `CNY`, `SGD`, `THB`, `AUD`. Every amount is a `bigint` in the currency's minor unit (dong for VND, cents for USD) and travels as a JSON integer; floating point is never used for money. The frontend formats amounts with `Intl.NumberFormat`. Changing the currency does not convert existing amounts; Settings warns about this.
 - **Auth:** a short-lived JWT access token (15 minutes) sent in the `Authorization` header; a long-lived random refresh token (30 days) stored in an `httpOnly`, `Secure` cookie, rotated on every refresh, with only its hash stored in the database.
 - **Tokens in the browser:** the access token is kept in memory only, never in `localStorage`. On page load the frontend calls `/auth/refresh` to restore the session from the refresh cookie, and it repeats that call once when the API answers 401 `unauthorized`. Refresh calls never overlap, within a tab or across tabs, because a reused refresh token revokes the session.
+- **One origin in the browser:** the frontend host forwards `/api/*` to the backend (a Vercel rewrite in production, the Vite proxy in development), so the browser only talks to the frontend's origin. The refresh cookie is therefore a first-party cookie, which browsers that block or partition third-party cookies (Safari, Firefox) still send. The frontend calls the API with relative URLs; `VITE_API_URL` stays empty.
 - **Access token signing:** HS256 with a symmetric secret read from the `JWT_SECRET` environment variable.
 - **Refresh token reuse:** every sign-in starts a token family. Presenting a refresh token that was already rotated is treated as theft: the request gets 401 and every token in that family is revoked. Other sign-ins (other devices) are not affected.
 - **Passwords:** 8 to 128 characters with no composition rules (NIST SP 800-63B), hashed with Argon2id.
@@ -465,6 +466,6 @@ Status as of 2026-11-14, describing what is merged into `main`. Update the Statu
 | 7 | Settings endpoint and screen, currency, then the work log. | Done: the settings API, currency, Google linking, the work log, and the Settings screen (profile, time zone, language, sign out). |
 | 8 | Finances (categories, transactions, monthly summary, budget). | Done, including the money card on the Today screen (`work` and `expense_total` in `GET /days/{date}`). |
 | 9 | Weekly statistics. | Done: `GET /stats/weekly` and the `/stats` screen. |
-| 10 | OpenAPI, deployment. | Not started: a backend Dockerfile and a Vercel SPA config exist; there is no OpenAPI document, and nothing is deployed. |
+| 10 | OpenAPI, deployment. | In progress: the backend Dockerfile, the Vercel config (SPA fallback and the `/api` rewrite), and the deployment guide `docs/DEPLOYMENT.md` exist; there is no OpenAPI document, and nothing is deployed yet. |
 
-`docs/IMPLEMENTATION_GUIDE.md` breaks steps 5, 7, 8, and 9 (plus the Today money card) into ordered tasks for AI coding agents.
+`docs/IMPLEMENTATION_GUIDE.md` breaks steps 5, 7, 8, and 9 (plus the Today money card) into ordered tasks for AI coding agents. `docs/DEPLOYMENT.md` describes how to deploy the app (step 10).
